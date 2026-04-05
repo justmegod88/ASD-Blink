@@ -3790,6 +3790,7 @@
     });
   </script>
 
+
 <script>
 (function(){
   function initASDPatch(){
@@ -3799,24 +3800,54 @@
     const asdRotateBtn = document.getElementById('asdRotateBtn');
     const asdBlinkBtn = document.getElementById('asdBlinkBtn');
     const asdCameraBtn = document.getElementById('asdCameraBtn');
+    const asdControlBar = document.getElementById('asdControlBar');
+    const asdScene = document.getElementById('asdScene');
+    const asdCameraStage = document.getElementById('asdCameraStage');
     const asdCameraVideo = document.getElementById('asdCameraVideo');
     const asdGuideAxis = document.getElementById('asdGuideAxis');
     const asdGuideCircle = document.getElementById('asdGuideCircle');
     const asdGuideDotLeft = document.getElementById('asdGuideDotLeft');
     const asdGuideDotRight = document.getElementById('asdGuideDotRight');
-    const asdEyeMV = document.getElementById('asdEyeMV');
-    const asdUpperLid = document.getElementById('asdUpperLid');
     const asdLensImg = document.getElementById('asdLensImg');
     const asdAngleBadge = document.getElementById('asdAngleBadge');
 
-    if(!missionASD || !asdOverlay || !asdRotateBtn || !asdBlinkBtn || !asdCameraBtn || !asdCameraVideo || !asdLensImg || !asdAngleBadge){
+    if(!missionASD || !asdOverlay || !asdRotateBtn || !asdBlinkBtn || !asdCameraBtn || !asdCameraVideo || !asdLensImg || !asdAngleBadge || !asdScene || !asdControlBar){
       return;
     }
 
-    let asdCameraStream = null;
+    let asdRearStream = null;
+    let asdFrontStream = null;
     let asdCameraOn = false;
+    let asdAutoMode = false;
     let asdAngleValue = 20;
     let asdBlinkBusy = false;
+    let detectRAF = null;
+    let blinkState = 'open';
+    let baselineBrightness = null;
+    let cooldownUntil = 0;
+
+    const asdAutoBtn = document.createElement('button');
+    asdAutoBtn.id = 'asdAutoBtn';
+    asdAutoBtn.className = 'asdActionBtn';
+    asdAutoBtn.type = 'button';
+    asdAutoBtn.textContent = '깜박임 자동인식';
+    asdControlBar.insertBefore(asdAutoBtn, asdCameraBtn);
+
+    const captureImg = document.createElement('img');
+    captureImg.id = 'asdCaptureFrame';
+    captureImg.alt = 'Rear camera capture';
+    asdCameraStage.appendChild(captureImg);
+
+    const frontPip = document.createElement('div');
+    frontPip.id = 'asdFrontPip';
+    frontPip.innerHTML = '<video id="asdFrontVideo" autoplay playsinline muted></video><div id="asdFrontPipLabel">전면 카메라</div>';
+    asdScene.appendChild(frontPip);
+    const asdFrontVideo = frontPip.querySelector('#asdFrontVideo');
+
+    const detectCanvas = document.createElement('canvas');
+    detectCanvas.width = 96;
+    detectCanvas.height = 72;
+    const detectCtx = detectCanvas.getContext('2d', { willReadFrequently:true });
 
     function syncAngleFromGlobal(){
       if (typeof window.asdAngle === 'number') asdAngleValue = window.asdAngle;
@@ -3831,13 +3862,12 @@
 
       const centerX = 50;
       const centerY = 52;
-      const outerRadius = 40;   // outer circle radius -> 10%/90%
-      const cyanRadius = 31.2;  // inner boundary where cyan marks should sit
+      const outerRadius = 40;
+      const cyanRadius = 31.2;
       const rad = asdAngleValue * Math.PI / 180;
       const cos = Math.cos(rad);
       const sin = Math.sin(rad);
 
-      // Yellow/green dots: exact dashed-line endpoints on the outer circle
       const leftX = centerX - outerRadius * cos;
       const leftY = centerY - outerRadius * sin;
       const rightX = centerX + outerRadius * cos;
@@ -3850,7 +3880,6 @@
         asdGuideDotRight.style.top = `${rightY}%`;
       }
 
-      // Cyan marks: larger, clearer, and attached to the inner boundary
       const asdGuideSideLeft = document.getElementById('asdGuideSideLeft');
       const asdGuideSideRight = document.getElementById('asdGuideSideRight');
       if (asdGuideSideLeft && asdGuideSideRight){
@@ -3869,6 +3898,17 @@
       }
     }
 
+    function updateButtons(){
+      if (asdCameraOn){
+        asdBlinkBtn.textContent = '깜박임 수동';
+        asdAutoBtn.style.display = 'inline-flex';
+      } else {
+        asdBlinkBtn.textContent = '깜박임 실행';
+        asdAutoBtn.style.display = 'none';
+      }
+      asdAutoBtn.classList.toggle('active', asdAutoMode);
+    }
+
     function renderAngle(){
       syncAngleFromGlobal();
       asdAngleValue = typeof window.asdAngle === 'number' ? window.asdAngle : asdAngleValue;
@@ -3882,8 +3922,13 @@
       }
       asdOverlay.classList.toggle('asd-stable', Math.abs(asdAngleValue) === 0);
       renderGuide();
-      if (asdCameraOn && asdCameraVideo){
-        const blur = Math.min(8, Math.abs(asdAngleValue) * 0.16);
+
+      const blur = Math.min(8, Math.abs(asdAngleValue) * 0.18);
+      if (asdAutoMode && captureImg.src){
+        captureImg.style.filter = Math.abs(asdAngleValue) === 0
+          ? 'blur(0px) saturate(1.02) brightness(1.02)'
+          : `blur(${blur.toFixed(2)}px) saturate(.92)`;
+      } else if (asdCameraOn && asdCameraVideo){
         asdCameraVideo.style.filter = Math.abs(asdAngleValue) === 0
           ? 'blur(0px) saturate(1.02) brightness(1.02)'
           : `blur(${blur.toFixed(2)}px) saturate(.92)`;
@@ -3896,17 +3941,64 @@
       renderAngle();
     }
 
-    async function startASDCamera(){
+    function stopRearStream(){
+      if (asdRearStream){
+        asdRearStream.getTracks().forEach(track => track.stop());
+        asdRearStream = null;
+      }
+      try{ asdCameraVideo.pause(); }catch(e){}
+      asdCameraVideo.srcObject = null;
+      asdCameraVideo.classList.remove('ready');
+    }
+
+    function stopFrontStream(){
+      if (asdFrontStream){
+        asdFrontStream.getTracks().forEach(track => track.stop());
+        asdFrontStream = null;
+      }
+      try{ asdFrontVideo.pause(); }catch(e){}
+      asdFrontVideo.srcObject = null;
+      baselineBrightness = null;
+      blinkState = 'open';
+      cooldownUntil = 0;
+    }
+
+    function stopDetectLoop(){
+      if (detectRAF){
+        cancelAnimationFrame(detectRAF);
+        detectRAF = null;
+      }
+    }
+
+    function exitAutoMode(options = {}){
+      const keepRear = !!options.keepRear;
+      stopDetectLoop();
+      stopFrontStream();
+      asdAutoMode = false;
+      asdScene.classList.remove('auto-front');
+      asdCameraVideo.style.opacity = '';
+      captureImg.removeAttribute('src');
+      captureImg.style.filter = '';
+      if (!keepRear && asdCameraOn){
+        // nothing else
+      }
+      updateButtons();
+      renderAngle();
+    }
+
+    async function startRearCamera(){
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
         alert('이 브라우저에서는 카메라 기능을 지원하지 않습니다.');
-        return;
+        return false;
       }
       try{
+        stopFrontStream();
+        stopRearStream();
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' },
+          video: { facingMode: { ideal:'environment' } },
           audio: false
         });
-        asdCameraStream = stream;
+        asdRearStream = stream;
         asdCameraVideo.classList.remove('ready');
         asdCameraVideo.srcObject = stream;
         const markReady = function(){
@@ -3916,25 +4008,130 @@
         asdCameraVideo.onloadedmetadata = markReady;
         asdCameraVideo.onloadeddata = markReady;
         asdCameraOn = true;
+        asdAutoMode = false;
         asdOverlay.classList.add('camera-on');
         asdCameraBtn.classList.add('active');
+        asdScene.classList.remove('auto-front');
+        updateButtons();
         renderAngle();
+        return true;
       }catch(e){
         alert('카메라 권한을 허용해야 사용할 수 있습니다.');
+        return false;
       }
     }
 
     function stopASDCamera(){
-      if (asdCameraStream){
-        asdCameraStream.getTracks().forEach(track => track.stop());
-        asdCameraStream = null;
-      }
-      try{ asdCameraVideo.pause(); }catch(e){}
-      asdCameraVideo.srcObject = null;
-      asdCameraVideo.classList.remove('ready');
+      exitAutoMode({ keepRear:false });
+      stopRearStream();
       asdCameraOn = false;
       asdOverlay.classList.remove('camera-on');
       asdCameraBtn.classList.remove('active');
+      updateButtons();
+    }
+
+    function captureRearFrame(){
+      if (!asdRearStream || !asdCameraVideo.videoWidth || !asdCameraVideo.videoHeight) return false;
+      const canvas = document.createElement('canvas');
+      canvas.width = asdCameraVideo.videoWidth;
+      canvas.height = asdCameraVideo.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(asdCameraVideo, 0, 0, canvas.width, canvas.height);
+      captureImg.src = canvas.toDataURL('image/jpeg', 0.92);
+      return true;
+    }
+
+    async function startFrontCameraForAuto(){
+      try{
+        stopFrontStream();
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user' },
+          audio: false
+        });
+        asdFrontStream = stream;
+        asdFrontVideo.srcObject = stream;
+        try{ await asdFrontVideo.play(); }catch(e){}
+        return true;
+      }catch(e){
+        alert('전면 카메라 권한을 허용해야 자동인식을 사용할 수 있습니다.');
+        return false;
+      }
+    }
+
+    function applyStabilizeStep(){
+      if (asdBlinkBusy) return;
+      asdBlinkBusy = true;
+
+      if (asdAngleValue > 0) asdAngleValue = Math.max(0, asdAngleValue - 5);
+      else if (asdAngleValue < 0) asdAngleValue = Math.min(0, asdAngleValue + 5);
+
+      writeAngleToGlobal();
+      renderAngle();
+      setTimeout(function(){ asdBlinkBusy = false; }, 260);
+    }
+
+    function computeBrightness(){
+      if (!asdFrontVideo.videoWidth || !asdFrontVideo.videoHeight) return null;
+      detectCtx.drawImage(asdFrontVideo, 0, 0, detectCanvas.width, detectCanvas.height);
+      const data = detectCtx.getImageData(20, 16, 56, 40).data;
+      let sum = 0;
+      let count = 0;
+      for (let i = 0; i < data.length; i += 4){
+        const y = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+        sum += y;
+        count++;
+      }
+      return count ? sum / count : null;
+    }
+
+    function detectBlinkLoop(){
+      if (!asdAutoMode || !asdFrontStream){
+        stopDetectLoop();
+        return;
+      }
+      const b = computeBrightness();
+      if (b != null){
+        if (baselineBrightness == null){
+          baselineBrightness = b;
+        } else {
+          if (blinkState === 'open'){
+            baselineBrightness = baselineBrightness * 0.92 + b * 0.08;
+            if (b < baselineBrightness * 0.72 && performance.now() > cooldownUntil){
+              blinkState = 'closed';
+            }
+          } else if (blinkState === 'closed'){
+            if (b > baselineBrightness * 0.88){
+              blinkState = 'open';
+              cooldownUntil = performance.now() + 700;
+              applyStabilizeStep();
+            }
+          }
+        }
+      }
+      detectRAF = requestAnimationFrame(detectBlinkLoop);
+    }
+
+    async function enterAutoMode(){
+      if (!asdCameraOn){
+        const ok = await startRearCamera();
+        if (!ok) return;
+      }
+      if (!asdRearStream){
+        const ok = await startRearCamera();
+        if (!ok) return;
+      }
+      if (!captureRearFrame()){
+        alert('후면 카메라 화면을 먼저 불러온 뒤 다시 시도해 주세요.');
+        return;
+      }
+      const okFront = await startFrontCameraForAuto();
+      if (!okFront) return;
+      asdAutoMode = true;
+      asdScene.classList.add('auto-front');
+      updateButtons();
+      renderAngle();
+      stopDetectLoop();
+      detectBlinkLoop();
     }
 
     function openASDPatched(e){
@@ -3946,6 +4143,7 @@
         asdOverlay.setAttribute('aria-hidden','false');
       }
       resetASDPatchedState();
+      updateButtons();
     }
 
     function closeASDPatched(e){
@@ -3984,29 +4182,36 @@
       writeAngleToGlobal();
       renderAngle();
     };
+
     asdBlinkBtn.onclick = function(ev){
       ev.preventDefault();
       ev.stopPropagation();
-      if (asdBlinkBusy) return;
-
-      asdBlinkBusy = true;
-
-      if (asdAngleValue > 0) asdAngleValue = Math.max(0, asdAngleValue - 5);
-      else if (asdAngleValue < 0) asdAngleValue = Math.min(0, asdAngleValue + 5);
-
-      writeAngleToGlobal();
-      renderAngle();
-
-      setTimeout(function(){ asdBlinkBusy = false; }, 260);
+      applyStabilizeStep();
     };
+
+    asdAutoBtn.onclick = async function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (asdAutoMode){
+        exitAutoMode({ keepRear:true });
+        await startRearCamera();
+      } else {
+        await enterAutoMode();
+      }
+    };
+
     asdCameraBtn.onclick = async function(ev){
       ev.preventDefault();
       ev.stopPropagation();
-      if (asdCameraOn) stopASDCamera();
-      else await startASDCamera();
+      if (asdCameraOn){
+        stopASDCamera();
+      } else {
+        await startRearCamera();
+      }
     };
 
     window.addEventListener('beforeunload', stopASDCamera);
+    updateButtons();
     renderAngle();
   }
 
@@ -4019,330 +4224,5 @@
 </script>
 
 
-<style>
-  #asdControlBar.asd-basic-mode{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 56px !important;gap:10px !important;align-items:center;}
-  #asdControlBar.asd-camera-mode{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 56px !important;gap:8px !important;align-items:center;}
-  #asdAutoBtn{display:none;}
-  #asdControlBar.asd-camera-mode #asdAutoBtn{display:flex;}
-  #asdControlBar.asd-basic-mode #asdBlinkBtn{display:flex;}
-  #asdControlBar.asd-camera-mode #asdBlinkBtn{display:flex;}
-  #asdCameraBtn{grid-column:auto;}
-  #asdAutoCapturedFrame{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:2;background:#dfe6ef;filter:blur(10px) saturate(.94) brightness(.98);transition:filter .28s ease, opacity .28s ease;}
-  #asdAutoFrontWrap{position:absolute;right:14px;top:14px;width:112px;height:152px;border-radius:22px;overflow:hidden;display:none;z-index:8;background:rgba(255,255,255,.92);border:1px solid rgba(37,99,235,.16);box-shadow:0 12px 26px rgba(15,23,42,.18);backdrop-filter:blur(8px);}
-  #asdAutoFrontVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);background:#dfe6ef;}
-  #asdAutoFrontGuide{position:absolute;left:8px;right:8px;bottom:8px;padding:7px 9px;border-radius:999px;text-align:center;font-size:11px;line-height:1.2;font-weight:900;color:#fff;background:rgba(37,99,235,.92);box-shadow:0 6px 12px rgba(37,99,235,.18);}
-  @media (max-width:560px){
-    #asdControlBar.asd-camera-mode{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 52px !important;gap:6px !important;}
-    #asdControlBar.asd-basic-mode{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 52px !important;gap:8px !important;}
-    #asdAutoFrontWrap{right:10px;top:10px;width:104px;height:142px;border-radius:20px;}
-    #asdAutoFrontGuide{font-size:10px;padding:6px 8px;}
-  }
-</style>
-<script>
-(function(){
-  function initASDModeSwitchPatch(){
-    const asdOverlay = document.getElementById('asdOverlay');
-    const asdScene = document.getElementById('asdScene');
-    const asdControlBar = document.getElementById('asdControlBar');
-    const asdRotateBtn = document.getElementById('asdRotateBtn');
-    const asdBlinkBtn = document.getElementById('asdBlinkBtn');
-    const asdCameraBtn = document.getElementById('asdCameraBtn');
-    const asdCameraVideo = document.getElementById('asdCameraVideo');
-    const asdGuideAxis = document.getElementById('asdGuideAxis');
-    const asdGuideCircle = document.getElementById('asdGuideCircle');
-    const asdGuideDotLeft = document.getElementById('asdGuideDotLeft');
-    const asdGuideDotRight = document.getElementById('asdGuideDotRight');
-    const asdGuideSideLeft = document.getElementById('asdGuideSideLeft');
-    const asdGuideSideRight = document.getElementById('asdGuideSideRight');
-    const asdLensImg = document.getElementById('asdLensImg');
-    const asdAngleBadge = document.getElementById('asdAngleBadge');
-    const asdHint = document.getElementById('asdHint');
-    if(!asdOverlay || !asdScene || !asdControlBar || !asdRotateBtn || !asdBlinkBtn || !asdCameraBtn || !asdCameraVideo || !asdLensImg || !asdAngleBadge) return;
-
-    let autoBtn = document.getElementById('asdAutoBtn');
-    if(!autoBtn){
-      autoBtn = document.createElement('button');
-      autoBtn.id = 'asdAutoBtn';
-      autoBtn.type = 'button';
-      autoBtn.className = 'asdActionBtn';
-      autoBtn.textContent = '깜박임 자동인식';
-      asdControlBar.insertBefore(autoBtn, asdCameraBtn);
-    }
-
-    let capturedFrame = document.getElementById('asdAutoCapturedFrame');
-    if(!capturedFrame){
-      capturedFrame = document.createElement('img');
-      capturedFrame.id = 'asdAutoCapturedFrame';
-      capturedFrame.alt = '';
-      asdScene.appendChild(capturedFrame);
-    }
-
-    let frontWrap = document.getElementById('asdAutoFrontWrap');
-    if(!frontWrap){
-      frontWrap = document.createElement('div');
-      frontWrap.id = 'asdAutoFrontWrap';
-      frontWrap.innerHTML = '<video id="asdAutoFrontVideo" autoplay playsinline muted></video><div id="asdAutoFrontGuide">눈을 한 번 깜박여 주세요</div>';
-      asdScene.appendChild(frontWrap);
-    }
-    const frontVideo = document.getElementById('asdAutoFrontVideo');
-    const frontGuide = document.getElementById('asdAutoFrontGuide');
-
-    if(asdHint){
-      const btn = asdHint.querySelector('button');
-      if(btn) btn.style.display = '';
-    }
-
-    let rearStream = null;
-    let frontStream = null;
-    let cameraOn = false;
-    let autoMode = false;
-    let blinkBusy = false;
-    let blinkWatchTimer = null;
-    let prevMetric = null;
-    let blinkArmed = false;
-    let angle = (typeof window.asdAngle === 'number') ? window.asdAngle : 20;
-
-    function renderAngle(){
-      window.asdAngle = angle;
-      if(asdGuideAxis) asdGuideAxis.style.transform = `rotate(${angle}deg)`;
-      if(asdGuideCircle) asdGuideCircle.style.transform = `translate(-50%,-50%) rotate(${(angle*0.18).toFixed(2)}deg)`;
-      const centerX = 50, centerY = 52, outerRadius = 40, cyanRadius = 31.2;
-      const rad = angle * Math.PI / 180;
-      const cos = Math.cos(rad), sin = Math.sin(rad);
-      const leftX = centerX - outerRadius * cos, leftY = centerY - outerRadius * sin;
-      const rightX = centerX + outerRadius * cos, rightY = centerY + outerRadius * sin;
-      if(asdGuideDotLeft){ asdGuideDotLeft.style.left = `${leftX}%`; asdGuideDotLeft.style.top = `${leftY}%`; }
-      if(asdGuideDotRight){ asdGuideDotRight.style.left = `${rightX}%`; asdGuideDotRight.style.top = `${rightY}%`; }
-      const cyanLeftX = centerX - cyanRadius * cos, cyanLeftY = centerY - cyanRadius * sin;
-      const cyanRightX = centerX + cyanRadius * cos, cyanRightY = centerY + cyanRadius * sin;
-      if(asdGuideSideLeft){ asdGuideSideLeft.style.left = `${cyanLeftX}%`; asdGuideSideLeft.style.top = `${cyanLeftY}%`; asdGuideSideLeft.style.transform = `translate(-50%,-50%) rotate(${angle}deg)`; }
-      if(asdGuideSideRight){ asdGuideSideRight.style.left = `${cyanRightX}%`; asdGuideSideRight.style.top = `${cyanRightY}%`; asdGuideSideRight.style.transform = `translate(-50%,-50%) rotate(${angle}deg)`; }
-      asdLensImg.style.transform = `translate(calc(-50% - 4px), calc(-50% + 10px)) rotate(${angle}deg)`;
-      if(angle === 0) asdAngleBadge.textContent = '축 안정';
-      else asdAngleBadge.textContent = `좌측 ${Math.abs(angle)}° 회전 발생`;
-      const stable = angle === 0;
-      asdOverlay.classList.toggle('asd-stable', stable);
-      if(asdGuideDotLeft && asdGuideDotRight){
-        asdGuideDotLeft.style.background = stable ? '#22c55e' : '#f59e0b';
-        asdGuideDotRight.style.background = stable ? '#22c55e' : '#f59e0b';
-      }
-      if(capturedFrame.style.display === 'block'){
-        const blur = Math.min(12, Math.abs(angle) * 0.55);
-        capturedFrame.style.filter = `blur(${blur}px) saturate(.94) brightness(.98)`;
-      }
-    }
-
-    function setBasicModeUI(){
-      asdControlBar.classList.remove('asd-camera-mode');
-      asdControlBar.classList.add('asd-basic-mode');
-      asdBlinkBtn.textContent = '깜박임 실행';
-      autoBtn.style.display = 'none';
-    }
-    function setCameraModeUI(){
-      asdControlBar.classList.remove('asd-basic-mode');
-      asdControlBar.classList.add('asd-camera-mode');
-      asdBlinkBtn.textContent = '깜박임 수동';
-      autoBtn.style.display = 'flex';
-    }
-
-    async function startRearCamera(options = {}){
-      const keepCapturedFrame = !!options.keepCapturedFrame;
-      stopFrontCamera();
-      if(rearStream) stopRearCamera();
-      rearStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}, audio:false});
-      asdCameraVideo.srcObject = rearStream;
-      asdCameraVideo.style.display = 'block';
-      asdCameraVideo.classList.add('ready');
-      asdOverlay.classList.add('camera-on');
-      asdCameraBtn.classList.add('active');
-      cameraOn = true;
-      setCameraModeUI();
-      if(!keepCapturedFrame) capturedFrame.style.display = 'none';
-      frontWrap.style.display = 'none';
-    }
-    function stopRearCamera(){
-      if(rearStream){ rearStream.getTracks().forEach(t=>t.stop()); rearStream = null; }
-      asdCameraVideo.srcObject = null;
-      asdCameraVideo.classList.remove('ready');
-      asdCameraVideo.style.display = '';
-    }
-    async function stopAllCameraMode(){
-      stopBlinkWatch();
-      stopFrontCamera();
-      stopRearCamera();
-      cameraOn = false;
-      autoMode = false;
-      asdOverlay.classList.remove('camera-on');
-      asdCameraBtn.classList.remove('active');
-      capturedFrame.style.display = 'none';
-      frontWrap.style.display = 'none';
-      setBasicModeUI();
-    }
-    function stopFrontCamera(){
-      if(frontStream){ frontStream.getTracks().forEach(t=>t.stop()); frontStream = null; }
-      if(frontVideo) frontVideo.srcObject = null;
-      frontWrap.style.display = 'none';
-    }
-
-    function captureRearFrame(){
-      try{
-        const v = asdCameraVideo;
-        if(!v || !v.videoWidth || !v.videoHeight) return false;
-        const canvas = document.createElement('canvas');
-        canvas.width = v.videoWidth; canvas.height = v.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-        capturedFrame.src = canvas.toDataURL('image/jpeg', 0.92);
-        capturedFrame.style.display = 'block';
-        capturedFrame.style.opacity = '1';
-        renderAngle();
-        return true;
-      } catch(e){ return false; }
-    }
-
-    function playBlinkLid(){
-      const top = document.getElementById('asdLidTop');
-      const bot = document.getElementById('asdLidBot');
-      if(!top || !bot) return;
-      top.style.transition = 'none'; bot.style.transition = 'none';
-      top.style.transform = 'translateY(-110%)'; bot.style.transform = 'translateY(110%)';
-      top.style.opacity = '0'; bot.style.opacity = '0';
-      requestAnimationFrame(()=>{
-        top.style.transition = 'transform 120ms ease, opacity 120ms ease';
-        bot.style.transition = 'transform 120ms ease, opacity 120ms ease';
-        top.style.transform = 'translateY(0%)'; bot.style.transform = 'translateY(0%)';
-        top.style.opacity = '1'; bot.style.opacity = '1';
-        setTimeout(()=>{
-          top.style.transition = 'transform 160ms ease, opacity 160ms ease';
-          bot.style.transition = 'transform 160ms ease, opacity 160ms ease';
-          top.style.transform = 'translateY(-110%)'; bot.style.transform = 'translateY(110%)';
-          top.style.opacity = '0'; bot.style.opacity = '0';
-        },140);
-      });
-    }
-
-    function handleBlinkStep(){
-      if(blinkBusy) return;
-      blinkBusy = true;
-      playBlinkLid();
-      if(angle > 0) angle = Math.max(0, angle - 5);
-      else if(angle < 0) angle = Math.min(0, angle + 5);
-      renderAngle();
-      setTimeout(()=>{ blinkBusy = false; }, 260);
-    }
-
-    async function startFrontForAuto(){
-      stopFrontCamera();
-      frontStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}, audio:false});
-      frontVideo.srcObject = frontStream;
-      frontWrap.style.display = 'block';
-      if(frontGuide) frontGuide.textContent = '눈을 한 번 깜박여 주세요';
-      startBlinkWatch();
-    }
-
-    function stopBlinkWatch(){
-      if(blinkWatchTimer){ clearInterval(blinkWatchTimer); blinkWatchTimer = null; }
-      prevMetric = null; blinkArmed = false;
-    }
-
-    function sampleFrontMetric(){
-      if(!frontVideo || frontVideo.readyState < 2 || !frontVideo.videoWidth) return null;
-      const canvas = document.createElement('canvas');
-      canvas.width = 72; canvas.height = 72;
-      const ctx = canvas.getContext('2d', {willReadFrequently:true});
-      const sx = frontVideo.videoWidth * 0.28;
-      const sy = frontVideo.videoHeight * 0.16;
-      const sw = frontVideo.videoWidth * 0.44;
-      const sh = frontVideo.videoHeight * 0.22;
-      ctx.drawImage(frontVideo, sx, sy, sw, sh, 0, 0, 72, 72);
-      const data = ctx.getImageData(0,0,72,72).data;
-      let sum = 0, count = 0;
-      for(let i=0;i<data.length;i+=16){
-        sum += (data[i] + data[i+1] + data[i+2]) / 3;
-        count++;
-      }
-      return sum / Math.max(1,count);
-    }
-
-    function startBlinkWatch(){
-      stopBlinkWatch();
-      blinkWatchTimer = setInterval(async ()=>{
-        const m = sampleFrontMetric();
-        if(m == null) return;
-        if(prevMetric == null){ prevMetric = m; return; }
-        const delta = Math.abs(m - prevMetric);
-        prevMetric = (prevMetric * 0.6) + (m * 0.4);
-        if(delta > 10) blinkArmed = true;
-        if(blinkArmed && delta < 4){
-          blinkArmed = false;
-          stopBlinkWatch();
-          if(frontGuide) frontGuide.textContent = '깜박임 인식됨';
-          handleBlinkStep();
-          setTimeout(async ()=>{
-            if(angle === 0){
-              capturedFrame.style.filter = 'blur(0px) saturate(1.02) brightness(1.02)';
-            } else {
-              renderAngle();
-            }
-            stopFrontCamera();
-            if(cameraOn) await startRearCamera({ keepCapturedFrame: true });
-          }, 260);
-        }
-      }, 120);
-    }
-
-    async function runAutoMode(){
-      if(!cameraOn || !rearStream){
-        await startRearCamera();
-        await new Promise(r=>setTimeout(r, 350));
-      }
-      const okay = captureRearFrame();
-      if(!okay) return;
-      stopRearCamera();
-      asdOverlay.classList.add('camera-on');
-      asdCameraBtn.classList.add('active');
-      cameraOn = true;
-      setCameraModeUI();
-      autoMode = true;
-      await startFrontForAuto();
-    }
-
-    asdRotateBtn.onclick = function(ev){
-      ev.preventDefault(); ev.stopPropagation();
-      const steps = [-25,-20,-15,-10,-5,5,10,15,20,25];
-      let next = steps[Math.floor(Math.random() * steps.length)];
-      if(next === angle) next = steps[(steps.indexOf(next)+1)%steps.length];
-      angle = next;
-      renderAngle();
-    };
-    asdBlinkBtn.onclick = async function(ev){
-      ev.preventDefault(); ev.stopPropagation();
-      if(cameraOn) handleBlinkStep();
-      else handleBlinkStep();
-    };
-    autoBtn.onclick = async function(ev){
-      ev.preventDefault(); ev.stopPropagation();
-      await runAutoMode();
-    };
-    asdCameraBtn.onclick = async function(ev){
-      ev.preventDefault(); ev.stopPropagation();
-      if(cameraOn) await stopAllCameraMode();
-      else await startRearCamera();
-    };
-
-    const asdClose = document.getElementById('asdClose');
-    if(asdClose){
-      asdClose.addEventListener('click', ()=>{ stopAllCameraMode(); }, true);
-    }
-    asdOverlay.addEventListener('click', function(ev){ if(ev.target === asdOverlay) stopAllCameraMode(); }, true);
-    window.addEventListener('beforeunload', ()=>{ stopAllCameraMode(); });
-
-    setBasicModeUI();
-    renderAngle();
-  }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initASDModeSwitchPatch);
-  else initASDModeSwitchPatch();
-})();
-</script>
 </body>
 </html>
