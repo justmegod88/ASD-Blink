@@ -3,13 +3,12 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>ACUVUE ASD Demo</title>
 <style>
   :root{
     --acuvue-blue:#005EB8;
     --acuvue-blue-deep:#004A93;
-    --acuvue-blue-soft:#1F78D1;
     --bg:#EEF5FC;
     --line:#D7E6F6;
     --text:#0D2640;
@@ -34,275 +33,185 @@
   .screen{ display:none; min-height:100vh; }
   .screen.active{ display:block; }
 
-  /* landing */
   .landing-wrap{ padding:22px 20px 34px; }
   .top-pill{
-    height:62px;
-    border-radius:28px;
-    background:var(--white);
-    border:1.5px solid #dbe8f5;
-    box-shadow:var(--shadow-soft);
-    display:flex; align-items:center; justify-content:center;
-    color:var(--acuvue-blue); font-weight:800; font-size:19px;
-    position:relative;
+    height:62px; border-radius:28px; background:var(--white); border:1.5px solid #dbe8f5; box-shadow:var(--shadow-soft);
+    display:flex; align-items:center; justify-content:center; color:var(--acuvue-blue); font-weight:800; font-size:19px; position:relative;
   }
   .search-btn{
     position:absolute; right:10px; top:50%; transform:translateY(-50%);
-    width:46px; height:46px; border-radius:16px; border:1.5px solid #dbe8f5;
-    background:#fff; color:#1a3d66; font-size:23px; display:flex; align-items:center; justify-content:center;
+    width:46px; height:46px; border-radius:16px; border:1.5px solid #dbe8f5; background:#fff; color:#1a3d66; font-size:23px;
+    display:flex; align-items:center; justify-content:center;
   }
   .hero{
     text-align:center; font-weight:900; color:var(--acuvue-blue);
     font-size:34px; line-height:1.28; margin:42px 0 34px; letter-spacing:-1.3px;
   }
   .landing-card{
-    background:var(--white); border:1.5px solid #dce9f6; border-radius:34px;
-    box-shadow:var(--shadow); min-height:370px; padding:28px 26px 24px;
-    position:relative; overflow:hidden;
+    background:var(--white); border:1.5px solid #dce9f6; border-radius:34px; box-shadow:var(--shadow); min-height:370px; padding:28px 26px 24px; position:relative; overflow:hidden;
   }
   .landing-card::after{
     content:""; position:absolute; inset:auto -40px -60px auto; width:180px; height:180px; border-radius:50%;
     background:radial-gradient(circle at center, rgba(0,94,184,.12) 0%, rgba(0,94,184,0) 72%);
     pointer-events:none;
   }
-  .landing-copy{
-    padding-top:154px;
-  }
-  .landing-title{
-    color:var(--acuvue-blue); font-weight:900; font-size:44px; line-height:1.05; letter-spacing:-1.8px;
-    margin:0 0 14px;
-  }
+  .landing-copy{ padding-top:154px; }
+  .landing-title{ color:var(--acuvue-blue); font-weight:900; font-size:44px; line-height:1.05; letter-spacing:-1.8px; margin:0 0 14px; }
   .landing-sub{ font-size:18px; color:#5f7287; margin:0; }
-  .packshot{
-    position:absolute; right:28px; top:78px; width:146px;
-    filter:drop-shadow(0 12px 14px rgba(0,94,184,.10));
-  }
+  .packshot{ position:absolute; right:28px; top:78px; width:146px; filter:drop-shadow(0 12px 14px rgba(0,94,184,.10)); }
   .start-btn{
-    position:absolute; right:24px; bottom:24px;
-    border:none; border-radius:26px; background:linear-gradient(180deg,#0B63C1 0%, #0058B7 100%);
-    color:#fff; min-width:150px; height:72px; padding:0 22px 0 20px; font-size:20px; font-weight:800;
-    box-shadow:0 14px 24px rgba(0,94,184,.25); display:flex; gap:14px; align-items:center; justify-content:center;
+    position:absolute; right:24px; bottom:24px; border:none; border-radius:26px; background:linear-gradient(180deg,#0B63C1 0%, #0058B7 100%);
+    color:#fff; min-width:150px; height:72px; padding:0 22px 0 20px; font-size:20px; font-weight:800; box-shadow:0 14px 24px rgba(0,94,184,.25);
+    display:flex; gap:14px; align-items:center; justify-content:center;
   }
   .arrow-badge{
-    width:44px; height:44px; border-radius:22px; background:rgba(7,40,83,.28);
-    display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700;
+    width:44px; height:44px; border-radius:22px; background:rgba(7,40,83,.28); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700;
   }
 
-  /* simulator */
   .sim-wrap{ padding:20px 16px 22px; }
-  .panel{
-    background:var(--white);
-    border-radius:30px;
-    border:1px solid #dce8f5;
-    box-shadow:var(--shadow);
-    overflow:hidden;
-  }
-  .panel-head{
-    padding:18px 18px 10px;
-    display:flex; align-items:flex-start; justify-content:space-between;
-  }
-  .title-lg{
-    font-size:22px; font-weight:900; letter-spacing:-.4px; margin:0;
-  }
-  .title-en{
-    color:#6a7f97; font-size:12px; letter-spacing:2.8px; margin-top:4px; font-weight:700;
-  }
-  .icon-close{
-    width:44px; height:44px; border-radius:50%; border:none; background:#F0F5FA; color:#596C83; font-size:28px;
-  }
+  .panel{ background:var(--white); border-radius:30px; border:1px solid #dce8f5; box-shadow:var(--shadow); overflow:hidden; }
+  .panel-head{ padding:18px 18px 10px; display:flex; align-items:flex-start; justify-content:space-between; }
+  .title-lg{ font-size:22px; font-weight:900; letter-spacing:-.4px; margin:0; }
+  .title-en{ color:#6a7f97; font-size:12px; letter-spacing:2.8px; margin-top:4px; font-weight:700; }
+  .icon-close{ width:44px; height:44px; border-radius:50%; border:none; background:#F0F5FA; color:#596C83; font-size:28px; }
 
-  .toolbar{
-    padding:0 16px 12px;
-    display:flex; gap:10px; align-items:center; justify-content:space-between;
-  }
+  .toolbar{ padding:0 16px 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; }
   .mode-toggle{
     background:#005EB8; border-radius:18px; padding:4px; display:flex; gap:4px; flex:1;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);
   }
   .mode-btn{
-    flex:1; height:42px; border-radius:14px; border:none; font-size:17px; font-weight:800;
-    background:transparent; color:#fff; opacity:.78;
+    flex:1; height:42px; border-radius:14px; border:none; font-size:17px; font-weight:800; background:transparent; color:#fff; opacity:.78;
   }
-  .mode-btn.active{
-    background:#fff; color:#17406d; opacity:1;
-    box-shadow:0 2px 8px rgba(0,0,0,.12);
-  }
+  .mode-btn.active{ background:#fff; color:#17406d; opacity:1; box-shadow:0 2px 8px rgba(0,0,0,.12); }
   .camera-icon-btn{
-    flex:none; width:50px; height:50px; border-radius:16px; border:none;
-    background:#fff; box-shadow:var(--shadow-soft); font-size:25px;
+    flex:none; width:50px; height:50px; border-radius:16px; border:none; background:#fff; box-shadow:var(--shadow-soft); font-size:25px;
     display:flex; align-items:center; justify-content:center; color:#17406d;
   }
 
   .viewer-shell{
-    margin:0 16px;
-    border-radius:26px;
-    background:#d9e4ee;
-    padding:0;
-    position:relative;
-    overflow:hidden;
-    aspect-ratio: 0.86 / 1;
+    margin:0 16px; border-radius:26px; background:#d9e4ee; position:relative; overflow:hidden; aspect-ratio: 0.86 / 1;
   }
   .viewer-stage{
-    position:absolute; inset:0;
-    overflow:hidden;
-    background:linear-gradient(180deg,#dfe8f1 0%, #ced9e6 100%);
+    position:absolute; inset:0; overflow:hidden; background:linear-gradient(180deg,#dfe8f1 0%, #ced9e6 100%);
   }
-  .camera-layer, .capture-layer, .blur-layer, .overlay-layer{
-    position:absolute; inset:0; width:100%; height:100%;
-  }
+  .camera-layer, .capture-layer, .overlay-layer, .eyelid-layer, .mini-overlay{ position:absolute; inset:0; width:100%; height:100%; }
   video, .capture-layer{ object-fit:cover; background:#ccd7e2; }
   .capture-layer{ display:none; }
-  .blur-layer{
-    pointer-events:none;
-    backdrop-filter:none; -webkit-backdrop-filter:none;
-    background:transparent;
-  }
-  .overlay-layer{ pointer-events:none; }
+  .overlay-layer, .mini-overlay{ pointer-events:none; }
   .camera-banner{
-    position:absolute; top:14px; right:14px; z-index:4;
-    display:flex; align-items:center; gap:0;
+    position:absolute; top:14px; right:14px; z-index:4; display:flex; align-items:center;
   }
   .banner-cam{
-    width:44px; height:44px; background:#fff; color:#183d64;
-    display:flex; align-items:center; justify-content:center; border:2px solid #163a63; border-right:none;
-    border-radius:4px 0 0 4px; font-size:22px; font-weight:700;
+    width:44px; height:44px; background:#fff; color:#183d64; display:flex; align-items:center; justify-content:center; border:2px solid #163a63; border-right:none; border-radius:4px 0 0 4px; font-size:22px; font-weight:700;
   }
   .banner-text{
-    height:44px; min-width:160px; padding:0 14px;
-    display:flex; align-items:center; justify-content:center;
-    background:#0E61BE; color:#fff; border:2px solid #163a63;
-    border-radius:0 4px 4px 0; font-size:17px; font-weight:800; letter-spacing:-.2px;
+    height:44px; min-width:160px; padding:0 14px; display:flex; align-items:center; justify-content:center;
+    background:#0E61BE; color:#fff; border:2px solid #163a63; border-radius:0 4px 4px 0; font-size:17px; font-weight:800; letter-spacing:-.2px;
   }
+
   .status-pill{
-    position:absolute; left:14px; bottom:14px; z-index:4;
-    height:42px; padding:0 14px 0 11px;
-    background:rgba(255,255,255,.96); border:1px solid #D6E3F3; border-radius:22px;
-    display:flex; align-items:center; gap:10px; color:#24518A; font-weight:800; font-size:16px;
-    box-shadow:var(--shadow-soft);
+    position:absolute; left:14px; bottom:14px; z-index:4; height:42px; padding:0 14px 0 11px; background:rgba(255,255,255,.96);
+    border:1px solid #D6E3F3; border-radius:22px; display:flex; align-items:center; gap:10px; color:#24518A; font-weight:800; font-size:16px; box-shadow:var(--shadow-soft);
   }
   .status-dot{
-    width:22px; height:22px; border-radius:50%;
-    box-shadow:0 0 0 7px rgba(20,190,75,.16);
-    background:var(--green);
-    transition:background .2s ease, box-shadow .2s ease;
+    width:22px; height:22px; border-radius:50%; box-shadow:0 0 0 7px rgba(20,190,75,.16); background:var(--green); transition:background .2s ease, box-shadow .2s ease;
   }
-  .status-pill.deviated .status-dot{
-    background:var(--orange);
-    box-shadow:0 0 0 7px rgba(255,170,18,.20);
-  }
-  .status-pill.deviated .status-text{ color:#2f5b91; }
-  .status-text small{ font-size:12px; font-weight:700; color:#597492; }
-
-  .actions{
-    padding:14px 16px 14px;
-    display:flex; gap:10px; align-items:center;
-  }
-  .btn-secondary, .btn-primary, .btn-dark{
-    border:none; border-radius:18px; height:56px; font-size:18px; font-weight:900; letter-spacing:-.2px;
-  }
-  .btn-secondary{
-    flex:0 0 34%;
-    background:#F3F7FB; color:#20569A; border:1.5px solid #D7E3F1;
-  }
-  .action-slot{
-    flex:1;
-    background:#0B61BE; border-radius:18px; padding:4px;
-    display:flex; align-items:center; justify-content:center; min-height:56px;
-  }
-  .btn-primary{
-    width:100%; background:#fff; color:#183D66; height:48px; border-radius:14px;
-  }
-  .btn-primary.solid{
-    background:transparent; color:#fff;
-  }
-  .btn-primary.hidden{ display:none; }
-
-  .desc-area{
-    border-top:1px solid #ECF2F8;
-    padding:16px 16px 18px;
-    background:linear-gradient(180deg,#fff 0%, #fbfdff 100%);
-  }
-  .desc-row{ display:flex; gap:12px; align-items:flex-start; justify-content:space-between; }
-  .info-mark{
-    width:16px; min-width:16px; margin-top:3px;
-    color:#2A69C8; font-weight:900; font-size:22px; line-height:1;
-  }
-  .desc-text{ flex:1; }
-  .desc-title{
-    margin:0 0 6px; font-size:18px; font-weight:900; color:#0D2640; letter-spacing:-.3px;
-  }
-  .desc-body{
-    margin:0; font-size:15px; line-height:1.45; color:#294D74; font-weight:700;
-  }
-  .desc-body .blue{ color:#0E61BE; }
-  .desc-body .orange{ color:#DA7D00; }
-  .confirm-btn{
-    flex:0 0 108px; height:64px; border:none; border-radius:18px;
-    background:#04111F; color:#fff; font-size:18px; font-weight:900;
-  }
-  .note{
-    margin-top:10px; font-size:11px; color:#6E7D8E; line-height:1.4;
-  }
-  .hint-bubble{
-    position:absolute; top:18px; right:18px; z-index:7;
-    max-width:170px;
-    background:linear-gradient(180deg,rgba(34,96,215,.94) 0%, rgba(34,96,215,.90) 100%);
-    color:#fff; border-radius:22px; padding:16px 18px;
-    box-shadow:0 14px 24px rgba(16,70,150,.28);
-    font-size:19px; font-weight:900; line-height:1.18; text-align:center;
-    display:none;
-  }
-  .hint-bubble::after{
-    content:""; position:absolute; bottom:-12px; right:38px;
-    border-width:14px 11px 0 11px; border-style:solid;
-    border-color:rgba(34,96,215,.92) transparent transparent transparent;
-    transform:rotate(16deg);
-  }
-  .hint-accent{
-    position:absolute; right:16px; top:50%; transform:translateY(-50%);
-    width:44px; height:44px; border-radius:50%; background:#FFAA12;
-    box-shadow:0 0 0 10px rgba(255,170,18,.16);
-  }
+  .status-pill.deviated .status-dot{ background:var(--orange); box-shadow:0 0 0 7px rgba(255,170,18,.20); }
 
   .helper-center{
-    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-    z-index:6;
-    padding:10px 16px; border-radius:18px;
-    background:rgba(255,255,255,.86); color:#21508a; font-weight:800; font-size:15px;
-    box-shadow:var(--shadow-soft); display:none;
-    text-align:center;
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:7;
+    padding:10px 16px; border-radius:18px; background:rgba(255,255,255,.86); color:#21508a; font-weight:800; font-size:15px; box-shadow:var(--shadow-soft); display:none; text-align:center;
+  }
+
+  .hint-bubble{
+    position:absolute; top:16px; right:18px; z-index:8; max-width:188px; min-width:160px;
+    background:linear-gradient(180deg,rgba(34,96,215,.94) 0%, rgba(34,96,215,.90) 100%); color:#fff; border-radius:22px; padding:15px 18px;
+    box-shadow:0 14px 24px rgba(16,70,150,.28); font-size:18px; font-weight:900; line-height:1.14; text-align:center; display:none;
+  }
+  .hint-bubble::after{
+    content:""; position:absolute; bottom:-12px; right:36px; border-width:14px 11px 0 11px; border-style:solid;
+    border-color:rgba(34,96,215,.92) transparent transparent transparent; transform:rotate(14deg);
+  }
+  .hint-accent{
+    position:absolute; right:16px; top:50%; transform:translateY(-50%); width:42px; height:42px; border-radius:50%; background:#FFAA12; box-shadow:0 0 0 10px rgba(255,170,18,.16);
   }
 
   .blink-mini{
-    position:absolute; right:16px; top:16px; z-index:6;
-    width:118px; height:154px; border-radius:20px;
-    overflow:hidden; background:#fff; box-shadow:0 12px 26px rgba(0,0,0,.16); display:none;
-    border:2px solid rgba(255,255,255,.9);
+    position:absolute; right:14px; top:14px; z-index:8; width:126px; height:160px; border-radius:22px; overflow:hidden; background:#fff;
+    box-shadow:0 12px 26px rgba(0,0,0,.18); display:none; border:2px solid rgba(255,255,255,.92);
   }
   .blink-mini video, .blink-mini canvas{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .blink-mini-label{
-    position:absolute; left:8px; right:8px; bottom:10px;
-    background:linear-gradient(180deg,rgba(34,96,215,.97),rgba(34,96,215,.94));
-    color:#fff; border-radius:18px; padding:10px 14px 12px; font-size:16px; font-weight:900; line-height:1.12;
-    text-align:center; box-shadow:0 10px 18px rgba(16,70,150,.28);
+    position:absolute; left:8px; right:8px; bottom:10px; background:linear-gradient(180deg,rgba(34,96,215,.97),rgba(34,96,215,.94));
+    color:#fff; border-radius:18px; padding:10px 12px 12px; font-size:15px; font-weight:900; line-height:1.12; text-align:center; box-shadow:0 10px 18px rgba(16,70,150,.28);
   }
   .blink-mini-dot{
-    position:absolute; right:10px; top:50%; transform:translateY(-50%);
-    width:30px; height:30px; border-radius:50%; background:#FFAA12;
-    box-shadow:0 0 0 8px rgba(255,170,18,.16);
+    position:absolute; right:10px; top:50%; transform:translateY(-50%); width:28px; height:28px; border-radius:50%; background:#FFAA12; box-shadow:0 0 0 8px rgba(255,170,18,.16);
   }
 
+  .eyelid-layer{
+    pointer-events:none; z-index:6;
+  }
+  .eyelid-top, .eyelid-bottom{
+    position:absolute; left:0; width:100%; height:52%; background:linear-gradient(180deg, rgba(219,213,205,.92), rgba(195,186,177,.95));
+    transform:translateY(-105%);
+    opacity:0;
+  }
+  .eyelid-bottom{
+    top:auto; bottom:0;
+    background:linear-gradient(180deg, rgba(197,188,180,.95), rgba(219,213,205,.92));
+    transform:translateY(105%);
+  }
+  .eyelid-layer.blink .eyelid-top{
+    animation:blinkTop .32s ease-in-out;
+  }
+  .eyelid-layer.blink .eyelid-bottom{
+    animation:blinkBottom .32s ease-in-out;
+  }
+  @keyframes blinkTop{
+    0%{ transform:translateY(-105%); opacity:0; }
+    25%{ transform:translateY(-10%); opacity:.95; }
+    50%{ transform:translateY(8%); opacity:1; }
+    75%{ transform:translateY(-12%); opacity:.95; }
+    100%{ transform:translateY(-105%); opacity:0; }
+  }
+  @keyframes blinkBottom{
+    0%{ transform:translateY(105%); opacity:0; }
+    25%{ transform:translateY(10%); opacity:.95; }
+    50%{ transform:translateY(-8%); opacity:1; }
+    75%{ transform:translateY(12%); opacity:.95; }
+    100%{ transform:translateY(105%); opacity:0; }
+  }
+
+  .actions{ padding:14px 16px 14px; display:flex; gap:10px; align-items:center; }
+  .btn-secondary, .btn-primary{
+    border:none; border-radius:18px; height:56px; font-size:18px; font-weight:900; letter-spacing:-.2px;
+  }
+  .btn-secondary{ flex:0 0 34%; background:#F3F7FB; color:#20569A; border:1.5px solid #D7E3F1; }
+  .action-slot{ flex:1; background:#0B61BE; border-radius:18px; padding:4px; min-height:56px; display:flex; align-items:center; }
+  .btn-primary{ width:100%; background:#fff; color:#183D66; height:48px; border-radius:14px; }
+  .btn-primary.solid{ background:transparent; color:#fff; }
+  .btn-primary.hidden{ display:none; }
+
+  .desc-area{ border-top:1px solid #ECF2F8; padding:16px 16px 18px; background:linear-gradient(180deg,#fff 0%, #fbfdff 100%); }
+  .desc-row{ display:flex; gap:12px; align-items:flex-start; justify-content:space-between; }
+  .info-mark{ width:16px; min-width:16px; margin-top:3px; color:#2A69C8; font-weight:900; font-size:22px; line-height:1; }
+  .desc-text{ flex:1; }
+  .desc-title{ margin:0 0 6px; font-size:18px; font-weight:900; color:#0D2640; letter-spacing:-.3px; }
+  .desc-body{ margin:0; font-size:15px; line-height:1.45; color:#294D74; font-weight:700; }
+  .desc-body .blue{ color:#0E61BE; }
+  .desc-body .orange{ color:#DA7D00; }
+  .confirm-btn{
+    flex:0 0 108px; height:64px; border:none; border-radius:18px; background:#04111F; color:#fff; font-size:18px; font-weight:900;
+  }
+  .note{ margin-top:10px; font-size:11px; color:#6E7D8E; line-height:1.4; }
   .cam-perm{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:8;
-    background:linear-gradient(180deg, rgba(237,244,251,.88), rgba(225,236,246,.88));
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:10; background:linear-gradient(180deg, rgba(237,244,251,.88), rgba(225,236,246,.88));
     text-align:center; padding:26px;
   }
-  .cam-card{
-    background:rgba(255,255,255,.95); border:1px solid #dce8f5; border-radius:24px; padding:22px 18px; box-shadow:var(--shadow);
-  }
+  .cam-card{ background:rgba(255,255,255,.95); border:1px solid #dce8f5; border-radius:24px; padding:22px 18px; box-shadow:var(--shadow); }
   .cam-card h3{ margin:0 0 10px; font-size:20px; color:#173F69; }
   .cam-card p{ margin:0; font-size:15px; line-height:1.45; color:#5E7692; font-weight:700; }
-
   .hidden{ display:none !important; }
 
   @media (max-width:380px){
@@ -310,22 +219,19 @@
     .landing-title{ font-size:38px; }
     .banner-text{ min-width:148px; font-size:16px; }
     .status-pill{ font-size:15px; }
-    .btn-secondary,.btn-primary,.btn-dark{ font-size:17px; }
+    .btn-secondary,.btn-primary{ font-size:17px; }
   }
 </style>
 </head>
 <body>
 <div class="app">
-
   <section class="screen landing-screen active" id="landingScreen">
     <div class="landing-wrap">
       <div class="top-pill">
         ACUVUE Interactive Experience
         <button class="search-btn" aria-label="search">⌕</button>
       </div>
-
       <div class="hero">아큐브 기술력을<br>직접 체험해 보세요</div>
-
       <div class="landing-card">
         <img class="packshot" alt="packshot" src="data:image/svg+xml;utf8,
           <svg xmlns='http://www.w3.org/2000/svg' width='260' height='170' viewBox='0 0 260 170'>
@@ -386,8 +292,12 @@
           <div class="viewer-stage" id="viewerStage">
             <video id="cameraVideo" class="camera-layer" playsinline autoplay muted></video>
             <img id="captureImage" class="capture-layer" alt="capture" />
-            <div id="blurLayer" class="blur-layer"></div>
             <canvas id="overlayCanvas" class="overlay-layer"></canvas>
+
+            <div class="eyelid-layer" id="eyelidLayer">
+              <div class="eyelid-top"></div>
+              <div class="eyelid-bottom"></div>
+            </div>
 
             <div id="cameraBanner" class="camera-banner">
               <div class="banner-cam">📷</div>
@@ -401,18 +311,18 @@
 
             <div class="helper-center" id="helperCenter">카메라를 준비 중입니다</div>
 
+            <div class="hint-bubble" id="hintBubble">
+              눈을 한번 깜박여<br>주세요
+              <span class="hint-accent"></span>
+            </div>
+
             <div class="blink-mini" id="blinkMini">
               <video id="blinkVideo" playsinline autoplay muted></video>
-              <canvas id="blinkCanvas"></canvas>
+              <canvas id="blinkCanvas" class="mini-overlay"></canvas>
               <div class="blink-mini-label">
                 눈을 한번 깜박여<br>주세요
                 <span class="blink-mini-dot"></span>
               </div>
-            </div>
-
-            <div class="hint-bubble" id="hintBubble">
-              눈을 한번 깜박여<br>주세요
-              <span class="hint-accent"></span>
             </div>
 
             <div class="cam-perm hidden" id="camFallback">
@@ -436,9 +346,7 @@
             <div class="info-mark">i</div>
             <div class="desc-text">
               <p class="desc-title" id="descTitle">난시 렌즈 축 안정의 중요성</p>
-              <p class="desc-body" id="descBody">
-                아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.
-              </p>
+              <p class="desc-body" id="descBody">아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.</p>
               <div class="note">해당 시뮬레이션은 이해를 돕기 위한 데모 화면이며, 실제 시야 경험과는 차이가 있을 수 있습니다. KR_2026_233</div>
             </div>
             <button class="confirm-btn" id="resetBtn">확인 완료</button>
@@ -447,17 +355,16 @@
       </div>
     </div>
   </section>
-
 </div>
 
 <script>
 (() => {
   const state = {
     screen: 'landing',
-    mode: 'manual',           // manual | auto
-    cameraFacing: 'user',     // user | environment
+    mode: 'manual',              // manual | auto
+    cameraFacing: 'user',        // user | environment
     currentAngle: 0,
-    stream: null,
+    mainStream: null,
     blinkStream: null,
     capturedDataUrl: '',
     autoRearRunning: false,
@@ -465,6 +372,7 @@
     blinkCooldownUntil: 0,
     lastBlinkMetric: null,
     cameraReady: false,
+    rearCaptured: false,
   };
 
   const landingScreen = document.getElementById('landingScreen');
@@ -475,11 +383,12 @@
   const manualBtn = document.getElementById('manualBtn');
   const autoBtn = document.getElementById('autoBtn');
   const cameraSwitchBtn = document.getElementById('cameraSwitchBtn');
+
   const cameraBannerText = document.getElementById('cameraBannerText');
   const cameraVideo = document.getElementById('cameraVideo');
   const captureImage = document.getElementById('captureImage');
   const overlayCanvas = document.getElementById('overlayCanvas');
-  const blurLayer = document.getElementById('blurLayer');
+  const eyelidLayer = document.getElementById('eyelidLayer');
   const statusPill = document.getElementById('statusPill');
   const statusText = document.getElementById('statusText');
   const helperCenter = document.getElementById('helperCenter');
@@ -510,11 +419,11 @@
 
   function getBlurByAngle(angle){
     const a = Math.abs(angle);
-    if (a >= 25) return 11.5;
-    if (a >= 20) return 9.5;
-    if (a >= 15) return 7.5;
-    if (a >= 10) return 5.2;
-    if (a >= 5) return 2.8;
+    if (a >= 25) return 12;
+    if (a >= 20) return 10;
+    if (a >= 15) return 7.8;
+    if (a >= 10) return 5.5;
+    if (a >= 5) return 3;
     return 0;
   }
 
@@ -530,11 +439,15 @@
       descBody.innerHTML = '아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.';
     } else {
       descTitle.textContent = '난시 렌즈는 축이 회전되면 시야가 흐려집니다.';
-      descBody.innerHTML = state.mode === 'manual'
-        ? '“<span class="blue">눈 깜박임</span>” 버튼을 눌러 회전된 축을 안정화 시켜 보세요.'
-        : (state.cameraFacing === 'user'
-            ? '자동인식 모드입니다. <span class="blue">눈을 한번 깜박여</span> 회전된 축을 안정화 시켜 보세요.'
-            : '후면 카메라에서는 <span class="orange">사진 촬영</span> 후 자동으로 축 안정화가 진행됩니다.');
+      if (state.mode === 'manual'){
+        descBody.innerHTML = '“<span class="blue">눈 깜박임</span>” 버튼을 눌러 회전된 축을 안정화 시켜 보세요.';
+      } else if (state.cameraFacing === 'user') {
+        descBody.innerHTML = '자동인식 모드입니다. <span class="blue">눈을 한번 깜박여</span> 회전된 축을 안정화 시켜 보세요.';
+      } else {
+        descBody.innerHTML = state.rearCaptured
+          ? '후면 카메라 캡쳐 화면입니다. 우측 상단 <span class="blue">전면 카메라</span>에서 순목을 인식하면 축이 안정화됩니다.'
+          : '후면 카메라에서는 먼저 <span class="orange">사진 촬영</span> 후, 우측 상단 전면 카메라에서 순목을 인식해 축이 안정화됩니다.';
+      }
     }
   }
 
@@ -543,39 +456,42 @@
       primaryActionBtn.classList.remove('hidden');
       primaryActionBtn.textContent = '눈 깜박임';
       primaryActionBtn.classList.add('solid');
-      primaryActionBtn.disabled = false;
       hintBubble.style.display = 'none';
       blinkMini.style.display = 'none';
       return;
     }
+
     if (state.cameraFacing === 'environment'){
       primaryActionBtn.classList.remove('hidden');
-      primaryActionBtn.textContent = state.capturedDataUrl ? '다시 촬영' : '사진 촬영';
+      primaryActionBtn.textContent = state.rearCaptured ? '다시 촬영' : '사진 촬영';
       primaryActionBtn.classList.add('solid');
-      primaryActionBtn.disabled = false;
-      hintBubble.style.display = 'none';
-      blinkMini.style.display = 'none';
+      hintBubble.style.display = state.rearCaptured && state.currentAngle !== 0 ? 'none' : 'none';
+      blinkMini.style.display = state.rearCaptured ? 'block' : 'none';
       return;
     }
+
     primaryActionBtn.classList.add('hidden');
     hintBubble.style.display = state.currentAngle !== 0 ? 'block' : 'none';
-    blinkMini.style.display = state.currentAngle !== 0 ? 'block' : 'none';
+    blinkMini.style.display = 'none';
   }
 
   function updateCameraBanner(){
-    cameraBannerText.textContent = state.cameraFacing === 'user' ? '전면 카메라 실행 중' : '후면 카메라 실행 중';
+    if (state.cameraFacing === 'environment' && state.rearCaptured){
+      cameraBannerText.textContent = '후면 캡쳐 화면';
+    } else {
+      cameraBannerText.textContent = state.cameraFacing === 'user' ? '전면 카메라 실행 중' : '후면 카메라 실행 중';
+    }
   }
 
-  function updateBlur(){
+  function applyBlur(){
     const blur = getBlurByAngle(state.currentAngle);
     const brightness = Math.max(0.78, 1 - Math.abs(state.currentAngle)*0.006);
-    if (state.capturedDataUrl && state.mode === 'auto' && state.cameraFacing === 'environment'){
+
+    if (state.cameraFacing === 'environment' && state.rearCaptured){
       captureImage.style.filter = `blur(${blur}px) brightness(${brightness})`;
       cameraVideo.style.filter = 'none';
-      blurLayer.style.background = 'transparent';
     } else {
       cameraVideo.style.filter = `blur(${blur}px) brightness(${brightness})`;
-      blurLayer.style.background = state.currentAngle === 0 ? 'transparent' : `rgba(255,255,255,${Math.min(.06 + Math.abs(state.currentAngle)/450, .14)})`;
       captureImage.style.filter = 'none';
     }
   }
@@ -585,7 +501,14 @@
     statusPill.classList.toggle('deviated', state.currentAngle !== 0);
     updateDescription();
     updatePrimaryButton();
-    updateBlur();
+    updateCameraBanner();
+    applyBlur();
+  }
+
+  function runBlinkEffect(){
+    eyelidLayer.classList.remove('blink');
+    void eyelidLayer.offsetWidth;
+    eyelidLayer.classList.add('blink');
   }
 
   function rotateTowardStableOneStep(){
@@ -596,32 +519,8 @@
 
   function triggerBlinkCorrection(){
     if (state.currentAngle === 0) return;
+    runBlinkEffect();
     rotateTowardStableOneStep();
-  }
-
-  function autoRearStabilize(){
-    if (state.autoRearRunning) return;
-    state.autoRearRunning = true;
-    const timer = setInterval(() => {
-      if (state.currentAngle === 0){
-        clearInterval(timer);
-        state.autoRearRunning = false;
-        return;
-      }
-      rotateTowardStableOneStep();
-    }, 360);
-  }
-
-  function setMode(mode){
-    state.mode = mode;
-    manualBtn.classList.toggle('active', mode === 'manual');
-    autoBtn.classList.toggle('active', mode === 'auto');
-    state.capturedDataUrl = '';
-    captureImage.src = '';
-    captureImage.style.display = 'none';
-    cameraVideo.style.display = 'block';
-    updateStatus();
-    setupBlinkDetector();
   }
 
   async function stopStream(stream){
@@ -629,58 +528,52 @@
     stream.getTracks().forEach(t => t.stop());
   }
 
-  async function startCamera(){
+  async function startMainCamera(facing){
     helperCenter.style.display = 'block';
     helperCenter.textContent = '카메라를 준비 중입니다';
     camFallback.classList.add('hidden');
     try{
-      await stopStream(state.stream);
-      const constraints = {
+      await stopStream(state.mainStream);
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio:false,
         video:{
-          facingMode: { ideal: state.cameraFacing },
-          width: { ideal: 1080 },
-          height: { ideal: 1440 }
+          facingMode:{ ideal:facing },
+          width:{ ideal:1080 },
+          height:{ ideal:1440 }
         }
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      state.stream = stream;
+      });
+      state.mainStream = stream;
       cameraVideo.srcObject = stream;
-      await cameraVideo.play().catch(() => {});
+      await cameraVideo.play().catch(()=>{});
+      helperCenter.style.display = 'none';
       state.cameraReady = true;
-      helperCenter.style.display = 'none';
-      updateCameraBanner();
-      if (state.mode === 'auto' && state.cameraFacing === 'user'){
-        setupBlinkDetector();
-      }
     }catch(err){
-      state.cameraReady = false;
       helperCenter.style.display = 'none';
+      state.cameraReady = false;
       camFallback.classList.remove('hidden');
       console.error(err);
     }
   }
 
-  async function setupBlinkDetector(){
-    clearBlinkDetector();
-    if (state.mode !== 'auto' || state.cameraFacing !== 'user') return;
+  async function startFrontBlinkStream(){
     try{
-      const constraints = {
+      await stopStream(state.blinkStream);
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio:false,
         video:{
           facingMode:{ ideal:'user' },
           width:{ ideal:320 },
           height:{ ideal:480 }
         }
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      });
       state.blinkStream = stream;
       blinkVideo.srcObject = stream;
       await blinkVideo.play().catch(()=>{});
       state.lastBlinkMetric = null;
+      clearInterval(state.blinkInterval);
       state.blinkInterval = setInterval(sampleBlinkMetric, 180);
     }catch(err){
-      console.warn('blink detector unavailable', err);
+      console.warn('blink stream unavailable', err);
     }
   }
 
@@ -697,20 +590,31 @@
     blinkVideo.srcObject = null;
   }
 
-  function sampleBlinkMetric(){
-    if (!blinkVideo.videoWidth || state.currentAngle === 0) return;
-    const w = 96;
-    const h = 140;
-    blinkCanvas.width = w;
-    blinkCanvas.height = h;
-    blinkCtx.drawImage(blinkVideo, 0, 0, w, h);
+  async function setupDetectionByMode(){
+    clearBlinkDetector();
 
-    // upper central region where both eyes are likely visible
+    if (state.mode !== 'auto') return;
+
+    if (state.cameraFacing === 'user'){
+      // Use full main front camera only. No extra mini view.
+      return;
+    }
+
+    // Rear auto: after rear capture, use a front mini camera for blink detection.
+    if (state.cameraFacing === 'environment' && state.rearCaptured){
+      await startFrontBlinkStream();
+    }
+  }
+
+  function sampleFromVideo(videoEl, sourceCtx, w, h, topRatio=0.18, heightRatio=0.22){
+    sourceCtx.canvas.width = w;
+    sourceCtx.canvas.height = h;
+    sourceCtx.drawImage(videoEl, 0, 0, w, h);
     const rx = Math.round(w * 0.18);
-    const ry = Math.round(h * 0.18);
+    const ry = Math.round(h * topRatio);
     const rw = Math.round(w * 0.64);
-    const rh = Math.round(h * 0.24);
-    const img = blinkCtx.getImageData(rx, ry, rw, rh).data;
+    const rh = Math.round(h * heightRatio);
+    const img = sourceCtx.getImageData(rx, ry, rw, rh).data;
 
     let brightness = 0;
     let contrast = 0;
@@ -720,14 +624,33 @@
       vals.push(y);
       brightness += y;
     }
-    brightness /= vals.length;
+    brightness /= vals.length || 1;
 
     for (let i=0; i<vals.length; i++){
       contrast += Math.abs(vals[i] - brightness);
     }
-    contrast /= vals.length;
+    contrast /= vals.length || 1;
 
-    const metric = brightness - contrast * 0.65;
+    return brightness - contrast * 0.65;
+  }
+
+  const fullDetectCanvas = document.createElement('canvas');
+  const fullDetectCtx = fullDetectCanvas.getContext('2d', { willReadFrequently:true });
+
+  function sampleBlinkMetric(){
+    if (state.currentAngle === 0) return;
+
+    let metric = null;
+
+    if (state.cameraFacing === 'user' && state.mode === 'auto'){
+      if (!cameraVideo.videoWidth) return;
+      metric = sampleFromVideo(cameraVideo, fullDetectCtx, 120, 180, 0.18, 0.22);
+    } else if (state.cameraFacing === 'environment' && state.mode === 'auto' && state.rearCaptured){
+      if (!blinkVideo.videoWidth) return;
+      metric = sampleFromVideo(blinkVideo, blinkCtx, 96, 140, 0.18, 0.24);
+    } else {
+      return;
+    }
 
     if (state.lastBlinkMetric == null){
       state.lastBlinkMetric = metric;
@@ -736,12 +659,19 @@
 
     const delta = state.lastBlinkMetric - metric;
     const now = Date.now();
-    // Sudden darker / lower-contrast eyelid closure signal
+
     if (delta > 10 && now > state.blinkCooldownUntil){
       state.blinkCooldownUntil = now + 900;
       triggerBlinkCorrection();
     }
     state.lastBlinkMetric = metric * 0.45 + state.lastBlinkMetric * 0.55;
+  }
+
+  function startBlinkLoop(){
+    clearInterval(state.blinkInterval);
+    if (state.mode !== 'auto') return;
+    state.lastBlinkMetric = null;
+    state.blinkInterval = setInterval(sampleBlinkMetric, 180);
   }
 
   function captureRearFrame(){
@@ -754,29 +684,37 @@
     state.capturedDataUrl = c.toDataURL('image/jpeg', .92);
     captureImage.src = state.capturedDataUrl;
     captureImage.style.display = 'block';
-    cameraVideo.style.display = 'none';
-    autoRearStabilize();
-    updatePrimaryButton();
-    updateBlur();
+    state.rearCaptured = true;
+    updateStatus();
+    setupDetectionByMode().then(startBlinkLoop);
+  }
+
+  async function switchCameraMode(){
+    state.cameraFacing = state.cameraFacing === 'user' ? 'environment' : 'user';
+    state.rearCaptured = false;
+    state.capturedDataUrl = '';
+    captureImage.src = '';
+    captureImage.style.display = 'none';
+    await startMainCamera(state.cameraFacing);
+    await setupDetectionByMode();
+    startBlinkLoop();
+    updateStatus();
   }
 
   function resetAll(){
     state.currentAngle = 0;
+    state.rearCaptured = false;
     state.capturedDataUrl = '';
     captureImage.src = '';
     captureImage.style.display = 'none';
-    cameraVideo.style.display = 'block';
-    state.autoRearRunning = false;
     updateStatus();
+    setupDetectionByMode().then(startBlinkLoop);
   }
 
   function deviateAxis(){
     state.currentAngle = chooseRandomAngle();
-    state.capturedDataUrl = '';
-    captureImage.src = '';
-    if (!(state.mode === 'auto' && state.cameraFacing === 'environment')){
-      captureImage.style.display = 'none';
-      cameraVideo.style.display = 'block';
+    if (state.cameraFacing === 'environment' && !state.rearCaptured && state.mode === 'auto'){
+      // keep waiting for capture
     }
     updateStatus();
   }
@@ -795,12 +733,11 @@
     ctx.clearRect(0, 0, width, height);
 
     const cx = width * 0.5;
-    const cy = height * 0.55;
+    const cy = height * 0.56;
     const r = Math.min(width, height) * 0.38;
 
-    // circle
     ctx.save();
-    ctx.globalAlpha = 0.36;
+    ctx.globalAlpha = 0.34;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI*2);
     ctx.strokeStyle = '#70A0D7';
@@ -808,11 +745,21 @@
     ctx.stroke();
     ctx.restore();
 
-    // faint lens stabilizer shapes
     const shapeW = r * 0.18;
     const shapeH = r * 0.42;
     const offX = r * 0.66;
     const offY = r * 0.05;
+    const angleRad = state.currentAngle * Math.PI / 180;
+
+    function roundRect(context, x, y, w, h, r){
+      context.beginPath();
+      context.moveTo(x + r, y);
+      context.arcTo(x + w, y, x + w, y + h, r);
+      context.arcTo(x + w, y + h, x, y + h, r);
+      context.arcTo(x, y + h, x, y, r);
+      context.arcTo(x, y, x + w, y, r);
+      context.closePath();
+    }
 
     function drawPill(x, y, rot){
       ctx.save();
@@ -825,11 +772,9 @@
       ctx.restore();
     }
 
-    const angleRad = state.currentAngle * Math.PI / 180;
     drawPill(cx - offX * Math.cos(angleRad), cy - offX * Math.sin(angleRad) - offY, angleRad);
     drawPill(cx + offX * Math.cos(angleRad), cy + offX * Math.sin(angleRad) + offY, angleRad);
 
-    // axis line
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(angleRad);
@@ -841,7 +786,6 @@
     ctx.lineTo(r*0.98, 0);
     ctx.stroke();
 
-    // end points
     const pointR = Math.max(9, width * 0.02);
     const pointColor = state.currentAngle === 0 ? '#16BE4A' : '#FFAA12';
     const pointGlow = state.currentAngle === 0 ? 'rgba(20,190,75,.24)' : 'rgba(255,170,18,.26)';
@@ -861,54 +805,53 @@
     requestAnimationFrame(drawOverlay);
   }
 
-  function roundRect(context, x, y, w, h, r){
-    context.beginPath();
-    context.moveTo(x + r, y);
-    context.arcTo(x + w, y, x + w, y + h, r);
-    context.arcTo(x + w, y + h, x, y + h, r);
-    context.arcTo(x, y + h, x, y, r);
-    context.arcTo(x, y, x + w, y, r);
-    context.closePath();
-  }
-
-  // events
   startExperienceBtn.addEventListener('click', async () => {
     showScreen('sim');
-    await startCamera();
+    await startMainCamera(state.cameraFacing);
     updateStatus();
   });
 
   closeSimBtn.addEventListener('click', async () => {
     showScreen('landing');
     clearBlinkDetector();
-    await stopStream(state.stream);
-    state.stream = null;
+    await stopStream(state.mainStream);
+    state.mainStream = null;
     state.cameraReady = false;
   });
 
-  manualBtn.addEventListener('click', () => setMode('manual'));
-  autoBtn.addEventListener('click', () => setMode('auto'));
+  manualBtn.addEventListener('click', async () => {
+    state.mode = 'manual';
+    manualBtn.classList.add('active');
+    autoBtn.classList.remove('active');
+    clearBlinkDetector();
+    updateStatus();
+  });
+
+  autoBtn.addEventListener('click', async () => {
+    state.mode = 'auto';
+    autoBtn.classList.add('active');
+    manualBtn.classList.remove('active');
+    await setupDetectionByMode();
+    startBlinkLoop();
+    updateStatus();
+  });
 
   cameraSwitchBtn.addEventListener('click', async () => {
-    state.cameraFacing = state.cameraFacing === 'user' ? 'environment' : 'user';
-    resetAll();
-    updateCameraBanner();
-    await startCamera();
-    await setupBlinkDetector();
-    updatePrimaryButton();
+    await switchCameraMode();
   });
 
   deviateBtn.addEventListener('click', () => {
     deviateAxis();
   });
 
-  primaryActionBtn.addEventListener('click', () => {
+  primaryActionBtn.addEventListener('click', async () => {
     if (state.mode === 'manual'){
       triggerBlinkCorrection();
       return;
     }
-    if (state.cameraFacing === 'environment'){
+    if (state.mode === 'auto' && state.cameraFacing === 'environment'){
       captureRearFrame();
+      return;
     }
   });
 
@@ -916,10 +859,10 @@
     resetAll();
   });
 
-  window.addEventListener('resize', () => updateBlur());
+  window.addEventListener('resize', applyBlur);
+  eyelidLayer.addEventListener('animationend', () => eyelidLayer.classList.remove('blink'));
 
   updateStatus();
-  updateCameraBanner();
   drawOverlay();
 })();
 </script>
