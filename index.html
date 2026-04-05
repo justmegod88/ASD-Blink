@@ -33,7 +33,9 @@
     width:min(430px,100vw);
     min-height:100vh;
     margin:0 auto;
-    background:linear-gradient(180deg,#F8FBFF 0%, var(--bg) 100%);
+    background:
+      radial-gradient(circle at top right, rgba(0,94,184,.10), transparent 26%),
+      linear-gradient(180deg,#F8FBFF 0%, var(--bg) 100%);
     overflow:hidden;
     position:relative;
   }
@@ -46,7 +48,7 @@
   .top-pill{
     height:62px;
     border-radius:30px;
-    background:#fff;
+    background:rgba(255,255,255,.92);
     border:1px solid #DCE8F4;
     box-shadow:var(--shadow-soft);
     display:flex;
@@ -57,6 +59,7 @@
     color:var(--blue);
     position:relative;
     letter-spacing:-.2px;
+    backdrop-filter:blur(6px);
   }
   .search{
     position:absolute;
@@ -74,66 +77,181 @@
     color:#193E66;
   }
   .hero{
-    text-align:center;
+    margin:40px 0 22px;
+    padding:0 6px;
+  }
+  .hero-kicker{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    height:30px;
+    padding:0 12px;
+    border-radius:999px;
+    background:#EAF4FF;
+    color:#2A69C8;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.3px;
+    margin-bottom:14px;
+  }
+  .hero h1{
+    margin:0;
     color:var(--blue);
     font-size:34px;
     font-weight:900;
-    line-height:1.25;
-    letter-spacing:-1.2px;
-    margin:42px 0 34px;
+    line-height:1.2;
+    letter-spacing:-1.3px;
   }
+  .hero p{
+    margin:12px 0 0;
+    color:#587089;
+    font-size:15px;
+    line-height:1.45;
+    font-weight:700;
+    letter-spacing:-.2px;
+  }
+
   .card{
     position:relative;
     overflow:hidden;
-    min-height:372px;
-    padding:28px 26px 24px;
-    border-radius:34px;
-    background:#fff;
+    min-height:430px;
+    padding:26px 24px 24px;
+    border-radius:36px;
+    background:linear-gradient(180deg,#ffffff 0%, #F8FBFF 100%);
     border:1px solid #DCE9F6;
     box-shadow:var(--shadow);
   }
   .card::before{
     content:"";
     position:absolute;
-    right:-42px;
-    bottom:-64px;
-    width:180px;
-    height:180px;
+    right:-50px;
+    top:-18px;
+    width:220px;
+    height:220px;
     border-radius:50%;
-    background:radial-gradient(circle at center, rgba(0,94,184,.12), rgba(0,94,184,0) 72%);
+    background:radial-gradient(circle at center, rgba(0,94,184,.13), rgba(0,94,184,0) 72%);
+  }
+  .card::after{
+    content:"";
+    position:absolute;
+    left:-42px;
+    bottom:-64px;
+    width:170px;
+    height:170px;
+    border-radius:50%;
+    background:radial-gradient(circle at center, rgba(255,176,32,.10), rgba(255,176,32,0) 75%);
+  }
+
+  .hero-panel{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    min-height:164px;
+  }
+  .badge-col{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .mini-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    height:30px;
+    padding:0 11px;
+    border-radius:999px;
+    background:#F1F7FF;
+    color:#215EA9;
+    font-size:12px;
+    font-weight:900;
+    width:max-content;
   }
   .pack{
-    position:absolute;
-    right:24px;
-    top:74px;
-    width:148px;
-    filter:drop-shadow(0 12px 16px rgba(0,74,147,.16));
+    width:150px;
+    filter:drop-shadow(0 14px 18px rgba(0,74,147,.18));
+    flex:0 0 auto;
+    margin-top:-6px;
   }
-  .copy{padding-top:156px}
-  .copy h1{
-    margin:0 0 14px;
+
+  .copy{
+    position:relative;
+    z-index:2;
+    margin-top:2px;
+  }
+  .copy h2{
+    margin:0 0 12px;
     color:var(--blue);
-    font-size:44px;
+    font-size:42px;
     line-height:1.02;
-    letter-spacing:-1.8px;
+    letter-spacing:-1.9px;
+    font-weight:900;
   }
   .copy p{
     margin:0;
     color:#607486;
     font-size:18px;
-    font-weight:700;
+    font-weight:800;
     letter-spacing:-.2px;
   }
+
+  .feature-row{
+    position:relative;
+    z-index:2;
+    margin-top:22px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .feature-chip{
+    min-height:74px;
+    border-radius:20px;
+    padding:14px 14px 12px;
+    background:#fff;
+    border:1px solid #E2ECF6;
+    box-shadow:var(--shadow-soft);
+  }
+  .feature-chip strong{
+    display:block;
+    color:#153B64;
+    font-size:14px;
+    font-weight:900;
+    margin-bottom:6px;
+    letter-spacing:-.2px;
+  }
+  .feature-chip span{
+    display:block;
+    color:#6B8197;
+    font-size:12px;
+    line-height:1.35;
+    font-weight:700;
+  }
+
+  .start-wrap{
+    position:relative;
+    z-index:2;
+    margin-top:20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .start-note{
+    color:#5C738C;
+    font-size:13px;
+    line-height:1.4;
+    font-weight:700;
+    max-width:160px;
+  }
   .start{
-    position:absolute;
-    right:24px;
-    bottom:24px;
     border:none;
     border-radius:26px;
     background:linear-gradient(180deg,#0A67C8,#0058B7);
     color:#fff;
     height:72px;
-    min-width:154px;
+    min-width:160px;
     padding:0 22px 0 18px;
     font-size:20px;
     font-weight:900;
@@ -649,21 +767,52 @@
   <section class="screen active" id="landingScreen">
     <div class="landing">
       <div class="top-pill">ACUVUE Interactive Experience<button class="search">⌕</button></div>
-      <div class="hero">아큐브 기술력을<br>직접 체험해 보세요</div>
+
+      <div class="hero">
+        <div class="hero-kicker">ASD™ Interactive Demo</div>
+        <h1>아큐브 기술력을<br>직접 체험해 보세요</h1>
+        <p>난시 렌즈의 축 회전과 시야 변화를 직접 확인하고,<br>눈 깜박임으로 안정화되는 과정을 체험할 수 있습니다.</p>
+      </div>
+
       <div class="card">
-        <img class="pack" alt="packshot" src="data:image/svg+xml;utf8,
-        <svg xmlns='http://www.w3.org/2000/svg' width='260' height='170' viewBox='0 0 260 170'>
-          <defs><linearGradient id='g1' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ffffff'/><stop offset='1' stop-color='%23eaf6ff'/></linearGradient><linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2300a9d8'/><stop offset='1' stop-color='%23005eb8'/></linearGradient></defs>
-          <rect x='12' y='26' rx='16' ry='16' width='180' height='108' fill='url(%23g1)' stroke='%23d6e6f6' stroke-width='3'/>
-          <rect x='154' y='10' rx='16' ry='16' width='92' height='116' fill='url(%23g2)' opacity='.95'/>
-          <text x='34' y='60' font-size='28' font-weight='700' fill='%23163c66' font-family='Arial'>ACUVUE</text>
-          <text x='34' y='100' font-size='40' font-weight='300' fill='%23163c66' font-family='Arial'>ACUVUE</text>
-          <text x='34' y='126' font-size='18' fill='%23163c66' font-family='Arial'>OASYS MAX</text>
-          <circle cx='122' cy='92' r='28' fill='none' stroke='%2300a9d8' stroke-width='3' opacity='.55'/>
-          <text x='182' y='36' font-size='14' font-weight='700' fill='white' font-family='Arial'>MAX</text>
-        </svg>">
-        <div class="copy"><h1>저녁까지<br>선명한 시야</h1><p>아큐브® 난시 기술력</p></div>
-        <button class="start" id="startBtn"><span class="ic">→</span>체험 시작</button>
+        <div class="hero-panel">
+          <div class="badge-col">
+            <div class="mini-badge">실시간 시뮬레이션</div>
+            <div class="mini-badge">전면/후면 카메라 지원</div>
+          </div>
+          <img class="pack" alt="packshot" src="data:image/svg+xml;utf8,
+          <svg xmlns='http://www.w3.org/2000/svg' width='260' height='170' viewBox='0 0 260 170'>
+            <defs><linearGradient id='g1' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ffffff'/><stop offset='1' stop-color='%23eaf6ff'/></linearGradient><linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2300a9d8'/><stop offset='1' stop-color='%23005eb8'/></linearGradient></defs>
+            <rect x='12' y='26' rx='16' ry='16' width='180' height='108' fill='url(%23g1)' stroke='%23d6e6f6' stroke-width='3'/>
+            <rect x='154' y='10' rx='16' ry='16' width='92' height='116' fill='url(%23g2)' opacity='.95'/>
+            <text x='34' y='60' font-size='28' font-weight='700' fill='%23163c66' font-family='Arial'>ACUVUE</text>
+            <text x='34' y='100' font-size='40' font-weight='300' fill='%23163c66' font-family='Arial'>ACUVUE</text>
+            <text x='34' y='126' font-size='18' fill='%23163c66' font-family='Arial'>OASYS MAX</text>
+            <circle cx='122' cy='92' r='28' fill='none' stroke='%2300a9d8' stroke-width='3' opacity='.55'/>
+            <text x='182' y='36' font-size='14' font-weight='700' fill='white' font-family='Arial'>MAX</text>
+          </svg>">
+        </div>
+
+        <div class="copy">
+          <h2>저녁까지<br>선명한 시야</h2>
+          <p>아큐브® 난시 기술력</p>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-chip">
+            <strong>축 회전 체험</strong>
+            <span>±25° 범위 내에서 축 회전을 유발하고 흐려지는 시야를 확인합니다.</span>
+          </div>
+          <div class="feature-chip">
+            <strong>순목 안정화</strong>
+            <span>눈 깜박임 또는 촬영 후 자동 인식으로 5°씩 축을 안정화합니다.</span>
+          </div>
+        </div>
+
+        <div class="start-wrap">
+          <div class="start-note">디폴트는 후면 카메라 / 우측 20° 회전 상태로 시작됩니다.</div>
+          <button class="start" id="startBtn"><span class="ic">→</span>체험 시작</button>
+        </div>
       </div>
     </div>
   </section>
@@ -695,8 +844,8 @@
                 <canvas class="overlay" id="overlayCanvas"></canvas>
 
                 <div class="eyelid" id="eyelidLayer"><div class="top"></div><div class="bottom"></div></div>
-                <div class="camera-banner"><div class="banner-ic">📷</div><div class="banner-tx" id="bannerText">전면 카메라 실행 중</div></div>
-                <div class="status" id="statusPill"><div class="dot"></div><div id="statusText">축 안정</div></div>
+                <div class="camera-banner"><div class="banner-ic">📷</div><div class="banner-tx" id="bannerText">후면 카메라 실행 중</div></div>
+                <div class="status" id="statusPill"><div class="dot"></div><div id="statusText">우측 20° 회전 발생</div></div>
                 <div class="helper" id="helperText">카메라를 준비 중입니다</div>
                 <div class="loading-ai" id="aiLoading">AI 순목 인식 준비 중</div>
                 <div class="hint" id="hintBubble">눈을 한번 깜박여<br>주세요<span class="orb"></span></div>
@@ -725,7 +874,7 @@
             <div class="info-top">
               <div class="info-icon">i</div>
               <div class="info-text">
-                <h3 id="descTitle">난시 렌즈 축 안정의 중요성</h3>
+                <h3 id="descTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.</h3>
                 <p id="descText">아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.</p>
                 <div class="note">해당 시뮬레이션은 이해를 돕기 위한 데모 화면이며, 실제 시야 경험과는 차이가 있을 수 있습니다. KR_2026_233</div>
               </div>
@@ -749,8 +898,8 @@
 
   const state = {
     mode: 'manual',
-    cameraFacing: 'user',
-    currentAngle: 0,
+    cameraFacing: 'environment',
+    currentAngle: 20,
     mainStream: null,
     blinkStream: null,
     rearCaptured: false,
@@ -775,11 +924,14 @@
   const miniCtx = blinkCanvas.getContext('2d');
 
   function updateMirror(){
-    const mirrorMain = state.cameraFacing === 'user' && !(state.cameraFacing === 'environment' && state.rearCaptured);
-    cameraVideo.style.transform = mirrorMain ? 'scaleX(-1)' : 'scaleX(1)';
+    if (state.cameraFacing === 'user'){
+      cameraVideo.style.transform = 'scaleX(-1) scale(3.2) translate(-22%, -9%)';
+    } else {
+      cameraVideo.style.transform = 'scaleX(1) scale(1)';
+    }
     captureImage.style.transform = 'scaleX(1)';
-    blinkVideo.style.transform = 'scaleX(-1)';
-    blinkCanvas.style.transform = 'scaleX(-1)';
+    blinkVideo.style.transform = 'scaleX(-1) scale(1.35)';
+    blinkCanvas.style.transform = 'scaleX(-1) scale(1.35)';
   }
 
   function showScreen(name){ landingScreen.classList.toggle('active', name === 'landing'); simScreen.classList.toggle('active', name === 'sim'); }
