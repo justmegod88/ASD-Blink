@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ko">
 <head>
@@ -6,338 +7,451 @@
   <title>아큐브 난시 체험</title>
   <style>
     :root{
-      --acuvue-blue:#005EB8;
-      --acuvue-blue-2:#1E78D6;
-      --text-navy:#1e293b;
-      --line:#dbe4f0;
-      --bg:#edf5fd;
-      --shadow:0 24px 70px rgba(15,23,42,.20);
+      --blue:#2563eb;
+      --blue-deep:#1d4ed8;
+      --bg:#eef5ff;
+      --text:#1e293b;
+      --sub:#94a3b8;
+      --line:#dbe7f8;
+      --shadow:0 24px 60px rgba(15,23,42,.18);
     }
     *{box-sizing:border-box}
-    html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",system-ui,sans-serif;background:linear-gradient(180deg,#f7fbff 0%,#edf5fd 48%,#e8f1fb 100%);overflow:hidden;color:var(--text-navy)}
-    .page{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px}
-    .hero-btn{
-      border:none;border-radius:999px;background:linear-gradient(180deg,#0f6bd7 0%,#005EB8 100%);color:#fff;
-      height:62px;padding:0 28px;font-size:20px;font-weight:900;letter-spacing:-.02em;
-      box-shadow:0 18px 34px rgba(0,94,184,.24);cursor:pointer
+    html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif;background:linear-gradient(180deg,#f6faff 0%,#edf5ff 100%);color:var(--text)}
+    body{overflow:hidden}
+    .landing{
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px;
+      background:
+        radial-gradient(60% 26% at 50% 20%, rgba(37,99,235,.22), rgba(37,99,235,0) 60%),
+        linear-gradient(180deg,#f7fbff 0%,#edf5ff 100%);
     }
-    .hero-btn:active{transform:scale(.98)}
+    .cta{
+      border:none; border-radius:22px; padding:18px 28px; min-width:220px; font-size:20px; font-weight:900;
+      background:linear-gradient(180deg,var(--blue) 0%, var(--blue-deep) 100%); color:#fff;
+      box-shadow:0 22px 44px rgba(37,99,235,.24); cursor:pointer;
+    }
 
-    #asdOverlay{position:fixed;inset:0;z-index:20;display:none;background:rgba(11,31,51,.18);backdrop-filter:blur(10px);padding:18px;align-items:center;justify-content:center}
-    #asdOverlay.show{display:flex}
-    #asdCard{width:min(560px,97vw);border-radius:40px;background:#fff;overflow:hidden;box-shadow:var(--shadow)}
-    #asdHeader{display:flex;justify-content:space-between;align-items:center;padding:24px 24px 12px;background:#fff}
-    #asdHeaderTitle{font-size:24px;line-height:1.14;font-weight:900;letter-spacing:-.03em}
-    #asdHeaderSubTitle{margin-top:4px;font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
-    #asdClose{width:40px;height:40px;border:none;border-radius:999px;background:#f8fafc;color:#94a3b8;font-weight:800;font-size:20px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(148,163,184,.16)}
+    .overlay{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:14px;
+      background:rgba(20,30,48,.18); backdrop-filter:blur(10px);
+    }
+    .overlay.show{display:flex}
+    .card{
+      width:min(720px,96vw); background:#fff; border-radius:34px; box-shadow:var(--shadow); overflow:hidden;
+      border:1px solid rgba(15,23,42,.06);
+    }
+    .head{
+      display:flex; justify-content:space-between; align-items:flex-start; padding:22px 22px 10px;
+    }
+    .head h1{margin:0; font-size:24px; line-height:1.15; font-weight:900; letter-spacing:-.03em}
+    .head .sub{margin-top:4px; color:var(--sub); font-size:11px; font-weight:800; letter-spacing:.16em}
+    .close{
+      width:42px; height:42px; border:none; border-radius:999px; background:#f8fafc; color:#94a3b8;
+      font-size:20px; font-weight:900; box-shadow:inset 0 0 0 1px rgba(148,163,184,.18); cursor:pointer;
+    }
 
-    #asdScene{position:relative;width:calc(100% - 32px);margin:0 16px;aspect-ratio:1/1;min-height:360px;border-radius:32px;overflow:hidden;background:#dfe7f1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-    #rearVideo,#rearCapture,#eyeFallback{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-    #rearVideo{opacity:0;transition:opacity .2s ease,filter .25s ease;background:#dfe7f1}
-    #rearVideo.ready{opacity:1}
-    #rearCapture{display:none;filter:blur(6px) saturate(.95);transition:filter .35s ease, opacity .25s ease}
-    #eyeFallback{background:#dfe7f1}
-    #eyeFallback img{width:100%;height:100%;object-fit:cover;display:block}
+    .scene{
+      position:relative; margin:0 16px; border-radius:30px; overflow:hidden; background:#dfe8f5;
+      aspect-ratio:1/1; min-height:360px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
+    }
+    .scene > *{position:absolute; inset:0}
+    #rearVideo,#frontVideoFull,#capturedRear{
+      width:100%; height:100%; object-fit:cover; background:#dfe8f5; display:block;
+    }
+    #capturedRear{display:none}
+    #frontVideoFull{display:none}
+    .blurLayer{
+      pointer-events:none;
+      backdrop-filter: blur(var(--blur,0px));
+      -webkit-backdrop-filter: blur(var(--blur,0px));
+      background:rgba(255,255,255,.02);
+      z-index:2;
+    }
+    .graphics{z-index:3; pointer-events:none}
+    .circle{
+      position:absolute; left:50%; top:52%; width:80%; height:80%; transform:translate(-50%,-50%);
+      border-radius:999px; border:2px solid rgba(82,126,193,.28);
+    }
+    .axis{
+      position:absolute; left:10%; right:10%; top:52%;
+      border-top:4px dashed rgba(68,67,73,.42);
+      transform-origin:center;
+      transition:transform .35s ease;
+    }
+    .side{
+      position:absolute; width:8.8%; height:17.5%; border-radius:999px;
+      background:linear-gradient(180deg, rgba(34,211,238,.24), rgba(56,189,248,.12));
+      box-shadow:inset 0 0 0 1px rgba(56,189,248,.18);
+    }
+    .side.left{ left:18.5%; top:52%; transform:translate(-50%,-50%)}
+    .side.right{ left:81.5%; top:52%; transform:translate(-50%,-50%)}
+    .dot{
+      position:absolute; width:18px; height:18px; border-radius:999px; background:#f59e0b;
+      box-shadow:0 0 0 8px rgba(245,158,11,.12), 0 4px 10px rgba(245,158,11,.35);
+    }
+    .dot.left{ left:10%; top:52%; transform:translate(-50%,-50%)}
+    .dot.right{ left:90%; top:52%; transform:translate(-50%,-50%)}
 
-    #asdGuide{position:absolute;inset:0;pointer-events:none;z-index:3}
-    #asdGuideCircle{position:absolute;left:50%;top:52%;width:80%;height:80%;transform:translate(-50%,-50%);border-radius:999px;border:2px solid rgba(71,125,190,.30)}
-    #asdGuideAxis{position:absolute;left:10%;right:10%;top:52%;border-top:3px dashed rgba(68,67,73,.55);transform-origin:center;transition:transform .18s ease}
-    .guideSide{position:absolute;width:8.8%;height:17.5%;border-radius:999px;background:linear-gradient(180deg, rgba(34,211,238,.26), rgba(56,189,248,.14));box-shadow:inset 0 0 0 1px rgba(56,189,248,.14),0 0 14px rgba(14,165,233,.10);opacity:.86;transform:translate(-50%,-50%)}
-    #asdGuideSideLeft{left:18.5%;top:52%}
-    #asdGuideSideRight{left:81.5%;top:52%}
-    .asdGuideDot{position:absolute;width:18px;height:18px;border-radius:999px;background:#f59e0b;box-shadow:0 0 0 8px rgba(245,158,11,.10),0 4px 10px rgba(245,158,11,.35);transform:translate(-50%,-50%);transition:left .18s ease, top .18s ease, background .18s ease, box-shadow .18s ease}
-    #asdGuideDotLeft{left:10%;top:52%}
-    #asdGuideDotRight{left:90%;top:52%}
-    #asdOverlay.asd-stable .asdGuideDot{background:#22c55e;box-shadow:0 0 0 8px rgba(34,197,94,.12),0 4px 10px rgba(34,197,94,.30)}
-
-    #asdLensImg{position:absolute;left:50%;top:52%;width:80%;transform:translate(calc(-50% - 4px),calc(-50% + 10px)) rotate(20deg);opacity:.70;pointer-events:none;z-index:2;filter:saturate(1.08) contrast(1.06)}
-    #asdUpperLid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;transform:scale(1.55) translateY(3px);transform-origin:center;z-index:4;filter:drop-shadow(0 2px 10px rgba(0,0,0,.18))}
-    #asdBlinkLid{position:absolute;inset:0;pointer-events:none;z-index:5}
-    #asdLidTop,#asdLidBot{position:absolute;left:0;right:0;height:55%;background: radial-gradient(120% 90% at 50% 85%, rgba(165,120,95,.98) 0%, rgba(120,80,62,.98) 46%, rgba(40,25,22,.98) 92%);opacity:0;transform:translateY(-110%)}
-    #asdLidBot{top:auto;bottom:0;background: radial-gradient(120% 90% at 50% 15%, rgba(165,120,95,.98) 0%, rgba(120,80,62,.98) 46%, rgba(40,25,22,.98) 92%);transform:translateY(110%)}
-    #asdAngleBadge{position:absolute;left:18px;bottom:18px;z-index:6;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.90);color:#2563eb;border:1px solid rgba(59,130,246,.16);font-size:14px;font-weight:900;box-shadow:0 12px 30px rgba(15,23,42,.18);backdrop-filter:blur(10px)}
-    #asdAngleBadge::before{content:"";width:10px;height:10px;border-radius:999px;background:currentColor;box-shadow:0 0 0 5px rgba(59,130,246,.10)}
-
-    #rotateFloating{position:absolute;left:18px;top:18px;z-index:7;height:42px;padding:0 14px;border:none;border-radius:999px;background:rgba(255,255,255,.92);color:#2563eb;font-weight:900;font-size:14px;box-shadow:0 10px 24px rgba(15,23,42,.14);cursor:pointer}
-    #rotateFloating:active{transform:scale(.98)}
-
-    #frontPip{position:absolute;right:22px;top:22px;z-index:8;width:34%;aspect-ratio:3/4;border-radius:28px;overflow:hidden;background:rgba(255,255,255,.88);box-shadow:0 16px 34px rgba(15,23,42,.22);display:none;border:2px solid rgba(255,255,255,.7)}
-    #frontPip video{width:100%;height:100%;object-fit:cover;display:block}
-    #frontGuide{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);min-height:40px;padding:0 16px;border-radius:999px;background:#2d6cf0;color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em;box-shadow:0 10px 20px rgba(37,99,235,.26)}
-    #frontGuide:active{transform:translateX(-50%) scale(.98)}
-    #blinkPrompt{position:absolute;left:24px;top:26px;z-index:8;display:none;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.92);border:2px solid rgba(110,155,230,.62);color:#2455C7;font-size:15px;font-weight:900;box-shadow:0 10px 20px rgba(15,23,42,.14)}
-    #blinkPrompt::before{content:"";width:12px;height:12px;border-radius:999px;background:#2455C7;box-shadow:0 0 0 6px rgba(36,85,199,.08)}
-
-    #asdControlBar{display:flex;align-items:center;gap:10px;padding:14px 16px 16px;background:#fff}
-    .asdActionBtn{flex:1 1 0;height:56px;border-radius:20px;border:1px solid rgba(148,163,184,.18);background:#fff;color:#1e293b;font-size:16px;font-weight:900;box-shadow:0 8px 20px rgba(15,23,42,.08);cursor:pointer}
-    .asdActionBtn:active{transform:scale(.98)}
-    #asdManualBtn{background:#fff;color:#2563eb}
-    #asdAutoBtn{background:#2563eb;border-color:#2563eb;color:#fff;box-shadow:0 14px 26px rgba(37,99,235,.16)}
-
+    .badge{
+      position:absolute; left:16px; bottom:16px; z-index:4;
+      display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:999px;
+      background:rgba(255,255,255,.92); color:var(--blue); border:1px solid rgba(59,130,246,.18);
+      box-shadow:0 10px 24px rgba(15,23,42,.12); font-size:14px; font-weight:900;
+    }
+    .badge:before{
+      content:""; width:10px; height:10px; border-radius:999px; background:currentColor;
+      box-shadow:0 0 0 5px rgba(59,130,246,.10)
+    }
+    .guide{
+      position:absolute; left:18px; top:18px; z-index:5; display:none;
+      padding:10px 16px; border-radius:999px; background:rgba(255,255,255,.94);
+      color:var(--blue); font-size:15px; font-weight:900; border:1.5px solid rgba(110,155,230,.85);
+      box-shadow:0 10px 18px rgba(11,31,51,.12);
+    }
+    .guide.show{display:inline-flex; align-items:center; gap:8px}
+    .guide:before{
+      content:""; width:10px; height:10px; border-radius:999px; background:currentColor;
+      box-shadow:0 0 0 5px rgba(59,130,246,.10)
+    }
+    .frontInset{
+      position:absolute; right:18px; top:26px; width:33%; aspect-ratio:3/4; border-radius:24px; overflow:hidden;
+      border:2px solid rgba(255,255,255,.85); box-shadow:0 12px 26px rgba(15,23,42,.18); z-index:5;
+      display:none; background:#e5edf8;
+    }
+    .frontInset.show{display:block}
+    .frontInset .label{
+      position:absolute; left:12px; right:12px; bottom:12px; z-index:2; padding:10px 14px; text-align:center;
+      border-radius:999px; background:rgba(37,99,235,.92); color:#fff; font-size:13px; font-weight:900;
+      box-shadow:0 8px 18px rgba(37,99,235,.22);
+    }
+    .frontInset video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1)}
+    .controls{
+      display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:14px 16px 16px; background:#fff;
+    }
+    .btn{
+      height:56px; border-radius:20px; border:1px solid rgba(148,163,184,.18); background:#fff;
+      color:var(--text); font-size:16px; font-weight:900; letter-spacing:-.02em; cursor:pointer;
+      box-shadow:0 8px 20px rgba(15,23,42,.08);
+    }
+    .btn.primary{background:var(--blue); color:#fff; border-color:var(--blue); box-shadow:0 14px 26px rgba(37,99,235,.16)}
+    .btn.active{background:#eff6ff; color:var(--blue); border-color:rgba(37,99,235,.2)}
+    .footer{
+      padding:0 18px 18px; background:#fff;
+      color:#475569; font-size:14px; line-height:1.55;
+    }
+    .footer .title{font-size:16px; font-weight:900; color:#1e293b; margin-bottom:4px}
+    .footer .blue{color:var(--blue); font-weight:800}
+    .hidden{display:none!important}
     @media (max-width:560px){
-      #asdOverlay{padding:8px}
-      #asdCard{width:100%;border-radius:30px}
-      #asdHeader{padding:20px 18px 10px}
-      #asdHeaderTitle{font-size:20px}
-      #asdHeaderSubTitle{font-size:10px}
-      #asdClose{width:36px;height:36px;font-size:18px}
-      #asdScene{width:calc(100% - 20px);margin:0 10px;min-height:320px;border-radius:26px}
-      #asdAngleBadge{left:14px;bottom:14px;padding:8px 12px;font-size:11px}
-      #rotateFloating{left:14px;top:14px;height:38px;font-size:12px;padding:0 12px}
-      #blinkPrompt{left:14px;top:14px;font-size:12px;padding:8px 12px}
-      #frontPip{right:14px;top:18px;width:33%;border-radius:24px}
-      #frontGuide{bottom:14px;font-size:11px;padding:0 12px;min-height:36px}
-      #asdControlBar{padding:12px 10px 12px;gap:8px}
-      .asdActionBtn{height:48px;font-size:13px;border-radius:16px}
+      .card{border-radius:28px}
+      .head{padding:18px 18px 8px}
+      .head h1{font-size:20px}
+      .close{width:38px;height:38px}
+      .scene{margin:0 10px; min-height:320px; border-radius:26px}
+      .badge{left:14px; bottom:14px; font-size:12px; padding:8px 12px}
+      .guide{left:14px; top:14px; font-size:13px; padding:9px 13px; max-width:60%}
+      .controls{padding:12px 10px}
+      .btn{height:48px; font-size:13px; border-radius:16px}
+      .footer{padding:0 14px 14px; font-size:13px}
+      .frontInset{width:34%; right:14px; top:22px; border-radius:20px}
+      .frontInset .label{font-size:12px; left:10px; right:10px; bottom:10px; padding:8px 10px}
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <button class="hero-btn" id="openExperienceBtn" type="button">아큐브 난시 체험</button>
+  <div class="landing" id="landing">
+    <button class="cta" id="openDemo">아큐브 난시 체험</button>
   </div>
 
-  <div id="asdOverlay" aria-hidden="true">
-    <div id="asdCard">
-      <div id="asdHeader">
+  <div class="overlay" id="overlay">
+    <div class="card">
+      <div class="head">
         <div>
-          <div id="asdHeaderTitle">ASD™ 축안정화</div>
-          <div id="asdHeaderSubTitle">ACCELERATION STABLE DESIGN</div>
+          <h1>ASD™ 축안정화</h1>
+          <div class="sub">ACCELERATION STABLE DESIGN</div>
         </div>
-        <button id="asdClose" type="button">X</button>
+        <button class="close" id="closeDemo">X</button>
       </div>
 
-      <div id="asdScene">
-        <div id="eyeFallback"><img src="a.png" alt="eye" onerror="this.src='a.gif'"></div>
+      <div class="scene" id="scene">
         <video id="rearVideo" autoplay playsinline muted></video>
-        <img id="rearCapture" alt="rear capture">
+        <img id="capturedRear" alt="">
+        <div class="blurLayer" id="blurLayer"></div>
 
-        <div id="asdGuide">
-          <div id="asdGuideCircle"></div>
-          <div id="asdGuideSideLeft" class="guideSide"></div>
-          <div id="asdGuideSideRight" class="guideSide"></div>
-          <div id="asdGuideAxis"></div>
-          <div id="asdGuideDotLeft" class="asdGuideDot"></div>
-          <div id="asdGuideDotRight" class="asdGuideDot"></div>
+        <div class="graphics">
+          <div class="circle"></div>
+          <div class="axis" id="axis"></div>
+          <div class="side left"></div>
+          <div class="side right"></div>
+          <div class="dot left"></div>
+          <div class="dot right"></div>
         </div>
 
-        <img id="asdLensImg" src="lens.png" alt="lens" onerror="this.style.display='none'">
-        <img id="asdUpperLid" src="upper_lid.png" alt="upper lid" onerror="this.style.display='none'">
-        <div id="asdBlinkLid"><div id="asdLidTop"></div><div id="asdLidBot"></div></div>
+        <div class="guide" id="guide">눈을 한 번 깜박여 주세요</div>
 
-        <button id="rotateFloating" type="button">축이탈</button>
-        <div id="blinkPrompt">눈을 한 번 깜박여 주세요</div>
-        <div id="frontPip">
+        <div class="frontInset" id="frontInset">
           <video id="frontVideo" autoplay playsinline muted></video>
-          <button id="frontGuide" type="button">눈 한번 깜박여 주세요</button>
+          <div class="label">눈을 한 번 깜박여 주세요</div>
         </div>
 
-        <div id="asdAngleBadge">좌측 20° 회전 발생</div>
+        <div class="badge" id="angleBadge">좌측 20° 회전 발생</div>
       </div>
 
-      <div id="asdControlBar">
-        <button id="asdManualBtn" class="asdActionBtn" type="button">깜박임 수동</button>
-        <button id="asdAutoBtn" class="asdActionBtn" type="button">깜박임 자동인식</button>
+      <div class="controls">
+        <button class="btn" id="rotateBtn">축이탈</button>
+        <button class="btn primary" id="manualBtn">깜박임 수동</button>
+        <button class="btn" id="autoBtn">깜박임 자동인식</button>
+      </div>
+
+      <div class="footer">
+        <div class="title">난시 렌즈는 축이 회전되면 시야가 흐려집니다.</div>
+        <div><span class="blue">깜박임 수동</span>은 클릭할 때마다 5도씩 안정화되고, <span class="blue">깜박임 자동인식</span>은 후면 화면을 캡처한 뒤 전면 카메라에서 눈 깜박임을 인식해 5도씩 안정화됩니다.</div>
       </div>
     </div>
   </div>
 
-  <script>
-    const openBtn = document.getElementById('openExperienceBtn');
-    const asdOverlay = document.getElementById('asdOverlay');
-    const asdClose = document.getElementById('asdClose');
-    const rearVideo = document.getElementById('rearVideo');
-    const frontVideo = document.getElementById('frontVideo');
-    const rearCapture = document.getElementById('rearCapture');
-    const eyeFallback = document.getElementById('eyeFallback');
-    const asdLensImg = document.getElementById('asdLensImg');
-    const asdGuideAxis = document.getElementById('asdGuideAxis');
-    const asdGuideCircle = document.getElementById('asdGuideCircle');
-    const asdGuideDotLeft = document.getElementById('asdGuideDotLeft');
-    const asdGuideDotRight = document.getElementById('asdGuideDotRight');
-    const asdAngleBadge = document.getElementById('asdAngleBadge');
-    const asdManualBtn = document.getElementById('asdManualBtn');
-    const asdAutoBtn = document.getElementById('asdAutoBtn');
-    const rotateFloating = document.getElementById('rotateFloating');
-    const frontPip = document.getElementById('frontPip');
-    const frontGuide = document.getElementById('frontGuide');
-    const blinkPrompt = document.getElementById('blinkPrompt');
-    const asdLidTop = document.getElementById('asdLidTop');
-    const asdLidBot = document.getElementById('asdLidBot');
+  <script type="module">
+    import vision from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34";
+    const { FaceLandmarker, FilesetResolver } = vision;
+
+    const openDemo = document.getElementById("openDemo");
+    const closeDemo = document.getElementById("closeDemo");
+    const overlay = document.getElementById("overlay");
+    const rearVideo = document.getElementById("rearVideo");
+    const frontVideo = document.getElementById("frontVideo");
+    const frontInset = document.getElementById("frontInset");
+    const capturedRear = document.getElementById("capturedRear");
+    const rotateBtn = document.getElementById("rotateBtn");
+    const manualBtn = document.getElementById("manualBtn");
+    const autoBtn = document.getElementById("autoBtn");
+    const axis = document.getElementById("axis");
+    const angleBadge = document.getElementById("angleBadge");
+    const blurLayer = document.getElementById("blurLayer");
+    const guide = document.getElementById("guide");
 
     let rearStream = null;
     let frontStream = null;
-    let angle = 20;
+    let faceLandmarker = null;
+    let angle = -20;
     let autoMode = false;
-    let blinkBusy = false;
-
-    const STEP = 5;
+    let detectLoopId = null;
+    let lastVideoTime = -1;
+    let blinkState = "open";
+    let blinkCooldownUntil = 0;
+    let closedFrames = 0;
 
     function randomAngle(){
-      const values = [-25,-20,-15,-10,10,15,20,25];
-      return values[Math.floor(Math.random()*values.length)];
+      const list = [-25,-20,-15,15,20,25];
+      return list[Math.floor(Math.random()*list.length)];
     }
 
-    function renderGuide(){
-      if(asdGuideAxis) asdGuideAxis.style.transform = `rotate(${angle}deg)`;
-      if(asdGuideCircle) asdGuideCircle.style.transform = `translate(-50%,-50%) rotate(${(angle * 0.18).toFixed(2)}deg)`;
-      const cx = 50, cy = 52, outer = 40;
-      const rad = angle * Math.PI / 180;
-      const cos = Math.cos(rad), sin = Math.sin(rad);
-      const lx = cx - outer*cos, ly = cy - outer*sin;
-      const rx = cx + outer*cos, ry = cy + outer*sin;
-      asdGuideDotLeft.style.left = `${lx}%`;
-      asdGuideDotLeft.style.top = `${ly}%`;
-      asdGuideDotRight.style.left = `${rx}%`;
-      asdGuideDotRight.style.top = `${ry}%`;
-
-      if(asdLensImg){
-        asdLensImg.style.transform = `translate(calc(-50% - 4px), calc(-50% + 10px)) rotate(${angle}deg)`;
-      }
-      if(angle > 0) asdAngleBadge.textContent = `좌측 ${Math.abs(angle)}° 회전 발생`;
-      else if(angle < 0) asdAngleBadge.textContent = `우측 ${Math.abs(angle)}° 회전 발생`;
-      else asdAngleBadge.textContent = '축 안정';
-      asdOverlay.classList.toggle('asd-stable', Math.abs(angle) === 0);
-
-      if(rearVideo.classList.contains('ready')){
-        const blur = Math.min(8, Math.abs(angle)*0.16);
-        rearVideo.style.filter = Math.abs(angle) === 0 ? 'blur(0px) saturate(1.02) brightness(1.02)' : `blur(${blur.toFixed(2)}px) saturate(.92)`;
-      }
-      if(rearCapture.style.display === 'block'){
-        const blur = Math.min(8, Math.abs(angle)*0.16);
-        rearCapture.style.filter = Math.abs(angle) === 0 ? 'blur(0px) saturate(1.02) brightness(1.02)' : `blur(${blur.toFixed(2)}px) saturate(.92)`;
-      }
-    }
-
-    function triggerBlink(){
-      if(blinkBusy) return;
-      blinkBusy = true;
-      asdLidTop.animate([
-        { opacity:0, transform:'translateY(-110%)' },
-        { opacity:1, transform:'translateY(0%)', offset:.45 },
-        { opacity:0, transform:'translateY(-110%)' }
-      ], { duration:520, easing:'ease-in-out' });
-      asdLidBot.animate([
-        { opacity:0, transform:'translateY(110%)' },
-        { opacity:1, transform:'translateY(0%)', offset:.45 },
-        { opacity:0, transform:'translateY(110%)' }
-      ], { duration:520, easing:'ease-in-out' });
-      setTimeout(()=> blinkBusy = false, 560);
+    function updateScene(){
+      axis.style.transform = `rotate(${angle}deg)`;
+      const dir = angle < 0 ? "좌측" : "우측";
+      const abs = Math.abs(angle);
+      angleBadge.textContent = abs === 0 ? "축 안정" : `${dir}${abs}° 회전 발생`;
+      blurLayer.style.setProperty("--blur", `${Math.max(0, abs) * 0.28}px`);
     }
 
     function stabilizeStep(){
-      if(angle === 0) return;
-      triggerBlink();
-      if(angle > 0) angle = Math.max(0, angle - STEP);
-      else angle = Math.min(0, angle + STEP);
-      renderGuide();
+      if (angle === 0) return;
+      if (angle > 0) angle = Math.max(0, angle - 5);
+      if (angle < 0) angle = Math.min(0, angle + 5);
+      updateScene();
     }
 
     async function startRearCamera(){
-      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-      try{
-        if(rearStream) rearStream.getTracks().forEach(t=>t.stop());
-        rearStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' }, audio:false });
-        rearVideo.srcObject = rearStream;
-        rearVideo.onloadedmetadata = ()=>{
-          rearVideo.classList.add('ready');
-          rearVideo.play().catch(()=>{});
-          eyeFallback.style.display = 'none';
-        };
-      }catch(e){
-        eyeFallback.style.display = 'block';
+      stopRearCamera();
+      rearStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 1280 } },
+        audio: false
+      });
+      rearVideo.srcObject = rearStream;
+      rearVideo.style.display = "block";
+      capturedRear.style.display = "none";
+    }
+
+    function stopRearCamera(){
+      if (rearStream){
+        rearStream.getTracks().forEach(t => t.stop());
+        rearStream = null;
       }
+      rearVideo.srcObject = null;
     }
 
     async function startFrontCamera(){
-      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return false;
-      try{
-        if(frontStream) frontStream.getTracks().forEach(t=>t.stop());
-        frontStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user' }, audio:false });
-        frontVideo.srcObject = frontStream;
-        frontVideo.onloadedmetadata = ()=> frontVideo.play().catch(()=>{});
-        frontPip.style.display = 'block';
-        blinkPrompt.style.display = 'inline-flex';
-        return true;
-      }catch(e){
-        frontPip.style.display = 'none';
-        blinkPrompt.style.display = 'none';
-        return false;
-      }
+      if (frontStream) return;
+      frontStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 860 } },
+        audio: false
+      });
+      frontVideo.srcObject = frontStream;
+      frontInset.classList.add("show");
     }
 
     function stopFrontCamera(){
-      if(frontStream){
-        frontStream.getTracks().forEach(t=>t.stop());
+      if (frontStream){
+        frontStream.getTracks().forEach(t => t.stop());
         frontStream = null;
       }
       frontVideo.srcObject = null;
-      frontPip.style.display = 'none';
-      blinkPrompt.style.display = 'none';
+      frontInset.classList.remove("show");
     }
 
     function captureRearFrame(){
-      if(!rearVideo.videoWidth || !rearVideo.videoHeight) return false;
-      const canvas = document.createElement('canvas');
-      canvas.width = rearVideo.videoWidth;
-      canvas.height = rearVideo.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(rearVideo,0,0,canvas.width,canvas.height);
-      rearCapture.src = canvas.toDataURL('image/jpeg', .92);
-      rearCapture.style.display = 'block';
-      rearVideo.style.opacity = '0';
-      return true;
+      const canvas = document.createElement("canvas");
+      const w = rearVideo.videoWidth || 1080;
+      const h = rearVideo.videoHeight || 1080;
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(rearVideo, 0, 0, w, h);
+      capturedRear.src = canvas.toDataURL("image/jpeg", .92);
+      capturedRear.style.display = "block";
+      rearVideo.style.display = "none";
     }
 
-    function resetState(){
+    async function ensureLandmarker(){
+      if (faceLandmarker) return faceLandmarker;
+      const filesetResolver = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/wasm"
+      );
+      faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+        baseOptions: {
+          modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task"
+        },
+        runningMode: "VIDEO",
+        numFaces: 1
+      });
+      return faceLandmarker;
+    }
+
+    function dist(a,b){
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      return Math.hypot(dx, dy);
+    }
+
+    function eyeAspectRatio(landmarks, left=true){
+      const idx = left
+        ? {h1:33, h2:133, v1:159, v2:145}
+        : {h1:362, h2:263, v1:386, v2:374};
+      const h = dist(landmarks[idx.h1], landmarks[idx.h2]);
+      const v = dist(landmarks[idx.v1], landmarks[idx.v2]);
+      return h > 0 ? v / h : 0;
+    }
+
+    function handleBlinkResult(landmarks){
+      const now = performance.now();
+      if (now < blinkCooldownUntil) return;
+
+      const leftEAR = eyeAspectRatio(landmarks, true);
+      const rightEAR = eyeAspectRatio(landmarks, false);
+      const ear = (leftEAR + rightEAR) / 2;
+
+      if (ear < 0.16){
+        closedFrames += 1;
+        blinkState = "closed";
+      } else if (blinkState === "closed" && closedFrames >= 1 && ear > 0.22){
+        blinkState = "open";
+        closedFrames = 0;
+        blinkCooldownUntil = now + 900;
+        stabilizeStep();
+      } else if (ear > 0.20){
+        closedFrames = 0;
+        blinkState = "open";
+      }
+    }
+
+    async function detectBlinkLoop(){
+      const landmarker = await ensureLandmarker();
+      const loop = async () => {
+        if (!autoMode || !frontVideo.srcObject) return;
+        if (frontVideo.readyState >= 2){
+          const nowMs = performance.now();
+          if (frontVideo.currentTime !== lastVideoTime){
+            lastVideoTime = frontVideo.currentTime;
+            const res = landmarker.detectForVideo(frontVideo, nowMs);
+            if (res.faceLandmarks && res.faceLandmarks.length){
+              handleBlinkResult(res.faceLandmarks[0]);
+            }
+          }
+        }
+        detectLoopId = requestAnimationFrame(loop);
+      };
+      detectLoopId = requestAnimationFrame(loop);
+    }
+
+    function stopDetectLoop(){
+      if (detectLoopId){
+        cancelAnimationFrame(detectLoopId);
+        detectLoopId = null;
+      }
+      blinkState = "open";
+      closedFrames = 0;
+      lastVideoTime = -1;
+    }
+
+    function setManualModeUI(){
       autoMode = false;
-      angle = 20;
-      rearCapture.style.display = 'none';
-      rearVideo.style.opacity = rearVideo.classList.contains('ready') ? '1' : '0';
+      autoBtn.classList.remove("active");
+      manualBtn.classList.add("primary");
+      guide.classList.remove("show");
+      stopDetectLoop();
       stopFrontCamera();
-      renderGuide();
+      capturedRear.style.display = "none";
+      rearVideo.style.display = "block";
     }
 
-    openBtn.addEventListener('click', async ()=>{
-      asdOverlay.classList.add('show');
-      asdOverlay.setAttribute('aria-hidden','false');
-      resetState();
-      await startRearCamera();
-      renderGuide();
-    });
-
-    asdClose.addEventListener('click', ()=>{
-      asdOverlay.classList.remove('show');
-      asdOverlay.setAttribute('aria-hidden','true');
-      stopFrontCamera();
-      if(rearStream){ rearStream.getTracks().forEach(t=>t.stop()); rearStream = null; }
-      rearVideo.srcObject = null;
-      rearVideo.classList.remove('ready');
-      rearVideo.style.opacity = '0';
-      eyeFallback.style.display = 'block';
-      rearCapture.style.display = 'none';
-    });
-
-    rotateFloating.addEventListener('click', ()=>{
-      angle = randomAngle();
-      renderGuide();
-    });
-
-    asdManualBtn.addEventListener('click', stabilizeStep);
-
-    asdAutoBtn.addEventListener('click', async ()=>{
+    async function setAutoMode(){
       autoMode = true;
-      if(!rearVideo.classList.contains('ready')) await startRearCamera();
+      manualBtn.classList.remove("primary");
+      autoBtn.classList.add("active");
+      guide.classList.add("show");
       captureRearFrame();
       await startFrontCamera();
+      await detectBlinkLoop();
+    }
+
+    openDemo.addEventListener("click", async () => {
+      overlay.classList.add("show");
+      angle = -20;
+      updateScene();
+      setManualModeUI();
+      await startRearCamera();
     });
 
-    frontGuide.addEventListener('click', ()=>{
-      if(!autoMode) return;
+    closeDemo.addEventListener("click", () => {
+      overlay.classList.remove("show");
+      stopDetectLoop();
+      stopFrontCamera();
+      stopRearCamera();
+    });
+
+    rotateBtn.addEventListener("click", () => {
+      angle = randomAngle();
+      updateScene();
+    });
+
+    manualBtn.addEventListener("click", async () => {
+      if (autoMode){
+        setManualModeUI();
+        await startRearCamera();
+        return;
+      }
       stabilizeStep();
     });
 
-    renderGuide();
+    autoBtn.addEventListener("click", async () => {
+      if (!rearStream && !autoMode){
+        await startRearCamera();
+      }
+      if (!autoMode){
+        await setAutoMode();
+      }
+    });
+
+    updateScene();
   </script>
 </body>
 </html>
