@@ -4,139 +4,157 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>ACUVUE ASD MediaPipe</title>
+<title>ACUVUE ASD Premium UI</title>
 <style>
   :root{
     --blue:#005EB8;
     --blue-deep:#004A93;
-    --blue-soft:#EAF3FF;
-    --text:#102842;
-    --sub:#667E98;
-    --line:#D9E7F4;
+    --blue-soft:#EAF4FF;
+    --navy:#14385F;
+    --text:#112B45;
+    --sub:#6C8298;
+    --line:#DCE8F5;
     --bg:#EEF5FC;
-    --green:#16BE4A;
-    --orange:#FFAF16;
-    --shadow:0 12px 28px rgba(0,74,147,.12);
+    --green:#14BE4B;
+    --orange:#FFB020;
+    --white:#fff;
+    --shadow:0 18px 34px rgba(0,74,147,.12);
+    --shadow-soft:0 10px 22px rgba(0,74,147,.08);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;background:#DCE4EE;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--text)}
-  .app{width:min(430px,100vw);margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#F8FBFF 0%,#EEF5FC 100%);}
+  html,body{margin:0;background:#DCE6F0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--text)}
+  .app{width:min(430px,100vw);min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#F8FBFF 0%, #EDF5FD 100%);position:relative;overflow:hidden}
   .screen{display:none;min-height:100vh}
   .screen.active{display:block}
 
   .landing{padding:22px 20px 34px}
   .top-pill{
-    height:62px;border-radius:30px;background:#fff;border:1px solid #DBE7F3;box-shadow:0 8px 18px rgba(0,74,147,.08);
-    display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--blue);font-size:19px;position:relative
+    height:62px;border-radius:30px;background:#fff;border:1px solid #DCE8F4;box-shadow:var(--shadow-soft);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;color:var(--blue);position:relative
   }
   .search{
     position:absolute;right:10px;top:8px;width:46px;height:46px;border-radius:16px;border:1px solid #DBE7F3;background:#fff;
     display:flex;align-items:center;justify-content:center;font-size:22px;color:#193E66
   }
   .hero{
-    text-align:center;color:var(--blue);font-weight:900;font-size:34px;line-height:1.28;letter-spacing:-1.3px;margin:42px 0 34px
+    text-align:center;color:var(--blue);font-size:34px;font-weight:900;line-height:1.28;letter-spacing:-1.2px;margin:42px 0 34px
   }
   .card{
-    background:#fff;border:1px solid #DDE9F6;border-radius:34px;box-shadow:var(--shadow);padding:28px 26px 24px;position:relative;overflow:hidden;min-height:372px
+    position:relative;overflow:hidden;min-height:372px;padding:28px 26px 24px;border-radius:34px;background:#fff;border:1px solid #DCE9F6;box-shadow:var(--shadow)
   }
-  .card::after{
-    content:"";position:absolute;right:-42px;bottom:-62px;width:180px;height:180px;border-radius:50%;
+  .card::before{
+    content:"";position:absolute;right:-42px;bottom:-64px;width:180px;height:180px;border-radius:50%;
     background:radial-gradient(circle at center, rgba(0,94,184,.12), rgba(0,94,184,0) 72%);
   }
-  .pack{position:absolute;right:28px;top:74px;width:146px}
+  .pack{position:absolute;right:24px;top:74px;width:148px;filter:drop-shadow(0 12px 16px rgba(0,74,147,.16))}
   .copy{padding-top:156px}
   .copy h1{margin:0 0 14px;color:var(--blue);font-size:44px;line-height:1.05;letter-spacing:-1.8px}
   .copy p{margin:0;color:#607486;font-size:18px}
   .start{
     position:absolute;right:24px;bottom:24px;border:none;border-radius:26px;background:linear-gradient(180deg,#0A67C8,#0058B7);
     color:#fff;height:72px;min-width:150px;padding:0 22px 0 18px;font-size:20px;font-weight:900;display:flex;gap:14px;align-items:center;
-    box-shadow:0 14px 24px rgba(0,94,184,.24)
+    box-shadow:0 14px 24px rgba(0,94,184,.24);cursor:pointer
   }
-  .start .ic{
-    width:44px;height:44px;border-radius:50%;background:rgba(6,35,72,.26);display:flex;align-items:center;justify-content:center;font-size:24px
+  .start .ic{width:44px;height:44px;border-radius:50%;background:rgba(6,35,72,.26);display:flex;align-items:center;justify-content:center;font-size:24px}
+
+  .sim{padding:18px 14px 22px}
+  .panel{
+    background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-radius:30px;border:1px solid #DBE7F4;box-shadow:var(--shadow);overflow:hidden
+  }
+  .head{padding:18px 18px 8px;display:flex;justify-content:space-between;align-items:flex-start}
+  .head h2{margin:0;font-size:23px;font-weight:900;letter-spacing:-.5px;color:var(--navy)}
+  .en{margin-top:4px;color:#72849A;font-size:11px;letter-spacing:2.8px;font-weight:800}
+  .close{
+    width:42px;height:42px;border:none;border-radius:50%;background:#F3F7FB;color:#63768B;font-size:26px;
+    box-shadow:inset 0 0 0 1px #E2ECF6;cursor:pointer
   }
 
-  .sim{padding:20px 16px 24px}
-  .panel{background:#fff;border-radius:30px;border:1px solid #DBE7F4;box-shadow:var(--shadow);overflow:hidden}
-  .head{padding:18px 18px 10px;display:flex;justify-content:space-between;align-items:flex-start}
-  .head h2{margin:0;font-size:22px;font-weight:900;letter-spacing:-.4px}
-  .en{margin-top:4px;color:#70849C;font-size:12px;letter-spacing:3px;font-weight:700}
-  .close{width:44px;height:44px;border:none;border-radius:50%;background:#F1F5FA;color:#5D7188;font-size:28px}
-
-  .toolbar{padding:0 16px 12px;display:flex;gap:10px;align-items:center}
+  .control-shell{padding:0 16px 12px}
+  .control-bar{
+    background:linear-gradient(180deg,#F8FBFF 0%,#EEF5FD 100%);border:1px solid #DFEAF6;border-radius:22px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7);padding:10px;display:flex;gap:10px;align-items:center
+  }
   .toggle{
-    flex:1;background:var(--blue);padding:4px;border-radius:18px;display:flex;gap:4px
+    flex:1;background:linear-gradient(180deg,#0B66C8,#005AB7);padding:4px;border-radius:18px;display:flex;gap:4px;
+    box-shadow:0 10px 18px rgba(0,94,184,.14)
   }
   .toggle button{
-    flex:1;height:42px;border:none;border-radius:14px;background:transparent;color:#fff;opacity:.78;font-size:17px;font-weight:900
+    flex:1;height:42px;border:none;border-radius:14px;background:transparent;color:#fff;opacity:.82;font-size:16px;font-weight:900;letter-spacing:-.2px;cursor:pointer
   }
-  .toggle button.active{background:#fff;color:#173D66;opacity:1;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .toggle button.active{background:#fff;color:#163C66;opacity:1;box-shadow:0 4px 10px rgba(0,0,0,.10)}
   .cam-switch{
-    width:50px;height:50px;border:none;border-radius:16px;background:#fff;box-shadow:0 8px 16px rgba(0,74,147,.10);font-size:24px;color:#173D66
+    flex:0 0 52px;width:52px;height:52px;border:none;border-radius:16px;background:#fff;box-shadow:var(--shadow-soft);font-size:24px;color:#173D66;cursor:pointer
   }
 
+  .viewer-wrap{padding:0 16px 14px}
+  .viewer-card{
+    background:linear-gradient(180deg,#EDF4FA 0%,#E3EDF6 100%);
+    border-radius:28px;padding:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55)
+  }
   .viewer{
-    margin:0 16px;border-radius:28px;background:#DCE6EF;overflow:hidden;position:relative;aspect-ratio:.86/1
+    position:relative;overflow:hidden;border-radius:22px;aspect-ratio:.86/1;background:linear-gradient(180deg,#DCE7F1,#CFDAE6)
   }
-  .stage{position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,#E4EBF3,#D4DEE9)}
-  .camera, .capture, .overlay, .mini-canvas, .eyelid{
-    position:absolute;inset:0;width:100%;height:100%
-  }
-  .camera, .capture{object-fit:cover;background:#CBD7E2}
+  .stage{position:absolute;inset:0;overflow:hidden}
+  .camera,.capture,.overlay,.eyelid,.mini-canvas{position:absolute;inset:0;width:100%;height:100%}
+  .camera,.capture{object-fit:cover;background:#CBD7E2}
   .capture{display:none}
-  .overlay,.mini-canvas,.eyelid{pointer-events:none}
+  .overlay,.eyelid,.mini-canvas{pointer-events:none}
+
   .camera-banner{
-    position:absolute;top:14px;right:14px;z-index:4;display:flex;align-items:center
+    position:absolute;left:14px;top:14px;z-index:6;display:flex;align-items:center
   }
   .banner-ic{
-    width:42px;height:42px;background:#fff;border:2px solid #173B63;border-right:none;border-radius:4px 0 0 4px;
-    display:flex;align-items:center;justify-content:center;font-size:20px
+    width:40px;height:40px;border-radius:14px 0 0 14px;background:#fff;color:#173C64;border:1.5px solid #173C64;border-right:none;
+    display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800
   }
   .banner-tx{
-    height:42px;min-width:162px;padding:0 14px;background:#0A63C2;border:2px solid #173B63;border-radius:0 4px 4px 0;
-    color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800
+    height:40px;padding:0 14px;border-radius:0 14px 14px 0;background:linear-gradient(180deg,#0D67C7,#025CB8);
+    border:1.5px solid #173C64;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;letter-spacing:-.2px
   }
+
   .status{
-    position:absolute;left:14px;bottom:14px;z-index:4;height:44px;padding:0 14px 0 11px;background:rgba(255,255,255,.97);
-    border:1px solid #D6E3F1;border-radius:22px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 18px rgba(0,74,147,.10);
-    font-size:16px;font-weight:900;color:#24518A
+    position:absolute;left:14px;bottom:14px;z-index:6;min-height:46px;padding:0 14px 0 11px;background:rgba(255,255,255,.96);
+    border:1px solid #D8E4F2;border-radius:24px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 22px rgba(0,74,147,.12);
+    color:#24518A;font-size:15px;font-weight:900
   }
-  .dot{
-    width:22px;height:22px;border-radius:50%;background:var(--green);box-shadow:0 0 0 7px rgba(22,190,74,.16)
-  }
-  .status.deviated .dot{background:var(--orange);box-shadow:0 0 0 7px rgba(255,175,22,.18)}
+  .dot{width:22px;height:22px;border-radius:50%;background:var(--green);box-shadow:0 0 0 7px rgba(20,190,75,.16)}
+  .status.deviated .dot{background:var(--orange);box-shadow:0 0 0 7px rgba(255,176,32,.18)}
 
   .helper{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:7;background:rgba(255,255,255,.9);padding:10px 16px;border-radius:18px;
-    font-size:15px;font-weight:800;color:#24518A;box-shadow:0 8px 16px rgba(0,74,147,.10);display:none;text-align:center
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:7;padding:10px 16px;border-radius:18px;background:rgba(255,255,255,.92);
+    font-size:14px;font-weight:800;color:#24518A;box-shadow:0 8px 18px rgba(0,74,147,.10);display:none;text-align:center
+  }
+  .loading-ai{
+    position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:7;background:rgba(4,17,31,.74);color:#fff;
+    padding:8px 12px;border-radius:14px;font-size:12px;font-weight:800;display:none
   }
 
   .hint{
-    position:absolute;top:16px;right:18px;z-index:8;min-width:160px;max-width:188px;background:linear-gradient(180deg,rgba(40,102,220,.95),rgba(40,102,220,.90));
-    color:#fff;border-radius:22px;padding:15px 18px;text-align:center;font-size:18px;font-weight:900;line-height:1.14;display:none;
-    box-shadow:0 14px 24px rgba(16,70,150,.28)
+    position:absolute;right:18px;top:16px;z-index:8;min-width:158px;max-width:182px;background:linear-gradient(180deg,rgba(40,102,220,.96),rgba(40,102,220,.90));
+    color:#fff;border-radius:22px;padding:14px 18px;text-align:center;font-size:17px;font-weight:900;line-height:1.14;display:none;
+    box-shadow:0 16px 24px rgba(16,70,150,.30)
   }
   .hint::after{
-    content:"";position:absolute;bottom:-12px;right:36px;border-width:14px 11px 0 11px;border-style:solid;
-    border-color:rgba(40,102,220,.92) transparent transparent transparent;transform:rotate(14deg)
+    content:"";position:absolute;bottom:-12px;right:34px;border-width:14px 11px 0 11px;border-style:solid;
+    border-color:rgba(40,102,220,.92) transparent transparent transparent;transform:rotate(12deg)
   }
   .hint .orb{
-    position:absolute;right:16px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:var(--orange);
-    box-shadow:0 0 0 10px rgba(255,175,22,.16)
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:var(--orange);
+    box-shadow:0 0 0 10px rgba(255,176,32,.15)
   }
 
   .mini{
     position:absolute;right:14px;top:14px;z-index:8;width:126px;height:160px;border-radius:22px;overflow:hidden;background:#fff;border:2px solid rgba(255,255,255,.92);
-    box-shadow:0 12px 26px rgba(0,0,0,.18);display:none
+    box-shadow:0 14px 26px rgba(0,0,0,.18);display:none
   }
   .mini video,.mini canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .mini-label{
     position:absolute;left:8px;right:8px;bottom:10px;background:linear-gradient(180deg,rgba(40,102,220,.97),rgba(40,102,220,.94));color:#fff;
-    border-radius:18px;padding:10px 12px 12px;text-align:center;font-size:15px;font-weight:900;line-height:1.12;box-shadow:0 10px 18px rgba(16,70,150,.28)
+    border-radius:18px;padding:10px 12px 12px;text-align:center;font-size:14px;font-weight:900;line-height:1.12;box-shadow:0 10px 18px rgba(16,70,150,.28)
   }
   .mini-orb{
     position:absolute;right:10px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--orange);
-    box-shadow:0 0 0 8px rgba(255,175,22,.16)
+    box-shadow:0 0 0 8px rgba(255,176,32,.16)
   }
 
   .eyelid .top,.eyelid .bottom{
@@ -163,27 +181,42 @@
     100%{transform:translateY(105%);opacity:0}
   }
 
-  .actions{padding:14px 16px;display:flex;gap:10px}
-  .btn-secondary,.btn-primary{
-    border:none;border-radius:18px;height:56px;font-size:18px;font-weight:900;letter-spacing:-.2px
+  .action-area{padding:0 16px 14px}
+  .action-panel{
+    background:#F6FAFE;border:1px solid #E1EBF6;border-radius:24px;padding:10px;display:flex;gap:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)
   }
-  .btn-secondary{flex:0 0 34%;background:#F3F7FB;border:1.5px solid #D7E3F1;color:#20569A}
-  .slot{flex:1;background:#0B61BE;border-radius:18px;padding:4px;display:flex;align-items:center}
+  .btn-secondary,.btn-primary{
+    border:none;border-radius:18px;height:56px;font-size:17px;font-weight:900;letter-spacing:-.2px;cursor:pointer
+  }
+  .btn-secondary{
+    flex:0 0 36%;background:#fff;border:1.5px solid #D7E3F1;color:#20569A;box-shadow:var(--shadow-soft)
+  }
+  .slot{
+    flex:1;background:linear-gradient(180deg,#0B66C8,#005AB7);border-radius:18px;padding:4px;display:flex;align-items:center;
+    box-shadow:0 12px 20px rgba(0,94,184,.14)
+  }
   .btn-primary{width:100%;height:48px;border-radius:14px;background:#fff;color:#173D66}
   .btn-primary.solid{background:transparent;color:#fff}
   .btn-primary.hidden{display:none}
 
-  .desc{border-top:1px solid #ECF2F8;padding:16px 16px 18px;background:linear-gradient(180deg,#fff,#FBFDFF)}
-  .desc-row{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
-  .info{width:16px;min-width:16px;color:#2A69C8;font-size:22px;font-weight:900;line-height:1;margin-top:3px}
-  .desc-body{flex:1}
-  .desc-body h3{margin:0 0 6px;font-size:18px;font-weight:900;letter-spacing:-.3px}
-  .desc-body p{margin:0;font-size:15px;line-height:1.45;color:#294D74;font-weight:700}
-  .desc-body .blue{color:#0E61BE}
-  .desc-body .orange{color:#D97F00}
+  .info-area{padding:0 16px 18px}
+  .info-card{
+    background:linear-gradient(180deg,#fff 0%,#FBFDFF 100%);border:1px solid #E2ECF6;border-radius:24px;padding:16px;box-shadow:var(--shadow-soft)
+  }
+  .info-top{display:flex;gap:12px;align-items:flex-start}
+  .info-icon{
+    width:28px;height:28px;border-radius:14px;background:#EAF3FF;color:#2A69C8;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:0 0 28px
+  }
+  .info-text{flex:1}
+  .info-text h3{margin:0 0 6px;font-size:18px;font-weight:900;letter-spacing:-.3px;color:var(--navy)}
+  .info-text p{margin:0;font-size:15px;line-height:1.48;color:#294D74;font-weight:700}
+  .info-text .blue{color:#0E61BE}
+  .info-text .orange{color:#D97F00}
   .note{margin-top:10px;font-size:11px;line-height:1.4;color:#6E7D8E}
+  .done-row{margin-top:14px}
   .done{
-    flex:0 0 108px;height:64px;border:none;border-radius:18px;background:#04111F;color:#fff;font-size:18px;font-weight:900
+    width:100%;height:56px;border:none;border-radius:18px;background:#061626;color:#fff;font-size:17px;font-weight:900;
+    box-shadow:0 12px 20px rgba(6,22,38,.14);cursor:pointer
   }
 
   .cam-perm{
@@ -194,18 +227,14 @@
   }
   .cam-card h3{margin:0 0 10px;font-size:20px;color:#173F69}
   .cam-card p{margin:0;font-size:15px;line-height:1.45;color:#5E7692;font-weight:700}
-  .loading-ai{
-    position:absolute;left:50%;top:24px;transform:translateX(-50%);z-index:9;background:rgba(4,17,31,.78);color:#fff;
-    padding:8px 12px;border-radius:14px;font-size:13px;font-weight:800;display:none
-  }
   .hidden{display:none!important}
 
   @media (max-width:380px){
     .hero{font-size:30px}
     .copy h1{font-size:38px}
-    .banner-tx{min-width:148px;font-size:16px}
-    .status{font-size:15px}
-    .btn-secondary,.btn-primary{font-size:17px}
+    .banner-tx{font-size:14px}
+    .status{font-size:14px}
+    .btn-secondary,.btn-primary{font-size:16px}
   }
 </style>
 </head>
@@ -263,79 +292,92 @@
           <button class="close" id="closeBtn">×</button>
         </div>
 
-        <div class="toolbar">
-          <div class="toggle">
-            <button class="active" id="manualBtn">수동클릭</button>
-            <button id="autoBtn">자동인식</button>
+        <div class="control-shell">
+          <div class="control-bar">
+            <div class="toggle">
+              <button class="active" id="manualBtn">수동클릭</button>
+              <button id="autoBtn">자동인식</button>
+            </div>
+            <button class="cam-switch" id="switchBtn">📷</button>
           </div>
-          <button class="cam-switch" id="switchBtn">📷</button>
         </div>
 
-        <div class="viewer">
-          <div class="stage">
-            <video class="camera" id="cameraVideo" playsinline autoplay muted></video>
-            <img class="capture" id="captureImage" alt="capture" />
-            <canvas class="overlay" id="overlayCanvas"></canvas>
+        <div class="viewer-wrap">
+          <div class="viewer-card">
+            <div class="viewer">
+              <div class="stage">
+                <video class="camera" id="cameraVideo" playsinline autoplay muted></video>
+                <img class="capture" id="captureImage" alt="capture" />
+                <canvas class="overlay" id="overlayCanvas"></canvas>
 
-            <div class="eyelid" id="eyelidLayer">
-              <div class="top"></div>
-              <div class="bottom"></div>
-            </div>
+                <div class="eyelid" id="eyelidLayer">
+                  <div class="top"></div>
+                  <div class="bottom"></div>
+                </div>
 
-            <div class="camera-banner">
-              <div class="banner-ic">📷</div>
-              <div class="banner-tx" id="bannerText">전면 카메라 실행 중</div>
-            </div>
+                <div class="camera-banner">
+                  <div class="banner-ic">📷</div>
+                  <div class="banner-tx" id="bannerText">전면 카메라 실행 중</div>
+                </div>
 
-            <div class="status" id="statusPill">
-              <div class="dot"></div>
-              <div id="statusText">축 안정</div>
-            </div>
+                <div class="status" id="statusPill">
+                  <div class="dot"></div>
+                  <div id="statusText">축 안정</div>
+                </div>
 
-            <div class="helper" id="helperText">카메라를 준비 중입니다</div>
-            <div class="loading-ai" id="aiLoading">AI 순목 인식 준비 중</div>
+                <div class="helper" id="helperText">카메라를 준비 중입니다</div>
+                <div class="loading-ai" id="aiLoading">AI 순목 인식 준비 중</div>
 
-            <div class="hint" id="hintBubble">
-              눈을 한번 깜박여<br>주세요
-              <span class="orb"></span>
-            </div>
+                <div class="hint" id="hintBubble">
+                  눈을 한번 깜박여<br>주세요
+                  <span class="orb"></span>
+                </div>
 
-            <div class="mini" id="miniBlink">
-              <video id="blinkVideo" playsinline autoplay muted></video>
-              <canvas id="blinkCanvas" class="mini-canvas"></canvas>
-              <div class="mini-label">
-                눈을 한번 깜박여<br>주세요
-                <span class="mini-orb"></span>
+                <div class="mini" id="miniBlink">
+                  <video id="blinkVideo" playsinline autoplay muted></video>
+                  <canvas id="blinkCanvas" class="mini-canvas"></canvas>
+                  <div class="mini-label">
+                    눈을 한번 깜박여<br>주세요
+                    <span class="mini-orb"></span>
+                  </div>
+                </div>
+
+                <div class="cam-perm hidden" id="camFallback">
+                  <div class="cam-card">
+                    <h3>카메라 권한이 필요합니다</h3>
+                    <p>브라우저에서 카메라 접근을 허용하면<br>전면/후면 카메라 체험이 가능합니다.</p>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div class="cam-perm hidden" id="camFallback">
-              <div class="cam-card">
-                <h3>카메라 권한이 필요합니다</h3>
-                <p>브라우저에서 카메라 접근을 허용하면<br>전면/후면 카메라 체험이 가능합니다.</p>
+        <div class="action-area">
+          <div class="action-panel">
+            <button class="btn-secondary" id="deviateBtn">축회전 유발</button>
+            <div class="slot">
+              <button class="btn-primary solid" id="primaryBtn">눈 깜박임</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-area">
+          <div class="info-card">
+            <div class="info-top">
+              <div class="info-icon">i</div>
+              <div class="info-text">
+                <h3 id="descTitle">난시 렌즈 축 안정의 중요성</h3>
+                <p id="descText">아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.</p>
+                <div class="note">해당 시뮬레이션은 이해를 돕기 위한 데모 화면이며, 실제 시야 경험과는 차이가 있을 수 있습니다. KR_2026_233</div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn-secondary" id="deviateBtn">축회전 유발</button>
-          <div class="slot">
-            <button class="btn-primary solid" id="primaryBtn">눈 깜박임</button>
-          </div>
-        </div>
-
-        <div class="desc">
-          <div class="desc-row">
-            <div class="info">i</div>
-            <div class="desc-body">
-              <h3 id="descTitle">난시 렌즈 축 안정의 중요성</h3>
-              <p id="descText">아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.</p>
-              <div class="note">해당 시뮬레이션은 이해를 돕기 위한 데모 화면이며, 실제 시야 경험과는 차이가 있을 수 있습니다. KR_2026_233</div>
+            <div class="done-row">
+              <button class="done" id="resetBtn">확인 완료</button>
             </div>
-            <button class="done" id="resetBtn">확인 완료</button>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -343,7 +385,6 @@
 
 <script type="module">
 import vision from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs";
-
 const { FaceLandmarker, FilesetResolver } = vision;
 
 const state = {
@@ -610,9 +651,7 @@ function detectBlinkFromLandmarks(landmarks){
   if (ear < CLOSED){
     state.closedFrames += 1;
     state.openFrames = 0;
-    if (state.blinkState === 'open'){
-      state.blinkState = 'closing';
-    }
+    if (state.blinkState === 'open') state.blinkState = 'closing';
   } else if (ear > OPEN){
     state.openFrames += 1;
     if ((state.blinkState === 'closing' || state.blinkState === 'closed') && state.closedFrames >= 1 && now > state.blinkCooldownUntil){
@@ -658,7 +697,7 @@ async function runBlinkDetectionLoop(){
         const result = state.faceLandmarker.detectForVideo(sourceVideo, nowMs);
         if (result && result.faceLandmarks && result.faceLandmarks.length > 0){
           detectBlinkFromLandmarks(result.faceLandmarks[0]);
-          drawMiniLandmarks(result.faceLandmarks[0], sourceVideo);
+          drawMiniLandmarks(result.faceLandmarks[0]);
         } else {
           clearMiniCanvas();
         }
@@ -678,18 +717,18 @@ function clearMiniCanvas(){
   miniCtx.clearRect(0, 0, blinkCanvas.width || 1, blinkCanvas.height || 1);
 }
 
-function drawMiniLandmarks(landmarks, videoEl){
+function drawMiniLandmarks(landmarks){
   if (state.cameraFacing !== 'environment' || !state.rearCaptured) return;
   const rect = blinkCanvas.getBoundingClientRect();
   const ratio = window.devicePixelRatio || 1;
-  const w = Math.round(rect.width * ratio);
-  const h = Math.round(rect.height * ratio);
+  const w = Math.max(1, Math.round(rect.width * ratio));
+  const h = Math.max(1, Math.round(rect.height * ratio));
   if (blinkCanvas.width !== w || blinkCanvas.height !== h){
     blinkCanvas.width = w;
     blinkCanvas.height = h;
   }
   miniCtx.clearRect(0,0,w,h);
-  miniCtx.strokeStyle = 'rgba(255,255,255,.85)';
+  miniCtx.strokeStyle = 'rgba(255,255,255,.88)';
   miniCtx.lineWidth = Math.max(1.5, w * 0.01);
 
   const left = [33,160,158,133,153,144,33];
@@ -713,6 +752,7 @@ function drawMiniLandmarks(landmarks, videoEl){
 async function setupDetection(){
   stopDetectLoop();
   stopMiniCamera();
+  clearMiniCanvas();
 
   if (state.mode !== 'auto') return;
   await setupFaceLandmarker();
@@ -759,8 +799,8 @@ function resetAll(){
 function drawOverlay(){
   const rect = overlayCanvas.getBoundingClientRect();
   const ratio = window.devicePixelRatio || 1;
-  const width = Math.round(rect.width * ratio);
-  const height = Math.round(rect.height * ratio);
+  const width = Math.max(1, Math.round(rect.width * ratio));
+  const height = Math.max(1, Math.round(rect.height * ratio));
   if (overlayCanvas.width !== width || overlayCanvas.height !== height){
     overlayCanvas.width = width;
     overlayCanvas.height = height;
