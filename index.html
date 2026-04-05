@@ -3,311 +3,332 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>ACUVUE ASD Demo UIUX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>ACUVUE ASD Demo</title>
 <style>
   :root{
-    --blue:#005EB8;
-    --blue-deep:#004A93;
-    --blue-soft:#EAF3FF;
-    --text:#102842;
-    --sub:#667E98;
-    --line:#D9E7F4;
+    --acuvue-blue:#005EB8;
+    --acuvue-blue-deep:#004A93;
     --bg:#EEF5FC;
-    --green:#16BE4A;
-    --orange:#FFAF16;
-    --shadow:0 12px 28px rgba(0,74,147,.12);
+    --line:#D7E6F6;
+    --text:#0D2640;
+    --sub:#5D7592;
+    --white:#fff;
+    --green:#14BE4B;
+    --orange:#FFAA12;
+    --shadow:0 12px 30px rgba(0,74,147,.14);
+    --shadow-soft:0 8px 18px rgba(0,74,147,.10);
   }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;background:#DCE4EE;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--text)}
-  .app{width:min(430px,100vw);margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#F8FBFF 0%,#EEF5FC 100%);}
-  .screen{display:none;min-height:100vh}
-  .screen.active{display:block}
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html,body{ margin:0; background:#dfe7f2; font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif; color:var(--text); }
+  body{ min-height:100vh; }
+  .app{
+    width:min(430px,100vw);
+    min-height:100vh;
+    margin:0 auto;
+    background:linear-gradient(180deg,#f7fbff 0%, #edf4fb 100%);
+    position:relative;
+    overflow:hidden;
+  }
+  .screen{ display:none; min-height:100vh; }
+  .screen.active{ display:block; }
 
-  .landing{padding:22px 20px 34px}
+  .landing-wrap{ padding:22px 20px 34px; }
   .top-pill{
-    height:62px;border-radius:30px;background:#fff;border:1px solid #DBE7F3;box-shadow:0 8px 18px rgba(0,74,147,.08);
-    display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--blue);font-size:19px;position:relative
+    height:62px; border-radius:28px; background:var(--white); border:1.5px solid #dbe8f5; box-shadow:var(--shadow-soft);
+    display:flex; align-items:center; justify-content:center; color:var(--acuvue-blue); font-weight:800; font-size:19px; position:relative;
   }
-  .search{
-    position:absolute;right:10px;top:8px;width:46px;height:46px;border-radius:16px;border:1px solid #DBE7F3;background:#fff;
-    display:flex;align-items:center;justify-content:center;font-size:22px;color:#193E66
+  .search-btn{
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    width:46px; height:46px; border-radius:16px; border:1.5px solid #dbe8f5; background:#fff; color:#1a3d66; font-size:23px;
+    display:flex; align-items:center; justify-content:center;
   }
   .hero{
-    text-align:center;color:var(--blue);font-weight:900;font-size:34px;line-height:1.28;letter-spacing:-1.3px;margin:42px 0 34px
+    text-align:center; font-weight:900; color:var(--acuvue-blue);
+    font-size:34px; line-height:1.28; margin:42px 0 34px; letter-spacing:-1.3px;
   }
-  .card{
-    background:#fff;border:1px solid #DDE9F6;border-radius:34px;box-shadow:var(--shadow);padding:28px 26px 24px;position:relative;overflow:hidden;min-height:372px
+  .landing-card{
+    background:var(--white); border:1.5px solid #dce9f6; border-radius:34px; box-shadow:var(--shadow); min-height:370px; padding:28px 26px 24px; position:relative; overflow:hidden;
   }
-  .card::after{
-    content:"";position:absolute;right:-42px;bottom:-62px;width:180px;height:180px;border-radius:50%;
-    background:radial-gradient(circle at center, rgba(0,94,184,.12), rgba(0,94,184,0) 72%);
+  .landing-card::after{
+    content:""; position:absolute; inset:auto -40px -60px auto; width:180px; height:180px; border-radius:50%;
+    background:radial-gradient(circle at center, rgba(0,94,184,.12) 0%, rgba(0,94,184,0) 72%);
+    pointer-events:none;
   }
-  .pack{position:absolute;right:28px;top:74px;width:146px}
-  .copy{padding-top:156px}
-  .copy h1{margin:0 0 14px;color:var(--blue);font-size:44px;line-height:1.05;letter-spacing:-1.8px}
-  .copy p{margin:0;color:#607486;font-size:18px}
-  .start{
-    position:absolute;right:24px;bottom:24px;border:none;border-radius:26px;background:linear-gradient(180deg,#0A67C8,#0058B7);
-    color:#fff;height:72px;min-width:150px;padding:0 22px 0 18px;font-size:20px;font-weight:900;display:flex;gap:14px;align-items:center;
-    box-shadow:0 14px 24px rgba(0,94,184,.24)
+  .landing-copy{ padding-top:154px; }
+  .landing-title{ color:var(--acuvue-blue); font-weight:900; font-size:44px; line-height:1.05; letter-spacing:-1.8px; margin:0 0 14px; }
+  .landing-sub{ font-size:18px; color:#5f7287; margin:0; }
+  .packshot{ position:absolute; right:28px; top:78px; width:146px; filter:drop-shadow(0 12px 14px rgba(0,94,184,.10)); }
+  .start-btn{
+    position:absolute; right:24px; bottom:24px; border:none; border-radius:26px; background:linear-gradient(180deg,#0B63C1 0%, #0058B7 100%);
+    color:#fff; min-width:150px; height:72px; padding:0 22px 0 20px; font-size:20px; font-weight:800; box-shadow:0 14px 24px rgba(0,94,184,.25);
+    display:flex; gap:14px; align-items:center; justify-content:center;
   }
-  .start .ic{
-    width:44px;height:44px;border-radius:50%;background:rgba(6,35,72,.26);display:flex;align-items:center;justify-content:center;font-size:24px
-  }
-
-  .sim{padding:20px 16px 24px}
-  .panel{background:#fff;border-radius:30px;border:1px solid #DBE7F4;box-shadow:var(--shadow);overflow:hidden}
-  .head{padding:18px 18px 10px;display:flex;justify-content:space-between;align-items:flex-start}
-  .head h2{margin:0;font-size:22px;font-weight:900;letter-spacing:-.4px}
-  .en{margin-top:4px;color:#70849C;font-size:12px;letter-spacing:3px;font-weight:700}
-  .close{width:44px;height:44px;border:none;border-radius:50%;background:#F1F5FA;color:#5D7188;font-size:28px}
-
-  .toolbar{padding:0 16px 12px;display:flex;gap:10px;align-items:center}
-  .toggle{
-    flex:1;background:var(--blue);padding:4px;border-radius:18px;display:flex;gap:4px
-  }
-  .toggle button{
-    flex:1;height:42px;border:none;border-radius:14px;background:transparent;color:#fff;opacity:.78;font-size:17px;font-weight:900
-  }
-  .toggle button.active{background:#fff;color:#173D66;opacity:1;box-shadow:0 2px 8px rgba(0,0,0,.12)}
-  .cam-switch{
-    width:50px;height:50px;border:none;border-radius:16px;background:#fff;box-shadow:0 8px 16px rgba(0,74,147,.10);font-size:24px;color:#173D66
+  .arrow-badge{
+    width:44px; height:44px; border-radius:22px; background:rgba(7,40,83,.28); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700;
   }
 
-  .viewer{
-    margin:0 16px;border-radius:28px;background:#DCE6EF;overflow:hidden;position:relative;aspect-ratio:.86/1
+  .sim-wrap{ padding:20px 16px 22px; }
+  .panel{ background:var(--white); border-radius:30px; border:1px solid #dce8f5; box-shadow:var(--shadow); overflow:hidden; }
+  .panel-head{ padding:18px 18px 10px; display:flex; align-items:flex-start; justify-content:space-between; }
+  .title-lg{ font-size:22px; font-weight:900; letter-spacing:-.4px; margin:0; }
+  .title-en{ color:#6a7f97; font-size:12px; letter-spacing:2.8px; margin-top:4px; font-weight:700; }
+  .icon-close{ width:44px; height:44px; border-radius:50%; border:none; background:#F0F5FA; color:#596C83; font-size:28px; }
+
+  .toolbar{ padding:0 16px 12px; display:flex; gap:10px; align-items:center; justify-content:space-between; }
+  .mode-toggle{
+    background:#005EB8; border-radius:18px; padding:4px; display:flex; gap:4px; flex:1;
   }
-  .stage{position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,#E4EBF3,#D4DEE9)}
-  .camera, .capture, .overlay, .mini-canvas, .eyelid{
-    position:absolute;inset:0;width:100%;height:100%
+  .mode-btn{
+    flex:1; height:42px; border-radius:14px; border:none; font-size:17px; font-weight:800; background:transparent; color:#fff; opacity:.78;
   }
-  .camera, .capture{object-fit:cover;background:#CBD7E2}
-  .capture{display:none}
-  .overlay,.mini-canvas,.eyelid{pointer-events:none}
+  .mode-btn.active{ background:#fff; color:#17406d; opacity:1; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+  .camera-icon-btn{
+    flex:none; width:50px; height:50px; border-radius:16px; border:none; background:#fff; box-shadow:var(--shadow-soft); font-size:25px;
+    display:flex; align-items:center; justify-content:center; color:#17406d;
+  }
+
+  .viewer-shell{
+    margin:0 16px; border-radius:26px; background:#d9e4ee; position:relative; overflow:hidden; aspect-ratio: 0.86 / 1;
+  }
+  .viewer-stage{
+    position:absolute; inset:0; overflow:hidden; background:linear-gradient(180deg,#dfe8f1 0%, #ced9e6 100%);
+  }
+  .camera-layer, .capture-layer, .overlay-layer, .eyelid-layer, .mini-overlay{ position:absolute; inset:0; width:100%; height:100%; }
+  video, .capture-layer{ object-fit:cover; background:#ccd7e2; }
+  .capture-layer{ display:none; }
+  .overlay-layer, .mini-overlay{ pointer-events:none; }
   .camera-banner{
-    position:absolute;top:14px;right:14px;z-index:4;display:flex;align-items:center
+    position:absolute; top:14px; right:14px; z-index:4; display:flex; align-items:center;
   }
-  .banner-ic{
-    width:42px;height:42px;background:#fff;border:2px solid #173B63;border-right:none;border-radius:4px 0 0 4px;
-    display:flex;align-items:center;justify-content:center;font-size:20px
+  .banner-cam{
+    width:44px; height:44px; background:#fff; color:#183d64; display:flex; align-items:center; justify-content:center; border:2px solid #163a63; border-right:none; border-radius:4px 0 0 4px; font-size:22px; font-weight:700;
   }
-  .banner-tx{
-    height:42px;min-width:162px;padding:0 14px;background:#0A63C2;border:2px solid #173B63;border-radius:0 4px 4px 0;
-    color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800
-  }
-  .status{
-    position:absolute;left:14px;bottom:14px;z-index:4;height:44px;padding:0 14px 0 11px;background:rgba(255,255,255,.97);
-    border:1px solid #D6E3F1;border-radius:22px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 18px rgba(0,74,147,.10);
-    font-size:16px;font-weight:900;color:#24518A
-  }
-  .dot{
-    width:22px;height:22px;border-radius:50%;background:var(--green);box-shadow:0 0 0 7px rgba(22,190,74,.16)
-  }
-  .status.deviated .dot{background:var(--orange);box-shadow:0 0 0 7px rgba(255,175,22,.18)}
-
-  .helper{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:7;background:rgba(255,255,255,.9);padding:10px 16px;border-radius:18px;
-    font-size:15px;font-weight:800;color:#24518A;box-shadow:0 8px 16px rgba(0,74,147,.10);display:none;text-align:center
+  .banner-text{
+    height:44px; min-width:160px; padding:0 14px; display:flex; align-items:center; justify-content:center;
+    background:#0E61BE; color:#fff; border:2px solid #163a63; border-radius:0 4px 4px 0; font-size:17px; font-weight:800; letter-spacing:-.2px;
   }
 
-  .hint{
-    position:absolute;top:16px;right:18px;z-index:8;min-width:160px;max-width:188px;background:linear-gradient(180deg,rgba(40,102,220,.95),rgba(40,102,220,.90));
-    color:#fff;border-radius:22px;padding:15px 18px;text-align:center;font-size:18px;font-weight:900;line-height:1.14;display:none;
-    box-shadow:0 14px 24px rgba(16,70,150,.28)
+  .status-pill{
+    position:absolute; left:14px; bottom:14px; z-index:4; height:42px; padding:0 14px 0 11px; background:rgba(255,255,255,.96);
+    border:1px solid #D6E3F3; border-radius:22px; display:flex; align-items:center; gap:10px; color:#24518A; font-weight:800; font-size:16px; box-shadow:var(--shadow-soft);
   }
-  .hint::after{
-    content:"";position:absolute;bottom:-12px;right:36px;border-width:14px 11px 0 11px;border-style:solid;
-    border-color:rgba(40,102,220,.92) transparent transparent transparent;transform:rotate(14deg)
+  .status-dot{
+    width:22px; height:22px; border-radius:50%; box-shadow:0 0 0 7px rgba(20,190,75,.16); background:var(--green); transition:background .2s ease, box-shadow .2s ease;
   }
-  .hint .orb{
-    position:absolute;right:16px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:var(--orange);
-    box-shadow:0 0 0 10px rgba(255,175,22,.16)
+  .status-pill.deviated .status-dot{ background:var(--orange); box-shadow:0 0 0 7px rgba(255,170,18,.20); }
+
+  .helper-center{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:7;
+    padding:10px 16px; border-radius:18px; background:rgba(255,255,255,.86); color:#21508a; font-weight:800; font-size:15px; box-shadow:var(--shadow-soft); display:none; text-align:center;
   }
 
-  .mini{
-    position:absolute;right:14px;top:14px;z-index:8;width:126px;height:160px;border-radius:22px;overflow:hidden;background:#fff;border:2px solid rgba(255,255,255,.92);
-    box-shadow:0 12px 26px rgba(0,0,0,.18);display:none
+  .hint-bubble{
+    position:absolute; top:16px; right:18px; z-index:8; max-width:188px; min-width:160px;
+    background:linear-gradient(180deg,rgba(34,96,215,.94) 0%, rgba(34,96,215,.90) 100%); color:#fff; border-radius:22px; padding:15px 18px;
+    box-shadow:0 14px 24px rgba(16,70,150,.28); font-size:18px; font-weight:900; line-height:1.14; text-align:center; display:none;
   }
-  .mini video,.mini canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .mini-label{
-    position:absolute;left:8px;right:8px;bottom:10px;background:linear-gradient(180deg,rgba(40,102,220,.97),rgba(40,102,220,.94));color:#fff;
-    border-radius:18px;padding:10px 12px 12px;text-align:center;font-size:15px;font-weight:900;line-height:1.12;box-shadow:0 10px 18px rgba(16,70,150,.28)
+  .hint-bubble::after{
+    content:""; position:absolute; bottom:-12px; right:36px; border-width:14px 11px 0 11px; border-style:solid;
+    border-color:rgba(34,96,215,.92) transparent transparent transparent; transform:rotate(14deg);
   }
-  .mini-orb{
-    position:absolute;right:10px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--orange);
-    box-shadow:0 0 0 8px rgba(255,175,22,.16)
+  .hint-accent{
+    position:absolute; right:16px; top:50%; transform:translateY(-50%); width:42px; height:42px; border-radius:50%; background:#FFAA12; box-shadow:0 0 0 10px rgba(255,170,18,.16);
   }
 
-  .eyelid .top,.eyelid .bottom{
-    position:absolute;left:0;width:100%;height:52%;background:linear-gradient(180deg, rgba(219,213,205,.92), rgba(195,186,177,.95));
-    transform:translateY(-105%);opacity:0
+  .blink-mini{
+    position:absolute; right:14px; top:14px; z-index:8; width:126px; height:160px; border-radius:22px; overflow:hidden; background:#fff;
+    box-shadow:0 12px 26px rgba(0,0,0,.18); display:none; border:2px solid rgba(255,255,255,.92);
   }
-  .eyelid .bottom{
-    top:auto;bottom:0;background:linear-gradient(180deg, rgba(197,188,180,.95), rgba(219,213,205,.92));transform:translateY(105%)
+  .blink-mini video, .blink-mini canvas{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .blink-mini-label{
+    position:absolute; left:8px; right:8px; bottom:10px; background:linear-gradient(180deg,rgba(34,96,215,.97),rgba(34,96,215,.94));
+    color:#fff; border-radius:18px; padding:10px 12px 12px; font-size:15px; font-weight:900; line-height:1.12; text-align:center; box-shadow:0 10px 18px rgba(16,70,150,.28);
   }
-  .eyelid.blink .top{animation:blinkTop .32s ease-in-out}
-  .eyelid.blink .bottom{animation:blinkBottom .32s ease-in-out}
+  .blink-mini-dot{
+    position:absolute; right:10px; top:50%; transform:translateY(-50%); width:28px; height:28px; border-radius:50%; background:#FFAA12; box-shadow:0 0 0 8px rgba(255,170,18,.16);
+  }
+
+  .eyelid-layer{
+    pointer-events:none; z-index:6;
+  }
+  .eyelid-top, .eyelid-bottom{
+    position:absolute; left:0; width:100%; height:52%; background:linear-gradient(180deg, rgba(219,213,205,.92), rgba(195,186,177,.95));
+    transform:translateY(-105%);
+    opacity:0;
+  }
+  .eyelid-bottom{
+    top:auto; bottom:0;
+    background:linear-gradient(180deg, rgba(197,188,180,.95), rgba(219,213,205,.92));
+    transform:translateY(105%);
+  }
+  .eyelid-layer.blink .eyelid-top{
+    animation:blinkTop .32s ease-in-out;
+  }
+  .eyelid-layer.blink .eyelid-bottom{
+    animation:blinkBottom .32s ease-in-out;
+  }
   @keyframes blinkTop{
-    0%{transform:translateY(-105%);opacity:0}
-    25%{transform:translateY(-10%);opacity:.95}
-    50%{transform:translateY(8%);opacity:1}
-    75%{transform:translateY(-12%);opacity:.95}
-    100%{transform:translateY(-105%);opacity:0}
+    0%{ transform:translateY(-105%); opacity:0; }
+    25%{ transform:translateY(-10%); opacity:.95; }
+    50%{ transform:translateY(8%); opacity:1; }
+    75%{ transform:translateY(-12%); opacity:.95; }
+    100%{ transform:translateY(-105%); opacity:0; }
   }
   @keyframes blinkBottom{
-    0%{transform:translateY(105%);opacity:0}
-    25%{transform:translateY(10%);opacity:.95}
-    50%{transform:translateY(-8%);opacity:1}
-    75%{transform:translateY(12%);opacity:.95}
-    100%{transform:translateY(105%);opacity:0}
+    0%{ transform:translateY(105%); opacity:0; }
+    25%{ transform:translateY(10%); opacity:.95; }
+    50%{ transform:translateY(-8%); opacity:1; }
+    75%{ transform:translateY(12%); opacity:.95; }
+    100%{ transform:translateY(105%); opacity:0; }
   }
 
-  .actions{padding:14px 16px;display:flex;gap:10px}
-  .btn-secondary,.btn-primary{
-    border:none;border-radius:18px;height:56px;font-size:18px;font-weight:900;letter-spacing:-.2px
+  .actions{ padding:14px 16px 14px; display:flex; gap:10px; align-items:center; }
+  .btn-secondary, .btn-primary{
+    border:none; border-radius:18px; height:56px; font-size:18px; font-weight:900; letter-spacing:-.2px;
   }
-  .btn-secondary{flex:0 0 34%;background:#F3F7FB;border:1.5px solid #D7E3F1;color:#20569A}
-  .slot{flex:1;background:#0B61BE;border-radius:18px;padding:4px;display:flex;align-items:center}
-  .btn-primary{width:100%;height:48px;border-radius:14px;background:#fff;color:#173D66}
-  .btn-primary.solid{background:transparent;color:#fff}
-  .btn-primary.hidden{display:none}
+  .btn-secondary{ flex:0 0 34%; background:#F3F7FB; color:#20569A; border:1.5px solid #D7E3F1; }
+  .action-slot{ flex:1; background:#0B61BE; border-radius:18px; padding:4px; min-height:56px; display:flex; align-items:center; }
+  .btn-primary{ width:100%; background:#fff; color:#183D66; height:48px; border-radius:14px; }
+  .btn-primary.solid{ background:transparent; color:#fff; }
+  .btn-primary.hidden{ display:none; }
 
-  .desc{border-top:1px solid #ECF2F8;padding:16px 16px 18px;background:linear-gradient(180deg,#fff,#FBFDFF)}
-  .desc-row{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
-  .info{width:16px;min-width:16px;color:#2A69C8;font-size:22px;font-weight:900;line-height:1;margin-top:3px}
-  .desc-body{flex:1}
-  .desc-body h3{margin:0 0 6px;font-size:18px;font-weight:900;letter-spacing:-.3px}
-  .desc-body p{margin:0;font-size:15px;line-height:1.45;color:#294D74;font-weight:700}
-  .desc-body .blue{color:#0E61BE}
-  .desc-body .orange{color:#D97F00}
-  .note{margin-top:10px;font-size:11px;line-height:1.4;color:#6E7D8E}
-  .done{
-    flex:0 0 108px;height:64px;border:none;border-radius:18px;background:#04111F;color:#fff;font-size:18px;font-weight:900
+  .desc-area{ border-top:1px solid #ECF2F8; padding:16px 16px 18px; background:linear-gradient(180deg,#fff 0%, #fbfdff 100%); }
+  .desc-row{ display:flex; gap:12px; align-items:flex-start; justify-content:space-between; }
+  .info-mark{ width:16px; min-width:16px; margin-top:3px; color:#2A69C8; font-weight:900; font-size:22px; line-height:1; }
+  .desc-text{ flex:1; }
+  .desc-title{ margin:0 0 6px; font-size:18px; font-weight:900; color:#0D2640; letter-spacing:-.3px; }
+  .desc-body{ margin:0; font-size:15px; line-height:1.45; color:#294D74; font-weight:700; }
+  .desc-body .blue{ color:#0E61BE; }
+  .desc-body .orange{ color:#DA7D00; }
+  .confirm-btn{
+    flex:0 0 108px; height:64px; border:none; border-radius:18px; background:#04111F; color:#fff; font-size:18px; font-weight:900;
   }
-
+  .note{ margin-top:10px; font-size:11px; color:#6E7D8E; line-height:1.4; }
   .cam-perm{
-    position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:26px;background:linear-gradient(180deg, rgba(237,244,251,.88), rgba(225,236,246,.88))
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:10; background:linear-gradient(180deg, rgba(237,244,251,.88), rgba(225,236,246,.88));
+    text-align:center; padding:26px;
   }
-  .cam-card{
-    background:rgba(255,255,255,.95);border:1px solid #DBE7F4;border-radius:24px;padding:22px 18px;box-shadow:var(--shadow);text-align:center
-  }
-  .cam-card h3{margin:0 0 10px;font-size:20px;color:#173F69}
-  .cam-card p{margin:0;font-size:15px;line-height:1.45;color:#5E7692;font-weight:700}
-  .hidden{display:none!important}
+  .cam-card{ background:rgba(255,255,255,.95); border:1px solid #dce8f5; border-radius:24px; padding:22px 18px; box-shadow:var(--shadow); }
+  .cam-card h3{ margin:0 0 10px; font-size:20px; color:#173F69; }
+  .cam-card p{ margin:0; font-size:15px; line-height:1.45; color:#5E7692; font-weight:700; }
+  .hidden{ display:none !important; }
 
   @media (max-width:380px){
-    .hero{font-size:30px}
-    .copy h1{font-size:38px}
-    .banner-tx{min-width:148px;font-size:16px}
-    .status{font-size:15px}
-    .btn-secondary,.btn-primary{font-size:17px}
+    .hero{ font-size:30px; }
+    .landing-title{ font-size:38px; }
+    .banner-text{ min-width:148px; font-size:16px; }
+    .status-pill{ font-size:15px; }
+    .btn-secondary,.btn-primary{ font-size:17px; }
   }
 </style>
 </head>
 <body>
 <div class="app">
-  <section class="screen active" id="landingScreen">
-    <div class="landing">
+  <section class="screen landing-screen active" id="landingScreen">
+    <div class="landing-wrap">
       <div class="top-pill">
         ACUVUE Interactive Experience
-        <button class="search">⌕</button>
+        <button class="search-btn" aria-label="search">⌕</button>
       </div>
       <div class="hero">아큐브 기술력을<br>직접 체험해 보세요</div>
-      <div class="card">
-        <img class="pack" alt="packshot" src="data:image/svg+xml;utf8,
-        <svg xmlns='http://www.w3.org/2000/svg' width='260' height='170' viewBox='0 0 260 170'>
-          <defs>
-            <linearGradient id='g1' x1='0' y1='0' x2='1' y2='1'>
-              <stop offset='0' stop-color='%23ffffff'/>
-              <stop offset='1' stop-color='%23eaf6ff'/>
-            </linearGradient>
-            <linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'>
-              <stop offset='0' stop-color='%2300a9d8'/>
-              <stop offset='1' stop-color='%23005eb8'/>
-            </linearGradient>
-          </defs>
-          <rect x='12' y='26' rx='16' ry='16' width='180' height='108' fill='url(%23g1)' stroke='%23d6e6f6' stroke-width='3'/>
-          <rect x='154' y='10' rx='16' ry='16' width='92' height='116' fill='url(%23g2)' opacity='.95'/>
-          <text x='34' y='60' font-size='28' font-weight='700' fill='%23163c66' font-family='Arial'>ACUVUE</text>
-          <text x='34' y='100' font-size='40' font-weight='300' fill='%23163c66' font-family='Arial'>ACUVUE</text>
-          <text x='34' y='126' font-size='18' fill='%23163c66' font-family='Arial'>OASYS MAX</text>
-          <circle cx='122' cy='92' r='28' fill='none' stroke='%2300a9d8' stroke-width='3' opacity='.55'/>
-          <text x='182' y='36' font-size='14' font-weight='700' fill='white' font-family='Arial'>MAX</text>
-          <text x='174' y='58' font-size='10' fill='white' font-family='Arial'>1-DAY</text>
-          <text x='173' y='78' font-size='11' fill='white' font-family='Arial'>ASTIGMATISM</text>
-          <text x='176' y='97' font-size='10' fill='white' font-family='Arial'>BLUE</text>
-          <text x='176' y='112' font-size='10' fill='white' font-family='Arial'>LIGHT</text>
-        </svg>">
-        <div class="copy">
-          <h1>저녁까지<br>선명한 시야</h1>
-          <p>아큐브® 난시 기술력</p>
+      <div class="landing-card">
+        <img class="packshot" alt="packshot" src="data:image/svg+xml;utf8,
+          <svg xmlns='http://www.w3.org/2000/svg' width='260' height='170' viewBox='0 0 260 170'>
+            <defs>
+              <linearGradient id='g1' x1='0' y1='0' x2='1' y2='1'>
+                <stop offset='0' stop-color='%23ffffff'/>
+                <stop offset='1' stop-color='%23eaf6ff'/>
+              </linearGradient>
+              <linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'>
+                <stop offset='0' stop-color='%2300a9d8'/>
+                <stop offset='1' stop-color='%23005eb8'/>
+              </linearGradient>
+            </defs>
+            <rect x='12' y='26' rx='16' ry='16' width='180' height='108' fill='url(%23g1)' stroke='%23d6e6f6' stroke-width='3'/>
+            <rect x='154' y='10' rx='16' ry='16' width='92' height='116' fill='url(%23g2)' opacity='.95'/>
+            <text x='34' y='60' font-size='28' font-weight='700' fill='%23163c66' font-family='Arial'>ACUVUE</text>
+            <text x='34' y='100' font-size='40' font-weight='300' fill='%23163c66' font-family='Arial'>ACUVUE</text>
+            <text x='34' y='126' font-size='18' fill='%23163c66' font-family='Arial'>OASYS MAX</text>
+            <circle cx='122' cy='92' r='28' fill='none' stroke='%2300a9d8' stroke-width='3' opacity='.55'/>
+            <text x='182' y='36' font-size='14' font-weight='700' fill='white' font-family='Arial'>MAX</text>
+            <text x='174' y='58' font-size='10' fill='white' font-family='Arial'>1-DAY</text>
+            <text x='173' y='78' font-size='11' fill='white' font-family='Arial'>ASTIGMATISM</text>
+            <text x='176' y='97' font-size='10' fill='white' font-family='Arial'>BLUE</text>
+            <text x='176' y='112' font-size='10' fill='white' font-family='Arial'>LIGHT</text>
+          </svg>">
+        <div class="landing-copy">
+          <h1 class="landing-title">저녁까지<br>선명한 시야</h1>
+          <p class="landing-sub">아큐브® 난시 기술력</p>
         </div>
-        <button class="start" id="startBtn"><span class="ic">→</span>체험 시작</button>
+        <button class="start-btn" id="startExperienceBtn">
+          <span class="arrow-badge">→</span>
+          체험 시작
+        </button>
       </div>
     </div>
   </section>
 
-  <section class="screen" id="simScreen">
-    <div class="sim">
+  <section class="screen sim-screen" id="simScreen">
+    <div class="sim-wrap">
       <div class="panel">
-        <div class="head">
+        <div class="panel-head">
           <div>
-            <h2>ASD™ 축안정화</h2>
-            <div class="en">ACCELERATION STABLE DESIGN</div>
+            <h2 class="title-lg">ASD™ 축안정화</h2>
+            <div class="title-en">ACCELERATION STABLE DESIGN</div>
           </div>
-          <button class="close" id="closeBtn">×</button>
+          <button class="icon-close" id="closeSimBtn">×</button>
         </div>
 
         <div class="toolbar">
-          <div class="toggle">
-            <button class="active" id="manualBtn">수동클릭</button>
-            <button id="autoBtn">자동인식</button>
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="manualBtn">수동클릭</button>
+            <button class="mode-btn" id="autoBtn">자동인식</button>
           </div>
-          <button class="cam-switch" id="switchBtn">📷</button>
+          <button class="camera-icon-btn" id="cameraSwitchBtn" aria-label="카메라 전환">📷</button>
         </div>
 
-        <div class="viewer">
-          <div class="stage">
-            <video class="camera" id="cameraVideo" playsinline autoplay muted></video>
-            <img class="capture" id="captureImage" alt="capture" />
-            <canvas class="overlay" id="overlayCanvas"></canvas>
+        <div class="viewer-shell">
+          <div class="viewer-stage" id="viewerStage">
+            <video id="cameraVideo" class="camera-layer" playsinline autoplay muted></video>
+            <img id="captureImage" class="capture-layer" alt="capture" />
+            <canvas id="overlayCanvas" class="overlay-layer"></canvas>
 
-            <div class="eyelid" id="eyelidLayer">
-              <div class="top"></div>
-              <div class="bottom"></div>
+            <div class="eyelid-layer" id="eyelidLayer">
+              <div class="eyelid-top"></div>
+              <div class="eyelid-bottom"></div>
             </div>
 
-            <div class="camera-banner">
-              <div class="banner-ic">📷</div>
-              <div class="banner-tx" id="bannerText">전면 카메라 실행 중</div>
+            <div id="cameraBanner" class="camera-banner">
+              <div class="banner-cam">📷</div>
+              <div class="banner-text" id="cameraBannerText">전면 카메라 실행 중</div>
             </div>
 
-            <div class="status" id="statusPill">
-              <div class="dot"></div>
-              <div id="statusText">축 안정</div>
+            <div class="status-pill" id="statusPill">
+              <div class="status-dot"></div>
+              <div class="status-text" id="statusText">축 안정</div>
             </div>
 
-            <div class="helper" id="helperText">카메라를 준비 중입니다</div>
+            <div class="helper-center" id="helperCenter">카메라를 준비 중입니다</div>
 
-            <div class="hint" id="hintBubble">
+            <div class="hint-bubble" id="hintBubble">
               눈을 한번 깜박여<br>주세요
-              <span class="orb"></span>
+              <span class="hint-accent"></span>
             </div>
 
-            <div class="mini" id="miniBlink">
+            <div class="blink-mini" id="blinkMini">
               <video id="blinkVideo" playsinline autoplay muted></video>
-              <canvas id="blinkCanvas" class="mini-canvas"></canvas>
-              <div class="mini-label">
+              <canvas id="blinkCanvas" class="mini-overlay"></canvas>
+              <div class="blink-mini-label">
                 눈을 한번 깜박여<br>주세요
-                <span class="mini-orb"></span>
+                <span class="blink-mini-dot"></span>
               </div>
             </div>
 
             <div class="cam-perm hidden" id="camFallback">
               <div class="cam-card">
                 <h3>카메라 권한이 필요합니다</h3>
-                <p>브라우저에서 카메라 접근을 허용하면<br>전면/후면 카메라 체험이 가능합니다.</p>
+                <p>브라우저의 카메라 접근을 허용하면<br>전면/후면 카메라 체험이 가능합니다.</p>
               </div>
             </div>
           </div>
@@ -315,20 +336,20 @@
 
         <div class="actions">
           <button class="btn-secondary" id="deviateBtn">축회전 유발</button>
-          <div class="slot">
-            <button class="btn-primary solid" id="primaryBtn">눈 깜박임</button>
+          <div class="action-slot">
+            <button class="btn-primary solid" id="primaryActionBtn">눈 깜박임</button>
           </div>
         </div>
 
-        <div class="desc">
+        <div class="desc-area">
           <div class="desc-row">
-            <div class="info">i</div>
-            <div class="desc-body">
-              <h3 id="descTitle">난시 렌즈 축 안정의 중요성</h3>
-              <p id="descText">아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.</p>
+            <div class="info-mark">i</div>
+            <div class="desc-text">
+              <p class="desc-title" id="descTitle">난시 렌즈 축 안정의 중요성</p>
+              <p class="desc-body" id="descBody">아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.</p>
               <div class="note">해당 시뮬레이션은 이해를 돕기 위한 데모 화면이며, 실제 시야 경험과는 차이가 있을 수 있습니다. KR_2026_233</div>
             </div>
-            <button class="done" id="resetBtn">확인 완료</button>
+            <button class="confirm-btn" id="resetBtn">확인 완료</button>
           </div>
         </div>
       </div>
@@ -339,50 +360,54 @@
 <script>
 (() => {
   const state = {
-    mode: 'manual',
-    cameraFacing: 'user',
+    screen: 'landing',
+    mode: 'manual',              // manual | auto
+    cameraFacing: 'user',        // user | environment
     currentAngle: 0,
     mainStream: null,
     blinkStream: null,
+    capturedDataUrl: '',
+    autoRearRunning: false,
     blinkInterval: null,
     blinkCooldownUntil: 0,
     lastBlinkMetric: null,
+    cameraReady: false,
     rearCaptured: false,
-    capturedDataUrl: ''
   };
 
   const landingScreen = document.getElementById('landingScreen');
   const simScreen = document.getElementById('simScreen');
-  const startBtn = document.getElementById('startBtn');
-  const closeBtn = document.getElementById('closeBtn');
+  const startExperienceBtn = document.getElementById('startExperienceBtn');
+  const closeSimBtn = document.getElementById('closeSimBtn');
+
   const manualBtn = document.getElementById('manualBtn');
   const autoBtn = document.getElementById('autoBtn');
-  const switchBtn = document.getElementById('switchBtn');
+  const cameraSwitchBtn = document.getElementById('cameraSwitchBtn');
+
+  const cameraBannerText = document.getElementById('cameraBannerText');
   const cameraVideo = document.getElementById('cameraVideo');
   const captureImage = document.getElementById('captureImage');
   const overlayCanvas = document.getElementById('overlayCanvas');
   const eyelidLayer = document.getElementById('eyelidLayer');
-  const bannerText = document.getElementById('bannerText');
   const statusPill = document.getElementById('statusPill');
   const statusText = document.getElementById('statusText');
-  const helperText = document.getElementById('helperText');
+  const helperCenter = document.getElementById('helperCenter');
+  const primaryActionBtn = document.getElementById('primaryActionBtn');
+  const deviateBtn = document.getElementById('deviateBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const descTitle = document.getElementById('descTitle');
+  const descBody = document.getElementById('descBody');
   const hintBubble = document.getElementById('hintBubble');
-  const miniBlink = document.getElementById('miniBlink');
+  const blinkMini = document.getElementById('blinkMini');
   const blinkVideo = document.getElementById('blinkVideo');
   const blinkCanvas = document.getElementById('blinkCanvas');
   const camFallback = document.getElementById('camFallback');
-  const deviateBtn = document.getElementById('deviateBtn');
-  const primaryBtn = document.getElementById('primaryBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const descTitle = document.getElementById('descTitle');
-  const descText = document.getElementById('descText');
 
   const ctx = overlayCanvas.getContext('2d');
   const blinkCtx = blinkCanvas.getContext('2d', { willReadFrequently:true });
-  const detectCanvas = document.createElement('canvas');
-  const detectCtx = detectCanvas.getContext('2d', { willReadFrequently:true });
 
   function showScreen(name){
+    state.screen = name;
     landingScreen.classList.toggle('active', name === 'landing');
     simScreen.classList.toggle('active', name === 'sim');
   }
@@ -392,7 +417,7 @@
     return arr[Math.floor(Math.random()*arr.length)];
   }
 
-  function getBlur(angle){
+  function getBlurByAngle(angle){
     const a = Math.abs(angle);
     if (a >= 25) return 12;
     if (a >= 20) return 10;
@@ -402,13 +427,7 @@
     return 0;
   }
 
-  function runBlinkEffect(){
-    eyelidLayer.classList.remove('blink');
-    void eyelidLayer.offsetWidth;
-    eyelidLayer.classList.add('blink');
-  }
-
-  function getStatusLabel(){
+  function getStatusText(){
     if (state.currentAngle === 0) return '축 안정';
     const dir = state.currentAngle < 0 ? '좌측' : '우측';
     return `${dir} ${Math.abs(state.currentAngle)}° 회전 발생`;
@@ -417,70 +436,82 @@
   function updateDescription(){
     if (state.currentAngle === 0){
       descTitle.textContent = '난시 렌즈 축 안정의 중요성';
-      descText.innerHTML = '아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.';
-      return;
-    }
-    descTitle.textContent = '난시 렌즈는 축이 회전되면 시야가 흐려집니다.';
-    if (state.mode === 'manual'){
-      descText.innerHTML = '“<span class="blue">눈 깜박임</span>” 버튼을 눌러 회전된 축을 안정화 시켜 보세요.';
-    } else if (state.cameraFacing === 'user'){
-      descText.innerHTML = '자동인식 모드입니다. <span class="blue">눈을 한번 깜박여</span> 회전된 축을 안정화 시켜 보세요.';
+      descBody.innerHTML = '아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.';
     } else {
-      descText.innerHTML = state.rearCaptured
-        ? '후면 카메라 캡쳐 화면입니다. 우측 상단 <span class="blue">전면 카메라</span>에서 순목을 인식하면 축이 안정화됩니다.'
-        : '후면 카메라에서는 먼저 <span class="orange">사진 촬영</span> 후, 우측 상단 전면 카메라에서 순목을 인식해 축이 안정화됩니다.';
+      descTitle.textContent = '난시 렌즈는 축이 회전되면 시야가 흐려집니다.';
+      if (state.mode === 'manual'){
+        descBody.innerHTML = '“<span class="blue">눈 깜박임</span>” 버튼을 눌러 회전된 축을 안정화 시켜 보세요.';
+      } else if (state.cameraFacing === 'user') {
+        descBody.innerHTML = '자동인식 모드입니다. <span class="blue">눈을 한번 깜박여</span> 회전된 축을 안정화 시켜 보세요.';
+      } else {
+        descBody.innerHTML = state.rearCaptured
+          ? '후면 카메라 캡쳐 화면입니다. 우측 상단 <span class="blue">전면 카메라</span>에서 순목을 인식하면 축이 안정화됩니다.'
+          : '후면 카메라에서는 먼저 <span class="orange">사진 촬영</span> 후, 우측 상단 전면 카메라에서 순목을 인식해 축이 안정화됩니다.';
+      }
     }
   }
 
-  function updateBanner(){
-    if (state.cameraFacing === 'environment' && state.rearCaptured) bannerText.textContent = '후면 캡쳐 화면';
-    else bannerText.textContent = state.cameraFacing === 'user' ? '전면 카메라 실행 중' : '후면 카메라 실행 중';
+  function updatePrimaryButton(){
+    if (state.mode === 'manual'){
+      primaryActionBtn.classList.remove('hidden');
+      primaryActionBtn.textContent = '눈 깜박임';
+      primaryActionBtn.classList.add('solid');
+      hintBubble.style.display = 'none';
+      blinkMini.style.display = 'none';
+      return;
+    }
+
+    if (state.cameraFacing === 'environment'){
+      primaryActionBtn.classList.remove('hidden');
+      primaryActionBtn.textContent = state.rearCaptured ? '다시 촬영' : '사진 촬영';
+      primaryActionBtn.classList.add('solid');
+      hintBubble.style.display = state.rearCaptured && state.currentAngle !== 0 ? 'none' : 'none';
+      blinkMini.style.display = state.rearCaptured ? 'block' : 'none';
+      return;
+    }
+
+    primaryActionBtn.classList.add('hidden');
+    hintBubble.style.display = state.currentAngle !== 0 ? 'block' : 'none';
+    blinkMini.style.display = 'none';
+  }
+
+  function updateCameraBanner(){
+    if (state.cameraFacing === 'environment' && state.rearCaptured){
+      cameraBannerText.textContent = '후면 캡쳐 화면';
+    } else {
+      cameraBannerText.textContent = state.cameraFacing === 'user' ? '전면 카메라 실행 중' : '후면 카메라 실행 중';
+    }
   }
 
   function applyBlur(){
-    const blur = getBlur(state.currentAngle);
+    const blur = getBlurByAngle(state.currentAngle);
     const brightness = Math.max(0.78, 1 - Math.abs(state.currentAngle)*0.006);
+
     if (state.cameraFacing === 'environment' && state.rearCaptured){
-      captureImage.style.display = 'block';
       captureImage.style.filter = `blur(${blur}px) brightness(${brightness})`;
       cameraVideo.style.filter = 'none';
     } else {
-      captureImage.style.display = 'none';
       cameraVideo.style.filter = `blur(${blur}px) brightness(${brightness})`;
       captureImage.style.filter = 'none';
     }
   }
 
-  function updatePrimary(){
-    if (state.mode === 'manual'){
-      primaryBtn.classList.remove('hidden');
-      primaryBtn.textContent = '눈 깜박임';
-      hintBubble.style.display = 'none';
-      miniBlink.style.display = 'none';
-      return;
-    }
-    if (state.cameraFacing === 'environment'){
-      primaryBtn.classList.remove('hidden');
-      primaryBtn.textContent = state.rearCaptured ? '다시 촬영' : '사진 촬영';
-      miniBlink.style.display = state.rearCaptured ? 'block' : 'none';
-      hintBubble.style.display = 'none';
-      return;
-    }
-    primaryBtn.classList.add('hidden');
-    hintBubble.style.display = state.currentAngle !== 0 ? 'block' : 'none';
-    miniBlink.style.display = 'none';
-  }
-
   function updateStatus(){
-    statusText.textContent = getStatusLabel();
+    statusText.textContent = getStatusText();
     statusPill.classList.toggle('deviated', state.currentAngle !== 0);
-    updateBanner();
     updateDescription();
-    updatePrimary();
+    updatePrimaryButton();
+    updateCameraBanner();
     applyBlur();
   }
 
-  function rotateTowardStable(){
+  function runBlinkEffect(){
+    eyelidLayer.classList.remove('blink');
+    void eyelidLayer.offsetWidth;
+    eyelidLayer.classList.add('blink');
+  }
+
+  function rotateTowardStableOneStep(){
     if (state.currentAngle > 0) state.currentAngle -= 5;
     else if (state.currentAngle < 0) state.currentAngle += 5;
     updateStatus();
@@ -489,7 +520,7 @@
   function triggerBlinkCorrection(){
     if (state.currentAngle === 0) return;
     runBlinkEffect();
-    rotateTowardStable();
+    rotateTowardStableOneStep();
   }
 
   async function stopStream(stream){
@@ -498,21 +529,27 @@
   }
 
   async function startMainCamera(facing){
-    helperText.style.display = 'block';
-    helperText.textContent = '카메라를 준비 중입니다';
+    helperCenter.style.display = 'block';
+    helperCenter.textContent = '카메라를 준비 중입니다';
     camFallback.classList.add('hidden');
     try{
       await stopStream(state.mainStream);
       const stream = await navigator.mediaDevices.getUserMedia({
         audio:false,
-        video:{ facingMode:{ ideal:facing }, width:{ ideal:1080 }, height:{ ideal:1440 } }
+        video:{
+          facingMode:{ ideal:facing },
+          width:{ ideal:1080 },
+          height:{ ideal:1440 }
+        }
       });
       state.mainStream = stream;
       cameraVideo.srcObject = stream;
       await cameraVideo.play().catch(()=>{});
-      helperText.style.display = 'none';
+      helperCenter.style.display = 'none';
+      state.cameraReady = true;
     }catch(err){
-      helperText.style.display = 'none';
+      helperCenter.style.display = 'none';
+      state.cameraReady = false;
       camFallback.classList.remove('hidden');
       console.error(err);
     }
@@ -523,18 +560,24 @@
       await stopStream(state.blinkStream);
       const stream = await navigator.mediaDevices.getUserMedia({
         audio:false,
-        video:{ facingMode:{ ideal:'user' }, width:{ ideal:320 }, height:{ ideal:480 } }
+        video:{
+          facingMode:{ ideal:'user' },
+          width:{ ideal:320 },
+          height:{ ideal:480 }
+        }
       });
       state.blinkStream = stream;
       blinkVideo.srcObject = stream;
       await blinkVideo.play().catch(()=>{});
       state.lastBlinkMetric = null;
+      clearInterval(state.blinkInterval);
+      state.blinkInterval = setInterval(sampleBlinkMetric, 180);
     }catch(err){
       console.warn('blink stream unavailable', err);
     }
   }
 
-  function clearBlink(){
+  function clearBlinkDetector(){
     if (state.blinkInterval){
       clearInterval(state.blinkInterval);
       state.blinkInterval = null;
@@ -547,39 +590,67 @@
     blinkVideo.srcObject = null;
   }
 
-  function sampleMetric(videoEl, sourceCtx, w, h, topRatio=.18, heightRatio=.22){
+  async function setupDetectionByMode(){
+    clearBlinkDetector();
+
+    if (state.mode !== 'auto') return;
+
+    if (state.cameraFacing === 'user'){
+      // Use full main front camera only. No extra mini view.
+      return;
+    }
+
+    // Rear auto: after rear capture, use a front mini camera for blink detection.
+    if (state.cameraFacing === 'environment' && state.rearCaptured){
+      await startFrontBlinkStream();
+    }
+  }
+
+  function sampleFromVideo(videoEl, sourceCtx, w, h, topRatio=0.18, heightRatio=0.22){
     sourceCtx.canvas.width = w;
     sourceCtx.canvas.height = h;
     sourceCtx.drawImage(videoEl, 0, 0, w, h);
-    const rx = Math.round(w * .18);
+    const rx = Math.round(w * 0.18);
     const ry = Math.round(h * topRatio);
-    const rw = Math.round(w * .64);
+    const rw = Math.round(w * 0.64);
     const rh = Math.round(h * heightRatio);
     const img = sourceCtx.getImageData(rx, ry, rw, rh).data;
-    let brightness = 0, contrast = 0;
+
+    let brightness = 0;
+    let contrast = 0;
     const vals = [];
-    for (let i=0;i<img.length;i+=4){
-      const y = img[i]*.299 + img[i+1]*.587 + img[i+2]*.114;
+    for (let i=0; i<img.length; i+=4){
+      const y = img[i] * .299 + img[i+1] * .587 + img[i+2] * .114;
       vals.push(y);
       brightness += y;
     }
     brightness /= vals.length || 1;
-    for (let i=0;i<vals.length;i++) contrast += Math.abs(vals[i] - brightness);
+
+    for (let i=0; i<vals.length; i++){
+      contrast += Math.abs(vals[i] - brightness);
+    }
     contrast /= vals.length || 1;
-    return brightness - contrast*.65;
+
+    return brightness - contrast * 0.65;
   }
+
+  const fullDetectCanvas = document.createElement('canvas');
+  const fullDetectCtx = fullDetectCanvas.getContext('2d', { willReadFrequently:true });
 
   function sampleBlinkMetric(){
     if (state.currentAngle === 0) return;
+
     let metric = null;
 
     if (state.cameraFacing === 'user' && state.mode === 'auto'){
       if (!cameraVideo.videoWidth) return;
-      metric = sampleMetric(cameraVideo, detectCtx, 120, 180, .18, .22);
+      metric = sampleFromVideo(cameraVideo, fullDetectCtx, 120, 180, 0.18, 0.22);
     } else if (state.cameraFacing === 'environment' && state.mode === 'auto' && state.rearCaptured){
       if (!blinkVideo.videoWidth) return;
-      metric = sampleMetric(blinkVideo, blinkCtx, 96, 140, .18, .24);
-    } else return;
+      metric = sampleFromVideo(blinkVideo, blinkCtx, 96, 140, 0.18, 0.24);
+    } else {
+      return;
+    }
 
     if (state.lastBlinkMetric == null){
       state.lastBlinkMetric = metric;
@@ -588,19 +659,17 @@
 
     const delta = state.lastBlinkMetric - metric;
     const now = Date.now();
+
     if (delta > 10 && now > state.blinkCooldownUntil){
       state.blinkCooldownUntil = now + 900;
       triggerBlinkCorrection();
     }
-    state.lastBlinkMetric = metric * .45 + state.lastBlinkMetric * .55;
+    state.lastBlinkMetric = metric * 0.45 + state.lastBlinkMetric * 0.55;
   }
 
-  async function setupDetection(){
-    clearBlink();
+  function startBlinkLoop(){
+    clearInterval(state.blinkInterval);
     if (state.mode !== 'auto') return;
-    if (state.cameraFacing === 'environment' && state.rearCaptured){
-      await startFrontBlinkStream();
-    }
     state.lastBlinkMetric = null;
     state.blinkInterval = setInterval(sampleBlinkMetric, 180);
   }
@@ -614,9 +683,10 @@
     x.drawImage(cameraVideo, 0, 0);
     state.capturedDataUrl = c.toDataURL('image/jpeg', .92);
     captureImage.src = state.capturedDataUrl;
+    captureImage.style.display = 'block';
     state.rearCaptured = true;
     updateStatus();
-    setupDetection();
+    setupDetectionByMode().then(startBlinkLoop);
   }
 
   async function switchCameraMode(){
@@ -624,8 +694,10 @@
     state.rearCaptured = false;
     state.capturedDataUrl = '';
     captureImage.src = '';
+    captureImage.style.display = 'none';
     await startMainCamera(state.cameraFacing);
-    await setupDetection();
+    await setupDetectionByMode();
+    startBlinkLoop();
     updateStatus();
   }
 
@@ -634,8 +706,17 @@
     state.rearCaptured = false;
     state.capturedDataUrl = '';
     captureImage.src = '';
+    captureImage.style.display = 'none';
     updateStatus();
-    setupDetection();
+    setupDetectionByMode().then(startBlinkLoop);
+  }
+
+  function deviateAxis(){
+    state.currentAngle = chooseRandomAngle();
+    if (state.cameraFacing === 'environment' && !state.rearCaptured && state.mode === 'auto'){
+      // keep waiting for capture
+    }
+    updateStatus();
   }
 
   function drawOverlay(){
@@ -643,76 +724,80 @@
     const ratio = window.devicePixelRatio || 1;
     const width = Math.round(rect.width * ratio);
     const height = Math.round(rect.height * ratio);
+
     if (overlayCanvas.width !== width || overlayCanvas.height !== height){
       overlayCanvas.width = width;
       overlayCanvas.height = height;
     }
 
-    ctx.clearRect(0,0,width,height);
-    const cx = width * .5;
-    const cy = height * .56;
-    const r = Math.min(width, height) * .38;
+    ctx.clearRect(0, 0, width, height);
+
+    const cx = width * 0.5;
+    const cy = height * 0.56;
+    const r = Math.min(width, height) * 0.38;
 
     ctx.save();
-    ctx.globalAlpha = .34;
+    ctx.globalAlpha = 0.34;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI*2);
     ctx.strokeStyle = '#70A0D7';
-    ctx.lineWidth = Math.max(2, width*.0045);
+    ctx.lineWidth = Math.max(2, width * 0.0045);
     ctx.stroke();
     ctx.restore();
 
-    const shapeW = r*.18;
-    const shapeH = r*.42;
-    const offX = r*.66;
-    const offY = r*.05;
+    const shapeW = r * 0.18;
+    const shapeH = r * 0.42;
+    const offX = r * 0.66;
+    const offY = r * 0.05;
     const angleRad = state.currentAngle * Math.PI / 180;
 
-    function roundRect(context, x, y, w, h, rr){
+    function roundRect(context, x, y, w, h, r){
       context.beginPath();
-      context.moveTo(x+rr,y);
-      context.arcTo(x+w,y,x+w,y+h,rr);
-      context.arcTo(x+w,y+h,x,y+h,rr);
-      context.arcTo(x,y+h,x,y,rr);
-      context.arcTo(x,y,x+w,y,rr);
+      context.moveTo(x + r, y);
+      context.arcTo(x + w, y, x + w, y + h, r);
+      context.arcTo(x + w, y + h, x, y + h, r);
+      context.arcTo(x, y + h, x, y, r);
+      context.arcTo(x, y, x + w, y, r);
       context.closePath();
     }
-    function drawPill(x,y,rot){
+
+    function drawPill(x, y, rot){
       ctx.save();
-      ctx.translate(x,y);
+      ctx.translate(x, y);
       ctx.rotate(rot);
-      ctx.globalAlpha = .28;
+      ctx.globalAlpha = 0.28;
       ctx.fillStyle = '#8DE8FF';
-      roundRect(ctx,-shapeW/2,-shapeH/2,shapeW,shapeH,shapeW/2);
+      roundRect(ctx, -shapeW/2, -shapeH/2, shapeW, shapeH, shapeW/2);
       ctx.fill();
       ctx.restore();
     }
 
-    drawPill(cx - offX*Math.cos(angleRad), cy - offX*Math.sin(angleRad) - offY, angleRad);
-    drawPill(cx + offX*Math.cos(angleRad), cy + offX*Math.sin(angleRad) + offY, angleRad);
+    drawPill(cx - offX * Math.cos(angleRad), cy - offX * Math.sin(angleRad) - offY, angleRad);
+    drawPill(cx + offX * Math.cos(angleRad), cy + offX * Math.sin(angleRad) + offY, angleRad);
 
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(angleRad);
-    ctx.lineWidth = Math.max(3, width*.006);
+    ctx.lineWidth = Math.max(3, width * 0.006);
     ctx.strokeStyle = 'rgba(70,75,82,.75)';
-    ctx.setLineDash([Math.max(16, width*.03), Math.max(10, width*.018)]);
+    ctx.setLineDash([Math.max(16, width * 0.03), Math.max(10, width * 0.018)]);
     ctx.beginPath();
-    ctx.moveTo(-r*.98,0);
-    ctx.lineTo(r*.98,0);
+    ctx.moveTo(-r*0.98, 0);
+    ctx.lineTo(r*0.98, 0);
     ctx.stroke();
 
-    const pointR = Math.max(9, width*.02);
-    const pointColor = state.currentAngle === 0 ? '#16BE4A' : '#FFAF16';
-    const pointGlow = state.currentAngle === 0 ? 'rgba(22,190,74,.24)' : 'rgba(255,175,22,.26)';
-    [-r*.98, r*.98].forEach(x => {
+    const pointR = Math.max(9, width * 0.02);
+    const pointColor = state.currentAngle === 0 ? '#16BE4A' : '#FFAA12';
+    const pointGlow = state.currentAngle === 0 ? 'rgba(20,190,75,.24)' : 'rgba(255,170,18,.26)';
+
+    [-r*0.98, r*0.98].forEach(x => {
       ctx.beginPath();
       ctx.fillStyle = pointGlow;
-      ctx.arc(x,0,pointR*1.75,0,Math.PI*2);
+      ctx.arc(x, 0, pointR*1.75, 0, Math.PI*2);
       ctx.fill();
       ctx.beginPath();
       ctx.fillStyle = pointColor;
-      ctx.arc(x,0,pointR,0,Math.PI*2);
+      ctx.arc(x, 0, pointR, 0, Math.PI*2);
       ctx.fill();
     });
     ctx.restore();
@@ -720,24 +805,25 @@
     requestAnimationFrame(drawOverlay);
   }
 
-  startBtn.addEventListener('click', async () => {
+  startExperienceBtn.addEventListener('click', async () => {
     showScreen('sim');
     await startMainCamera(state.cameraFacing);
     updateStatus();
   });
 
-  closeBtn.addEventListener('click', async () => {
+  closeSimBtn.addEventListener('click', async () => {
     showScreen('landing');
-    clearBlink();
+    clearBlinkDetector();
     await stopStream(state.mainStream);
     state.mainStream = null;
+    state.cameraReady = false;
   });
 
   manualBtn.addEventListener('click', async () => {
     state.mode = 'manual';
     manualBtn.classList.add('active');
     autoBtn.classList.remove('active');
-    clearBlink();
+    clearBlinkDetector();
     updateStatus();
   });
 
@@ -745,26 +831,27 @@
     state.mode = 'auto';
     autoBtn.classList.add('active');
     manualBtn.classList.remove('active');
-    await setupDetection();
+    await setupDetectionByMode();
+    startBlinkLoop();
     updateStatus();
   });
 
-  switchBtn.addEventListener('click', async () => {
+  cameraSwitchBtn.addEventListener('click', async () => {
     await switchCameraMode();
   });
 
   deviateBtn.addEventListener('click', () => {
-    state.currentAngle = chooseRandomAngle();
-    updateStatus();
+    deviateAxis();
   });
 
-  primaryBtn.addEventListener('click', () => {
+  primaryActionBtn.addEventListener('click', async () => {
     if (state.mode === 'manual'){
       triggerBlinkCorrection();
       return;
     }
     if (state.mode === 'auto' && state.cameraFacing === 'environment'){
       captureRearFrame();
+      return;
     }
   });
 
@@ -772,8 +859,8 @@
     resetAll();
   });
 
-  eyelidLayer.addEventListener('animationend', () => eyelidLayer.classList.remove('blink'));
   window.addEventListener('resize', applyBlur);
+  eyelidLayer.addEventListener('animationend', () => eyelidLayer.classList.remove('blink'));
 
   updateStatus();
   drawOverlay();
