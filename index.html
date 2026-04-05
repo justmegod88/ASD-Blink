@@ -801,6 +801,19 @@
     .asdActionBtn:active{ transform:scale(.98); }
     #asdRotateBtn{ color:#2563eb; background:#f8fbff; }
     #asdBlinkBtn{ color:#fff; background:#2563eb; border-color:#2563eb; box-shadow:0 14px 26px rgba(37,99,235,.16); }
+    .asdSplitWrap{
+      flex:1 1 100%;
+      display:none;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      width:100%;
+    }
+    #asdOverlay.camera-on .asdSplitWrap.show{ display:grid; }
+    #asdOverlay.camera-on #asdBlinkBtn.is-split-hidden{ display:none; }
+    .asdSplitBtn{ height:56px; }
+    .asdSplitManual{ color:#2563eb; background:#f8fbff; }
+    .asdSplitAuto{ color:#fff; background:#2563eb; border-color:#2563eb; box-shadow:0 14px 26px rgba(37,99,235,.16); }
+
     #asdCameraBtn{
       flex:0 0 56px;
       width:56px;
@@ -1359,6 +1372,9 @@
       #asdAngleBadge{ left:14px; bottom:14px; padding:8px 12px; font-size:11px; }
       #asdControlBar{ padding:12px 10px 12px; gap:8px; }
       .asdActionBtn{ height:48px; font-size:13px; border-radius:16px; }
+      .asdSplitWrap{ gap:8px; }
+      .asdSplitBtn{ height:48px; }
+
       #asdHint{ padding:14px 14px 14px; gap:10px; }
       #asdInfoBadge{ width:32px; height:32px; border-radius:10px; font-size:14px; }
       #asdHint .hintTitle{ font-size:15px; }
@@ -2319,6 +2335,10 @@
       <div id="asdControlBar">
         <button id="asdRotateBtn" class="asdActionBtn" type="button">축회전 유발</button>
         <button id="asdBlinkBtn" class="asdActionBtn" type="button">깜박임 실행</button>
+        <div id="asdBlinkSplitWrap" class="asdSplitWrap" aria-hidden="true">
+          <button id="asdBlinkManualBtn" class="asdActionBtn asdSplitBtn asdSplitManual" type="button">수동</button>
+          <button id="asdBlinkAutoBtn" class="asdActionBtn asdSplitBtn asdSplitAuto" type="button">자동</button>
+        </div>
         <button id="asdCameraBtn" class="asdActionBtn" type="button" aria-label="카메라">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M4 7h3l2-2h6l2 2h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"></path>
@@ -3940,8 +3960,11 @@
     const missionASD = document.getElementById('missionASD');
     const asdOverlay = document.getElementById('asdOverlay');
     const asdClose = document.getElementById('asdClose');
-    const asdManualBtn = document.getElementById('asdRotateBtn');
-    const asdAutoBtn = document.getElementById('asdBlinkBtn');
+    const asdRotateBtn = document.getElementById('asdRotateBtn');
+    const asdBlinkBtn = document.getElementById('asdBlinkBtn');
+    const asdBlinkSplitWrap = document.getElementById('asdBlinkSplitWrap');
+    const asdManualBtn = document.getElementById('asdBlinkManualBtn');
+    const asdAutoBtn = document.getElementById('asdBlinkAutoBtn');
     const asdCameraBtn = document.getElementById('asdCameraBtn');
     const asdCameraStage = document.getElementById('asdCameraStage');
     const asdCameraVideo = document.getElementById('asdCameraVideo');
@@ -3954,15 +3977,10 @@
     const asdHint = document.getElementById('asdHint');
     const globalDisclaimer = document.getElementById('globalToricDisclaimer');
 
-    if(!missionASD || !asdOverlay || !asdManualBtn || !asdAutoBtn || !asdCameraStage || !asdCameraVideo || !asdLensImg || !asdAngleBadge){
+    if(!missionASD || !asdOverlay || !asdRotateBtn || !asdBlinkBtn || !asdManualBtn || !asdAutoBtn || !asdCameraBtn || !asdCameraStage || !asdCameraVideo || !asdLensImg || !asdAngleBadge){
       return;
     }
 
-    if (asdHint) asdHint.style.display = 'none';
-    if (globalDisclaimer) globalDisclaimer.style.display = 'none';
-    if (asdCameraBtn) asdCameraBtn.style.display = 'none';
-    asdManualBtn.textContent = '깜박임 수동';
-    asdAutoBtn.textContent = '깜박임 자동인식';
 
     let capturedFrame = document.getElementById('asdCapturedFrame');
     if(!capturedFrame){
@@ -4105,6 +4123,62 @@
       renderAngle();
       updateStatus('축이탈 발생');
     }
+    function showSplitButtons(show){
+      if(asdBlinkSplitWrap){
+        asdBlinkSplitWrap.classList.toggle('show', !!show);
+        asdBlinkSplitWrap.setAttribute('aria-hidden', show ? 'false' : 'true');
+      }
+      if(asdBlinkBtn){
+        asdBlinkBtn.classList.toggle('is-split-hidden', !!show);
+      }
+      if(asdCameraBtn){
+        asdCameraBtn.classList.toggle('active', !!show);
+      }
+    }
+
+    async function enableRearCameraMode(){
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        alert('이 브라우저에서는 카메라 기능을 지원하지 않습니다.');
+        return false;
+      }
+      try{
+        autoModeOn = false;
+        stopFrontDetection();
+        if(!rearLiveOn){
+          await startRearLive();
+        } else {
+          asdOverlay.classList.add('camera-on');
+          applyImageBlur();
+        }
+        if(capturedFrame){
+          capturedFrame.style.display = 'none';
+          capturedFrame.removeAttribute('src');
+        }
+        if(asdCameraVideo) asdCameraVideo.style.display = 'block';
+        showSplitButtons(true);
+        updateStatus(Math.abs(asdAngleValue) === 0 ? '축 안정화 완료' : '후면 카메라 실행 중');
+        return true;
+      }catch(e){
+        showSplitButtons(false);
+        return false;
+      }
+    }
+
+    function disableRearCameraMode(){
+      stopRearLive();
+      stopFrontDetection();
+      asdOverlay.classList.remove('camera-on');
+      if(capturedFrame){
+        capturedFrame.style.display = 'none';
+        capturedFrame.removeAttribute('src');
+      }
+      if(asdCameraVideo){
+        asdCameraVideo.style.display = 'block';
+      }
+      showSplitButtons(false);
+      updateStatus(Math.abs(asdAngleValue) === 0 ? '축 안정화 완료' : '카메라 꺼짐');
+    }
+
 
     function resetStateForOpen(){
       autoModeOn = false;
@@ -4118,6 +4192,8 @@
       }
       if(frontPreviewWrap) frontPreviewWrap.style.display = 'none';
       if(frontPreviewVideo) frontPreviewVideo.srcObject = null;
+      showSplitButtons(false);
+      if(asdCameraBtn) asdCameraBtn.classList.remove('active');
       randomizeAxis();
     }
 
@@ -4326,7 +4402,7 @@
         autoModeOn = true;
         asdOverlay.classList.add('auto-detect');
         updateStatus('후면 화면 캡처 중');
-        if(!rearLiveOn) await startRearLive();
+        if(!rearLiveOn) { const ok = await enableRearCameraMode(); if(!ok) return; }
         await new Promise(r => setTimeout(r, 500));
         const okay = captureRearFrame();
         if(!okay){
@@ -4349,13 +4425,12 @@
       autoModeOn = false;
       asdOverlay.classList.remove('auto-detect');
       stopFrontDetection();
-      if(!rearLiveOn){
-        await startRearLive();
+      if(rearLiveOn){
+        if(capturedFrame) capturedFrame.style.display = 'none';
+        if(asdCameraVideo) asdCameraVideo.style.display = 'block';
       }
-      capturedFrame.style.display = 'none';
-      asdCameraVideo.style.display = 'block';
       handleBlinkStep();
-      updateStatus(Math.abs(asdAngleValue) === 0 ? '축 안정화 완료' : '후면 카메라 실행 중');
+      updateStatus(Math.abs(asdAngleValue) === 0 ? '축 안정화 완료' : (rearLiveOn ? '후면 카메라 실행 중' : '축이탈 발생'));
     }
 
     function openASDPatched(e){
@@ -4367,7 +4442,6 @@
         asdOverlay.setAttribute('aria-hidden','false');
       }
       resetStateForOpen();
-      startRearLive().catch(()=>{});
     }
 
     function closeASDPatched(e){
@@ -4376,6 +4450,7 @@
       stopFrontDetection();
       asdOverlay.classList.remove('camera-on');
       asdOverlay.classList.remove('auto-detect');
+      showSplitButtons(false);
       if (typeof window.closeASD === 'function') {
         window.closeASD();
       } else {
@@ -4400,15 +4475,41 @@
       if (ev.target === asdOverlay) closeASDPatched();
     }, true);
 
+    asdRotateBtn.onclick = function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      randomizeAxis();
+    };
+
+    asdBlinkBtn.onclick = async function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      await manualBlink();
+    };
+
+    asdCameraBtn.onclick = async function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      if(rearLiveOn || autoModeOn || (asdOverlay.classList.contains('camera-on') && asdBlinkSplitWrap && asdBlinkSplitWrap.classList.contains('show'))){
+        disableRearCameraMode();
+      }else{
+        await enableRearCameraMode();
+      }
+    };
+
     asdManualBtn.onclick = async function(ev){
       ev.preventDefault();
       ev.stopPropagation();
+      const ok = rearLiveOn ? true : await enableRearCameraMode();
+      if(!ok) return;
       await manualBlink();
     };
 
     asdAutoBtn.onclick = async function(ev){
       ev.preventDefault();
       ev.stopPropagation();
+      const ok = rearLiveOn ? true : await enableRearCameraMode();
+      if(!ok) return;
       await runAutoMode();
     };
 
