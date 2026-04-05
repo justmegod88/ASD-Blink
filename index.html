@@ -971,7 +971,7 @@
   function applyBlur(){
     const blur = getBlur(state.currentAngle);
     const brightness = Math.max(0.78, 1 - Math.abs(state.currentAngle)*0.006);
-    if (state.cameraFacing === 'environment' && state.rearCaptured){
+    if (state.mode === 'auto' && state.cameraFacing === 'environment' && state.rearCaptured){
       captureImage.style.display = 'block';
       captureImage.style.filter = `blur(${blur}px) brightness(${brightness})`;
       cameraVideo.style.filter = 'none';
@@ -1021,6 +1021,7 @@
   async function restartRearAutoCapture(){
     stopDetectLoop();
     stopMiniCamera();
+    state.currentAngle = chooseRandomAngle();
     state.rearCaptured = false;
     state.capturedDataUrl = '';
     captureImage.src = '';
