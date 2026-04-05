@@ -528,8 +528,8 @@
     right:14px;
     top:14px;
     z-index:8;
-    width:122px;
-    height:104px;
+    width:108px;
+    height:72px;
     border-radius:22px;
     overflow:hidden;
     background:#fff;
@@ -543,18 +543,19 @@
     width:100%;
     height:100%;
     object-fit:cover;
+    object-position:center 24%;
   }
   .mini-label{
     position:absolute;
-    left:8px;
-    right:8px;
-    bottom:10px;
+    left:6px;
+    right:6px;
+    bottom:6px;
     background:linear-gradient(180deg,#FFB84A,#FFA61F);
     color:#173C64;
-    border-radius:14px;
-    padding:7px 10px 8px;
+    border-radius:12px;
+    padding:6px 8px 6px;
     text-align:center;
-    font-size:12px;
+    font-size:11px;
     font-weight:900;
     line-height:1.1;
     box-shadow:0 10px 16px rgba(255,176,32,.26);
@@ -1009,6 +1010,28 @@
     }catch(err){ console.warn('blink stream unavailable', err); }
   }
   function stopMiniCamera(){ if (state.blinkStream){ state.blinkStream.getTracks().forEach(t=>t.stop()); state.blinkStream=null; } blinkVideo.srcObject=null; }
+  function waitForVideoReady(videoEl){
+    return new Promise((resolve) => {
+      if (videoEl.readyState >= 2 && videoEl.videoWidth > 0) return resolve();
+      const done = () => { videoEl.removeEventListener('loadeddata', done); resolve(); };
+      videoEl.addEventListener('loadeddata', done, { once:true });
+      setTimeout(resolve, 400);
+    });
+  }
+  async function restartRearAutoCapture(){
+    stopDetectLoop();
+    stopMiniCamera();
+    state.rearCaptured = false;
+    state.capturedDataUrl = '';
+    captureImage.src = '';
+    captureImage.style.display = 'none';
+    if (state.cameraFacing !== 'environment') state.cameraFacing = 'environment';
+    updateStatus();
+    await startMainCamera('environment');
+    await waitForVideoReady(cameraVideo);
+    await new Promise(r => setTimeout(r, 180));
+    captureRearFrame();
+  }
 
   async function setupFaceLandmarker(){
     if (state.faceLandmarkerReady || !vision) return;
@@ -1120,7 +1143,17 @@
   autoBtn.addEventListener('click', async () => { state.mode='auto'; autoBtn.classList.add('active'); manualBtn.classList.remove('active'); triggerModeChange(); await setupDetection(); updateStatus(); });
   switchBtn.addEventListener('click', async () => { await switchCameraMode(); triggerModeChange(); updateStatus(); });
   deviateBtn.addEventListener('click', () => { state.currentAngle = chooseRandomAngle(); updateStatus(); });
-  primaryBtn.addEventListener('click', () => { if (state.mode==='manual') { triggerBlinkCorrection(); } else if (state.mode==='auto' && state.cameraFacing==='environment') { state.rearCaptured = false; captureImage.style.display='none'; captureRearFrame(); } });
+  primaryBtn.addEventListener('click', async () => {
+    if (state.mode==='manual') {
+      triggerBlinkCorrection();
+    } else if (state.mode==='auto' && state.cameraFacing==='environment') {
+      if (state.rearCaptured) {
+        await restartRearAutoCapture();
+      } else {
+        captureRearFrame();
+      }
+    }
+  });
   resetBtn.addEventListener('click', () => { resetAll(); });
   eyelidLayer.addEventListener('animationend', () => eyelidLayer.classList.remove('blink'));
   window.addEventListener('resize', () => { applyBlur(); updateMirror(); });
