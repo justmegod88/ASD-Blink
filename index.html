@@ -4145,7 +4145,8 @@
       autoBtn.style.display = 'flex';
     }
 
-    async function startRearCamera(){
+    async function startRearCamera(options = {}){
+      const keepCapturedFrame = !!options.keepCapturedFrame;
       stopFrontCamera();
       if(rearStream) stopRearCamera();
       rearStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}, audio:false});
@@ -4156,7 +4157,7 @@
       asdCameraBtn.classList.add('active');
       cameraOn = true;
       setCameraModeUI();
-      capturedFrame.style.display = 'none';
+      if(!keepCapturedFrame) capturedFrame.style.display = 'none';
       frontWrap.style.display = 'none';
     }
     function stopRearCamera(){
@@ -4278,16 +4279,20 @@
           if(frontGuide) frontGuide.textContent = '깜박임 인식됨';
           handleBlinkStep();
           setTimeout(async ()=>{
-            if(angle === 0){ capturedFrame.style.filter = 'blur(0px) saturate(1.02) brightness(1.02)'; }
+            if(angle === 0){
+              capturedFrame.style.filter = 'blur(0px) saturate(1.02) brightness(1.02)';
+            } else {
+              renderAngle();
+            }
             stopFrontCamera();
-            if(cameraOn) await startRearCamera();
+            if(cameraOn) await startRearCamera({ keepCapturedFrame: true });
           }, 260);
         }
       }, 120);
     }
 
     async function runAutoMode(){
-      if(!cameraOn){
+      if(!cameraOn || !rearStream){
         await startRearCamera();
         await new Promise(r=>setTimeout(r, 350));
       }
