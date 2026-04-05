@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASD FINAL</title>
+
+<style>
+body{margin:0;font-family:-apple-system;background:#EDF5FD}
+.app{max-width:430px;margin:auto;background:#fff;min-height:100vh}
+
+/* landing */
+.landing{padding:30px 20px;text-align:center}
+.landing h1{font-size:28px;color:#005EB8;margin-bottom:20px}
+.start-btn{background:#005EB8;color:#fff;border:none;padding:18px;border-radius:20px;width:100%;font-size:18px;font-weight:800}
+
+/* sim */
+.sim{display:none;padding:16px}
+.video-box{position:relative;border-radius:20px;overflow:hidden}
+video,img{width:100%;height:auto;object-fit:cover}
+
+/* front zoom */
+.front{transform: scaleX(-1) scale(3.5) translate(-22%,-10%)}
+
+/* hint */
+.hint{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:#005EB8;
+  color:#fff;
+  padding:8px 12px;
+  border-radius:16px;
+  font-size:13px;
+}
+
+/* camera switch */
+.switch{
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:#fff;
+  border-radius:12px;
+  padding:6px 10px;
+  font-size:18px;
+}
+
+/* buttons */
+.controls{display:flex;gap:10px;margin-top:10px}
+.controls button{flex:1;padding:14px;border:none;border-radius:14px;font-weight:800}
+.primary{background:#005EB8;color:#fff}
+.secondary{background:#E6EEF7}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="landing" id="landing">
+  <h1>난시 축 회전 체험</h1>
+  <button class="start-btn" onclick="start()">체험 시작</button>
+</div>
+
+<div class="sim" id="sim">
+
+  <div class="video-box">
+    <div class="switch" onclick="switchCamera()">🔄</div>
+
+    <video id="video" autoplay playsinline></video>
+    <img id="capture" style="display:none">
+
+    <div class="hint">눈을 깜박여 주세요</div>
+  </div>
+
+  <div class="controls">
+    <button class="secondary" onclick="randomRotate()">축이탈</button>
+    <button class="primary" id="mainBtn" onclick="mainAction()">눈 깜박임</button>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+let stream;
+let facing = "environment";
+let mode = "manual";
+let angle = 20;
+let captured = false;
+
+async function start(){
+  document.getElementById("landing").style.display="none";
+  document.getElementById("sim").style.display="block";
+  await startCamera();
+  randomRotate();
+}
+
+async function startCamera(){
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+
+  stream = await navigator.mediaDevices.getUserMedia({
+    video:{facingMode:facing}
+  });
+
+  const video = document.getElementById("video");
+  video.srcObject = stream;
+
+  if(facing==="user"){
+    video.classList.add("front");
+  }else{
+    video.classList.remove("front");
+  }
+}
+
+function switchCamera(){
+  facing = facing==="user" ? "environment" : "user";
+  captured=false;
+  document.getElementById("capture").style.display="none";
+  startCamera();
+  randomRotate(); // 핵심: 상태 변경시 회전
+}
+
+function randomRotate(){
+  const arr=[-25,-20,-15,-10,-5,5,10,15,20,25];
+  angle = arr[Math.floor(Math.random()*arr.length)];
+  applyBlur();
+}
+
+function applyBlur(){
+  const video = document.getElementById("video");
+  const img = document.getElementById("capture");
+
+  const blur = Math.abs(angle)/2;
+
+  if(captured){
+    img.style.filter = `blur(${blur}px)`;
+  }else{
+    video.style.filter = `blur(${blur}px)`;
+  }
+}
+
+function blink(){
+  if(angle>0) angle-=5;
+  if(angle<0) angle+=5;
+  applyBlur();
+}
+
+function capture(){
+  const video = document.getElementById("video");
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  canvas.getContext("2d").drawImage(video,0,0);
+  const img = document.getElementById("capture");
+  img.src = canvas.toDataURL();
+  img.style.display="block";
+
+  captured=true;
+  applyBlur();
+}
+
+function mainAction(){
+  if(facing==="environment"){
+    if(!captured){
+      document.getElementById("mainBtn").innerText="재시작";
+      capture();
+    }else{
+      capture();
+    }
+  }else{
+    blink();
+  }
+}
+</script>
+
+</body>
+</html>
