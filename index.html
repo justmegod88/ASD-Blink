@@ -515,6 +515,40 @@
     background:linear-gradient(180deg,#2E72D8 0%, #1E61CB 100%);
   }
 
+
+  /* final button redesign */
+  .toggle{
+    background:linear-gradient(180deg,#EAF2FC 0%, #DEEAF9 100%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.95), 0 6px 14px rgba(0,94,184,.08) !important;
+    border:1px solid #D6E4F5;
+  }
+  .toggle button{
+    color:#5F7EA3 !important;
+    opacity:1 !important;
+    font-weight:900;
+  }
+  .toggle button.active{
+    background:linear-gradient(180deg,#2F72D8 0%, #1F62CC 100%) !important;
+    color:#fff !important;
+    box-shadow:0 8px 16px rgba(0,94,184,.18) !important;
+  }
+  .slot{
+    background:linear-gradient(180deg,#EEF5FD 0%, #E3EEF9 100%) !important;
+    border:1px solid #D6E4F5;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.95), 0 6px 14px rgba(0,94,184,.08) !important;
+  }
+  .btn-primary{
+    background:linear-gradient(180deg,#2F72D8 0%, #1F62CC 100%) !important;
+    color:#fff !important;
+    box-shadow:0 8px 16px rgba(0,94,184,.18);
+  }
+  .viewer-deviate{
+    background:linear-gradient(180deg,#FFFFFF 0%, #F6FAFF 100%) !important;
+    color:#1E61CB !important;
+    border:1.5px solid #CFE0F5 !important;
+    box-shadow:0 10px 20px rgba(0,74,147,.10) !important;
+  }
+
 </style>
 </head>
 <body>
@@ -1062,9 +1096,12 @@
     updateStatus();
   });
 
-  deviateBtn.addEventListener('click', () => {
+  deviateBtn.addEventListener('click', async () => {
     state.currentAngle = chooseRandomAngle();
     updateStatus();
+    if (state.mode === 'auto') {
+      await runAutoFlow();
+    }
   });
 
   primaryBtn.addEventListener('click', async () => {
