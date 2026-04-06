@@ -878,6 +878,8 @@
     await startMainCamera();
     await new Promise(r => setTimeout(r, 180));
     captureRearFrame();
+    state.currentAngle = chooseRandomAngle();
+    updateStatus();
   }
 
   function resetAll(){
