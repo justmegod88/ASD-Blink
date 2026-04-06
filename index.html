@@ -1,226 +1,1022 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>아큐브 난시 체험</title>
-  <style>
-    :root{ --blue:#2563eb; --blue-deep:#1d4ed8; --text:#1e293b; --sub:#94a3b8; }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif;background:linear-gradient(180deg,#f7fbff 0%,#edf5ff 100%);overflow:hidden}
-    .landing{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; background:radial-gradient(60% 26% at 50% 18%, rgba(37,99,235,.22), rgba(37,99,235,0) 60%), linear-gradient(180deg,#f7fbff 0%,#edf5ff 100%); z-index:1;}
-    .cta{border:none; border-radius:22px; padding:18px 28px; min-width:220px; font-size:20px; font-weight:900; color:#fff; cursor:pointer; background:linear-gradient(180deg,var(--blue) 0%, var(--blue-deep) 100%); box-shadow:0 22px 44px rgba(37,99,235,.24);}
-    .overlay{position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:14px; background:rgba(20,30,48,.18); backdrop-filter:blur(10px); z-index:20;}
-    .overlay.show{display:flex}
-    .card{width:min(720px,96vw); background:#fff; border-radius:34px; overflow:hidden; box-shadow:0 24px 60px rgba(15,23,42,.18); border:1px solid rgba(15,23,42,.06);}
-    .head{display:flex; justify-content:space-between; align-items:flex-start; padding:22px 22px 10px}
-    .head h1{margin:0; font-size:24px; line-height:1.15; font-weight:900; letter-spacing:-.03em; color:var(--text)}
-    .sub{margin-top:4px; color:var(--sub); font-size:11px; font-weight:800; letter-spacing:.16em}
-    .close{width:42px; height:42px; border:none; border-radius:999px; background:#f8fafc; color:#94a3b8; font-size:20px; font-weight:900; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(148,163,184,.18);}
-    .scene{position:relative; margin:0 16px; border-radius:30px; overflow:hidden; aspect-ratio:1/1; min-height:360px; background:#dfe8f5; box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);}
-    .scene > *{position:absolute; inset:0}
-    #rearVideo,#capturedRear{width:100%; height:100%; object-fit:cover; background:#dfe8f5; display:block}
-    #capturedRear{display:none}
-    .blurLayer{pointer-events:none; backdrop-filter: blur(var(--blur,0px)); -webkit-backdrop-filter: blur(var(--blur,0px)); z-index:2}
-    .graphics{z-index:3; pointer-events:none}
-    .circle{position:absolute; left:50%; top:52%; width:80%; height:80%; transform:translate(-50%,-50%); border-radius:999px; border:2px solid rgba(82,126,193,.28);}
-    .axis{position:absolute; left:10%; right:10%; top:52%; border-top:4px dashed rgba(68,67,73,.42); transform-origin:center; transition:transform .35s ease;}
-    .side{position:absolute; width:8.8%; height:17.5%; border-radius:999px; background:linear-gradient(180deg, rgba(34,211,238,.24), rgba(56,189,248,.12)); box-shadow:inset 0 0 0 1px rgba(56,189,248,.18);}
-    .side.left{left:18.5%; top:52%; transform:translate(-50%,-50%)}
-    .side.right{left:81.5%; top:52%; transform:translate(-50%,-50%)}
-    .dot{position:absolute; width:18px; height:18px; border-radius:999px; background:#f59e0b; box-shadow:0 0 0 8px rgba(245,158,11,.12), 0 4px 10px rgba(245,158,11,.35);}
-    .dot.left{left:10%; top:52%; transform:translate(-50%,-50%)}
-    .dot.right{left:90%; top:52%; transform:translate(-50%,-50%)}
-    .badge{position:absolute; left:16px; bottom:16px; z-index:4; display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:999px; background:rgba(255,255,255,.92); color:var(--blue); border:1px solid rgba(59,130,246,.18); box-shadow:0 10px 24px rgba(15,23,42,.12); font-size:14px; font-weight:900;}
-    .badge:before{content:""; width:10px; height:10px; border-radius:999px; background:currentColor; box-shadow:0 0 0 5px rgba(59,130,246,.10)}
-    .guide{position:absolute; left:18px; top:18px; z-index:5; display:none; align-items:center; gap:8px; padding:10px 16px; border-radius:999px; background:rgba(255,255,255,.94); color:var(--blue); font-size:15px; font-weight:900; border:1.5px solid rgba(110,155,230,.85); box-shadow:0 10px 18px rgba(11,31,51,.12);}
-    .guide.show{display:inline-flex}
-    .guide:before{content:""; width:10px; height:10px; border-radius:999px; background:currentColor; box-shadow:0 0 0 5px rgba(59,130,246,.10)}
-    .frontInset{position:absolute; right:18px; top:26px; width:33%; aspect-ratio:3/4; border-radius:24px; overflow:hidden; border:2px solid rgba(255,255,255,.85); box-shadow:0 12px 26px rgba(15,23,42,.18); z-index:5; display:none; background:#e5edf8;}
-    .frontInset.show{display:block}
-    .frontInset video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1)}
-    .frontInset .label{position:absolute; left:12px; right:12px; bottom:12px; z-index:2; padding:10px 14px; text-align:center; border-radius:999px; background:rgba(37,99,235,.92); color:#fff; font-size:13px; font-weight:900; box-shadow:0 8px 18px rgba(37,99,235,.22);}
-    .controls{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:14px 16px 16px; background:#fff}
-    .btn{height:56px; border-radius:20px; border:1px solid rgba(148,163,184,.18); background:#fff; color:var(--text); font-size:16px; font-weight:900; cursor:pointer; box-shadow:0 8px 20px rgba(15,23,42,.08);}
-    .btn.primary{background:var(--blue); color:#fff; border-color:var(--blue); box-shadow:0 14px 26px rgba(37,99,235,.16)}
-    .btn.active{background:#eff6ff; color:var(--blue); border-color:rgba(37,99,235,.2)}
-    .footer{padding:0 18px 18px; background:#fff; color:#475569; font-size:14px; line-height:1.55}
-    .footer .title{font-size:16px; font-weight:900; color:#1e293b; margin-bottom:4px}
-    .footer .blue{color:var(--blue); font-weight:800}
-    @media (max-width:560px){
-      .card{border-radius:28px} .head{padding:18px 18px 8px} .head h1{font-size:20px} .close{width:38px;height:38px}
-      .scene{margin:0 10px; min-height:320px; border-radius:26px} .badge{left:14px; bottom:14px; font-size:12px; padding:8px 12px}
-      .guide{left:14px; top:14px; font-size:13px; padding:9px 13px; max-width:60%} .controls{padding:12px 10px}
-      .btn{height:48px; font-size:13px; border-radius:16px} .footer{padding:0 14px 14px; font-size:13px}
-      .frontInset{width:34%; right:14px; top:22px; border-radius:20px} .frontInset .label{font-size:12px; left:10px; right:10px; bottom:10px; padding:8px 10px}
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>ACUVUE ASD Rear Only</title>
+<style>
+  :root{
+    --blue:#005EB8;
+    --blue-deep:#004A93;
+    --navy:#14385F;
+    --text:#112B45;
+    --sub:#6C8298;
+    --line:#DCE8F5;
+    --green:#14BE4B;
+    --orange:#FFB020;
+    --white:#FFFFFF;
+    --bg:#EDF5FD;
+    --shadow:0 18px 34px rgba(0,74,147,.12);
+    --shadow-soft:0 10px 22px rgba(0,74,147,.08);
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{
+    margin:0;
+    background:#DCE6F0;
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    color:var(--text);
+  }
+
+  .app{
+    width:min(430px,100vw);
+    min-height:100vh;
+    margin:0 auto;
+    background:
+      radial-gradient(circle at top right, rgba(0,94,184,.10), transparent 26%),
+      linear-gradient(180deg,#F8FBFF 0%, var(--bg) 100%);
+    overflow:hidden;
+    position:relative;
+  }
+
+  .screen{display:none;min-height:100vh}
+  .screen.active{display:block}
+
+  /* landing */
+  .landing{padding:24px 20px 34px}
+  .hero{
+    margin:18px 0 18px;
+    padding:0 6px;
+  }
+  .hero h1{
+    margin:0;
+    color:var(--blue);
+    font-size:34px;
+    font-weight:900;
+    line-height:1.18;
+    letter-spacing:-1.3px;
+  }
+
+  .card{
+    position:relative;
+    overflow:hidden;
+    min-height:320px;
+    padding:24px 24px 24px;
+    border-radius:36px;
+    background:linear-gradient(180deg,#ffffff 0%, #F8FBFF 100%);
+    border:1px solid #DCE9F6;
+    box-shadow:var(--shadow);
+  }
+  .pack{
+    position:absolute;
+    right:22px;
+    top:22px;
+    width:146px;
+    filter:drop-shadow(0 14px 18px rgba(0,74,147,.18));
+  }
+  .copy{
+    position:relative;
+    z-index:2;
+    margin-top:138px;
+  }
+  .copy h2{
+    margin:0 0 12px;
+    color:var(--blue);
+    font-size:42px;
+    line-height:1.02;
+    letter-spacing:-1.9px;
+    font-weight:900;
+  }
+  .copy p{
+    margin:0;
+    color:#607486;
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:-.2px;
+  }
+  .start-wrap{
+    position:relative;
+    z-index:2;
+    margin-top:22px;
+    display:flex;
+    justify-content:flex-start;
+  }
+  .start{
+    border:none;
+    border-radius:26px;
+    background:linear-gradient(180deg,#0A67C8,#0058B7);
+    color:#fff;
+    height:72px;
+    min-width:160px;
+    padding:0 22px 0 18px;
+    font-size:20px;
+    font-weight:900;
+    display:flex;
+    gap:14px;
+    align-items:center;
+    box-shadow:0 14px 24px rgba(0,94,184,.24);
+    cursor:pointer;
+  }
+  .start .ic{
+    width:44px;height:44px;border-radius:50%;
+    background:rgba(6,35,72,.26);
+    display:flex;align-items:center;justify-content:center;font-size:24px;
+  }
+
+  /* simulator */
+  .sim{padding:16px 14px 22px}
+  .panel{
+    background:rgba(255,255,255,.97);
+    border-radius:30px;
+    border:1px solid #DBE7F4;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .head{
+    padding:18px 18px 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+  .head h2{
+    margin:0;
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:-.5px;
+    color:var(--navy);
+    line-height:1.1;
+  }
+  .en{
+    margin-top:4px;
+    color:#72849A;
+    font-size:10px;
+    letter-spacing:2.4px;
+    font-weight:800;
+  }
+  .close{
+    width:42px;height:42px;border:none;border-radius:50%;
+    background:#F3F7FB;color:#63768B;font-size:26px;
+    box-shadow:inset 0 0 0 1px #E2ECF6;cursor:pointer;
+  }
+
+  .viewer-wrap{padding:0 16px 14px}
+  .viewer-card{
+    background:linear-gradient(180deg,#EDF4FA 0%,#E3EDF6 100%);
+    border-radius:28px;
+    padding:10px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.65);
+  }
+  .viewer{
+    position:relative;
+    overflow:hidden;
+    border-radius:22px;
+    aspect-ratio:.83/1;
+    background:linear-gradient(180deg,#DCE7F1,#CFDAE6);
+  }
+  .stage{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+  }
+  .camera,.capture,.overlay,.eyelid,.mini-canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+  }
+  .camera,.capture{
+    object-fit:cover;
+    background:#CBD7E2;
+    transition:filter .25s ease, transform .25s ease;
+  }
+  .capture{display:none}
+  .overlay,.eyelid,.mini-canvas{pointer-events:none}
+
+  .viewer-deviate{
+    position:absolute;
+    right:14px;
+    top:14px;
+    z-index:7;
+    min-width:122px;
+    height:40px;
+    border:none;
+    border-radius:14px;
+    padding:0 14px;
+    background:linear-gradient(180deg,#0D67C7,#025CB8);
+    color:#fff;
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:-.2px;
+    box-shadow:0 8px 16px rgba(0,94,184,.18);
+    cursor:pointer;
+  }
+
+  .status{
+    position:absolute;
+    left:14px;
+    bottom:14px;
+    z-index:6;
+    min-height:44px;
+    padding:0 14px 0 11px;
+    background:rgba(255,255,255,.97);
+    border:1px solid #D8E4F2;
+    border-radius:24px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    box-shadow:0 10px 22px rgba(0,74,147,.12);
+    color:#24518A;
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:-.1px;
+  }
+  .dot{
+    width:20px;height:20px;border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 0 7px rgba(20,190,75,.16);
+  }
+  .status.deviated .dot{
+    background:var(--orange);
+    box-shadow:0 0 0 7px rgba(255,176,32,.18);
+  }
+
+  .helper{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    z-index:7;
+    padding:10px 16px;
+    border-radius:18px;
+    background:rgba(255,255,255,.94);
+    font-size:14px;
+    font-weight:800;
+    color:#24518A;
+    box-shadow:0 8px 18px rgba(0,74,147,.10);
+    display:none;
+    text-align:center;
+    white-space:nowrap;
+  }
+  .loading-ai{
+    position:absolute;
+    left:50%;
+    top:16px;
+    transform:translateX(-50%);
+    z-index:7;
+    background:rgba(4,17,31,.74);
+    color:#fff;
+    padding:8px 12px;
+    border-radius:14px;
+    font-size:12px;
+    font-weight:800;
+    display:none;
+  }
+
+  .mini{
+    position:absolute;
+    left:14px;
+    top:14px;
+    z-index:8;
+    width:108px;
+    height:72px;
+    border-radius:20px;
+    overflow:hidden;
+    background:#fff;
+    border:2px solid rgba(255,255,255,.92);
+    box-shadow:0 14px 26px rgba(0,0,0,.18);
+    display:none;
+  }
+  .mini video,.mini canvas{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;
+    object-position:center 24%;
+  }
+  .mini-label{
+    position:absolute;
+    left:6px;
+    right:6px;
+    bottom:6px;
+    background:linear-gradient(180deg,#FFB84A,#FFA61F);
+    color:#173C64;
+    border-radius:12px;
+    padding:6px 8px 6px;
+    text-align:center;
+    font-size:11px;
+    font-weight:900;
+    line-height:1.1;
+    box-shadow:0 10px 16px rgba(255,176,32,.26);
+  }
+
+  .eyelid .top,.eyelid .bottom{
+    position:absolute;
+    left:0;width:100%;height:52%;
+    background:linear-gradient(180deg, rgba(219,213,205,.92), rgba(195,186,177,.95));
+    transform:translateY(-105%);
+    opacity:0;
+  }
+  .eyelid .bottom{
+    top:auto;bottom:0;
+    background:linear-gradient(180deg, rgba(197,188,180,.95), rgba(219,213,205,.92));
+    transform:translateY(105%);
+  }
+  .eyelid.blink .top{animation:blinkTop .32s ease-in-out}
+  .eyelid.blink .bottom{animation:blinkBottom .32s ease-in-out}
+  @keyframes blinkTop{
+    0%{transform:translateY(-105%);opacity:0}
+    25%{transform:translateY(-10%);opacity:.95}
+    50%{transform:translateY(8%);opacity:1}
+    75%{transform:translateY(-12%);opacity:.95}
+    100%{transform:translateY(-105%);opacity:0}
+  }
+  @keyframes blinkBottom{
+    0%{transform:translateY(105%);opacity:0}
+    25%{transform:translateY(10%);opacity:.95}
+    50%{transform:translateY(-8%);opacity:1}
+    75%{transform:translateY(12%);opacity:.95}
+    100%{transform:translateY(105%);opacity:0}
+  }
+
+  .action-area{padding:0 16px 14px}
+  .action-panel{
+    background:#F6FAFE;
+    border:1px solid #E1EBF6;
+    border-radius:24px;
+    padding:10px;
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    gap:10px;
+    align-items:center;
+  }
+  .toggle{
+    width:100%;
+    background:linear-gradient(180deg,#0B66C8,#005AB7);
+    padding:4px;
+    border-radius:18px;
+    display:flex;
+    gap:4px;
+    box-shadow:0 10px 18px rgba(0,94,184,.14);
+  }
+  .toggle button{
+    flex:1;
+    height:46px;
+    border:none;
+    border-radius:14px;
+    background:transparent;
+    color:#fff;
+    opacity:.82;
+    font-size:15px;
+    font-weight:900;
+    letter-spacing:-.2px;
+    cursor:pointer;
+  }
+  .toggle button.active{
+    background:#fff;
+    color:#163C66;
+    opacity:1;
+    box-shadow:0 4px 10px rgba(0,0,0,.10);
+  }
+  .slot{
+    width:100%;
+    background:linear-gradient(180deg,#0B66C8,#005AB7);
+    border-radius:18px;
+    padding:4px;
+    display:flex;
+    align-items:center;
+    box-shadow:0 12px 20px rgba(0,94,184,.14);
+  }
+  .btn-primary{
+    width:100%;
+    height:46px;
+    border:none;
+    border-radius:14px;
+    background:transparent;
+    color:#fff;
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:-.2px;
+    cursor:pointer;
+  }
+
+  .info-area{padding:0 16px 18px}
+  .info-card{
+    background:linear-gradient(180deg,#fff 0%,#FBFDFF 100%);
+    border:1px solid #E2ECF6;
+    border-radius:24px;
+    padding:16px;
+    box-shadow:var(--shadow-soft);
+  }
+  .info-top{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .info-icon{
+    width:28px;height:28px;border-radius:14px;background:#EAF3FF;color:#2A69C8;
+    font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:0 0 28px;
+  }
+  .info-text{flex:1}
+  .info-text h3{
+    margin:0 0 6px;font-size:17px;font-weight:900;color:var(--navy);letter-spacing:-.3px;line-height:1.25;
+  }
+  .info-text p{
+    margin:0;font-size:14px;line-height:1.52;color:#294D74;font-weight:700;
+  }
+  .info-text .blue{color:#0E61BE}
+  .info-text .orange{color:#D97F00}
+  .note{
+    margin-top:10px;font-size:11px;line-height:1.4;color:#6E7D8E;
+  }
+  .done-row{margin-top:14px}
+  .done{
+    width:100%;height:54px;border:none;border-radius:18px;background:#061626;color:#fff;
+    font-size:16px;font-weight:900;box-shadow:0 12px 20px rgba(6,22,38,.14);cursor:pointer;
+  }
+
+  .cam-perm{
+    position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:26px;
+    background:linear-gradient(180deg, rgba(237,244,251,.88), rgba(225,236,246,.88));
+  }
+  .cam-card{
+    background:rgba(255,255,255,.95);border:1px solid #DBE7F4;border-radius:24px;padding:22px 18px;
+    box-shadow:var(--shadow);text-align:center;
+  }
+  .cam-card h3{margin:0 0 10px;font-size:20px;color:#173F69}
+  .cam-card p{margin:0;font-size:15px;line-height:1.45;color:#5E7692;font-weight:700}
+  .hidden{display:none!important}
+</style>
 </head>
 <body>
-  <div class="landing" id="landing"><button class="cta" id="openDemo">아큐브 난시 체험</button></div>
-  <div class="overlay" id="overlay">
-    <div class="card">
-      <div class="head">
-        <div><h1>ASD™ 축안정화</h1><div class="sub">ACCELERATION STABLE DESIGN</div></div>
-        <button class="close" id="closeDemo">X</button>
+<div class="app">
+  <section class="screen active" id="landingScreen">
+    <div class="landing">
+      <div class="hero">
+        <h1>아큐브 기술력을<br>직접 체험해 보세요</h1>
       </div>
 
-      <div class="scene">
-        <video id="rearVideo" autoplay playsinline muted></video>
-        <img id="capturedRear" alt="">
-        <div class="blurLayer" id="blurLayer"></div>
-        <div class="graphics">
-          <div class="circle"></div>
-          <div class="axis" id="axis"></div>
-          <div class="side left"></div>
-          <div class="side right"></div>
-          <div class="dot left"></div>
-          <div class="dot right"></div>
+      <div class="card">
+        <img class="pack" alt="packshot" src="data:image/svg+xml;utf8,
+        <svg xmlns='http://www.w3.org/2000/svg' width='260' height='170' viewBox='0 0 260 170'>
+          <defs><linearGradient id='g1' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ffffff'/><stop offset='1' stop-color='%23eaf6ff'/></linearGradient><linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2300a9d8'/><stop offset='1' stop-color='%23005eb8'/></linearGradient></defs>
+          <rect x='12' y='26' rx='16' ry='16' width='180' height='108' fill='url(%23g1)' stroke='%23d6e6f6' stroke-width='3'/>
+          <rect x='154' y='10' rx='16' ry='16' width='92' height='116' fill='url(%23g2)' opacity='.95'/>
+          <text x='34' y='60' font-size='28' font-weight='700' fill='%23163c66' font-family='Arial'>ACUVUE</text>
+          <text x='34' y='100' font-size='40' font-weight='300' fill='%23163c66' font-family='Arial'>ACUVUE</text>
+          <text x='34' y='126' font-size='18' fill='%23163c66' font-family='Arial'>OASYS MAX</text>
+          <circle cx='122' cy='92' r='28' fill='none' stroke='%2300a9d8' stroke-width='3' opacity='.55'/>
+          <text x='182' y='36' font-size='14' font-weight='700' fill='white' font-family='Arial'>MAX</text>
+        </svg>">
+        <div class="copy">
+          <h2>저녁까지<br>선명한 시야</h2>
+          <p>아큐브® 난시 기술력</p>
         </div>
-        <div class="guide" id="guide">눈을 한 번 깜박여 주세요</div>
-        <div class="frontInset" id="frontInset">
-          <video id="frontVideo" autoplay playsinline muted></video>
-          <div class="label">눈을 한 번 깜박여 주세요</div>
+        <div class="start-wrap">
+          <button class="start" id="startBtn"><span class="ic">→</span>체험 시작</button>
         </div>
-        <div class="badge" id="angleBadge">좌측 20° 회전 발생</div>
-      </div>
-
-      <div class="controls">
-        <button class="btn" id="rotateBtn">축이탈</button>
-        <button class="btn primary" id="manualBtn">깜박임 수동</button>
-        <button class="btn" id="autoBtn">깜박임 자동인식</button>
-      </div>
-
-      <div class="footer">
-        <div class="title">난시 렌즈는 축이 회전되면 시야가 흐려집니다.</div>
-        <div><span class="blue">수동</span>은 카메라가 켜진 상태에서 클릭할 때마다 5도씩 안정화되고, <span class="blue">자동인식</span>은 후면 화면을 캡처한 뒤 전면 카메라를 보여주며 자동으로 5도씩 안정화됩니다.</div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <section class="screen" id="simScreen">
+    <div class="sim">
+      <div class="panel">
+        <div class="head">
+          <div><h2>ASD™ 축안정화</h2><div class="en">ACCELERATION STABLE DESIGN</div></div>
+          <button class="close" id="closeBtn">×</button>
+        </div>
+
+        <div class="viewer-wrap">
+          <div class="viewer-card">
+            <div class="viewer">
+              <div class="stage">
+                <video class="camera" id="cameraVideo" playsinline autoplay muted></video>
+                <img class="capture" id="captureImage" alt="capture" />
+                <canvas class="overlay" id="overlayCanvas"></canvas>
+
+                <div class="eyelid" id="eyelidLayer"><div class="top"></div><div class="bottom"></div></div>
+                <button class="viewer-deviate" id="deviateBtn">축 이탈 유발</button>
+                <div class="status" id="statusPill"><div class="dot"></div><div id="statusText">우측 20° 회전 발생</div></div>
+                <div class="helper" id="helperText">카메라를 준비 중입니다</div>
+                <div class="loading-ai" id="aiLoading">AI 순목 인식 준비 중</div>
+
+                <div class="mini" id="miniBlink">
+                  <video id="blinkVideo" playsinline autoplay muted></video>
+                  <canvas id="blinkCanvas" class="mini-canvas"></canvas>
+                  <div class="mini-label">눈을 깜박여<br>주세요</div>
+                </div>
+
+                <div class="cam-perm hidden" id="camFallback"><div class="cam-card"><h3>카메라 권한이 필요합니다</h3><p>브라우저에서 카메라 접근을 허용하면<br>후면 카메라 체험이 가능합니다.</p></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-area">
+          <div class="action-panel">
+            <div class="toggle">
+              <button class="active" id="manualBtn">수동</button>
+              <button id="autoBtn">자동</button>
+            </div>
+            <div class="slot"><button class="btn-primary" id="primaryBtn">깜박임 실행</button></div>
+          </div>
+        </div>
+
+        <div class="info-area">
+          <div class="info-card">
+            <div class="info-top">
+              <div class="info-icon">i</div>
+              <div class="info-text">
+                <h3 id="descTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.</h3>
+                <p id="descText">후면 카메라 라이브 화면에서 <span class="blue">깜박임 실행</span> 또는 <span class="orange">시작</span>으로 회전된 축을 안정화 시켜 보세요.</p>
+                <div class="note">해당 시뮬레이션은 이해를 돕기 위한 데모 화면이며, 실제 시야 경험과는 차이가 있을 수 있습니다. KR_2026_233</div>
+              </div>
+            </div>
+            <div class="done-row"><button class="done" id="resetBtn">확인 완료</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
 
 <script>
-const openDemo = document.getElementById("openDemo");
-const closeDemo = document.getElementById("closeDemo");
-const overlay = document.getElementById("overlay");
-const rearVideo = document.getElementById("rearVideo");
-const frontVideo = document.getElementById("frontVideo");
-const frontInset = document.getElementById("frontInset");
-const capturedRear = document.getElementById("capturedRear");
-const rotateBtn = document.getElementById("rotateBtn");
-const manualBtn = document.getElementById("manualBtn");
-const autoBtn = document.getElementById("autoBtn");
-const axis = document.getElementById("axis");
-const angleBadge = document.getElementById("angleBadge");
-const blurLayer = document.getElementById("blurLayer");
-const guide = document.getElementById("guide");
-
-let rearStream = null, frontStream = null, angle = -20, autoMode = false, autoTick = null;
-
-function randomAngle(){ const list=[-25,-20,-15,15,20,25]; return list[Math.floor(Math.random()*list.length)]; }
-function updateScene(){
-  axis.style.transform = `rotate(${angle}deg)`;
-  const dir = angle < 0 ? "좌측" : "우측";
-  const abs = Math.abs(angle);
-  angleBadge.textContent = abs === 0 ? "축 안정" : `${dir}${abs}° 회전 발생`;
-  blurLayer.style.setProperty("--blur", `${Math.max(0, abs) * 0.28}px`);
-}
-function stabilizeStep(){
-  if (angle === 0) return;
-  if (angle > 0) angle = Math.max(0, angle - 5);
-  if (angle < 0) angle = Math.min(0, angle + 5);
-  updateScene();
-}
-async function startRearCamera(){
-  if (rearStream) return;
-  rearStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment", width:{ideal:1280}, height:{ideal:1280}}, audio:false });
-  rearVideo.srcObject = rearStream;
-  rearVideo.style.display = "block";
-  capturedRear.style.display = "none";
-}
-function stopRearCamera(){
-  if (rearStream){ rearStream.getTracks().forEach(t=>t.stop()); rearStream = null; }
-  rearVideo.srcObject = null;
-}
-async function startFrontCamera(){
-  if (frontStream) return;
-  frontStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user", width:{ideal:640}, height:{ideal:860}}, audio:false });
-  frontVideo.srcObject = frontStream;
-  frontInset.classList.add("show");
-}
-function stopFrontCamera(){
-  if (frontStream){ frontStream.getTracks().forEach(t=>t.stop()); frontStream = null; }
-  frontVideo.srcObject = null;
-  frontInset.classList.remove("show");
-}
-function captureRearFrame(){
-  const canvas = document.createElement("canvas");
-  const w = rearVideo.videoWidth || 1080, h = rearVideo.videoHeight || 1080;
-  canvas.width = w; canvas.height = h;
-  canvas.getContext("2d").drawImage(rearVideo, 0, 0, w, h);
-  capturedRear.src = canvas.toDataURL("image/jpeg", .92);
-  capturedRear.style.display = "block";
-  rearVideo.style.display = "none";
-}
-function setManualModeUI(){
-  autoMode = false;
-  autoBtn.classList.remove("active");
-  manualBtn.classList.add("primary");
-  guide.classList.remove("show");
-  if (autoTick){ clearInterval(autoTick); autoTick = null; }
-  stopFrontCamera();
-  capturedRear.style.display = "none";
-  rearVideo.style.display = "block";
-}
-async function setAutoMode(){
-  autoMode = true;
-  manualBtn.classList.remove("primary");
-  autoBtn.classList.add("active");
-  guide.classList.add("show");
-  captureRearFrame();
-  await startFrontCamera();
-  if (autoTick) clearInterval(autoTick);
-  autoTick = setInterval(() => { if (autoMode) stabilizeStep(); }, 2200);
-}
-
-openDemo.addEventListener("click", async function(){
-  overlay.classList.add("show");
-  angle = -20;
-  updateScene();
+(async function () {
+  let vision = null;
   try {
-    await startRearCamera();
-    setManualModeUI();
-  } catch(e) {
-    console.error(e);
-    alert("카메라 권한을 허용해 주세요.");
+    vision = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs");
+  } catch (e) {
+    console.warn("MediaPipe import failed", e);
   }
-});
-closeDemo.addEventListener("click", function(){
-  overlay.classList.remove("show");
-  if (autoTick){ clearInterval(autoTick); autoTick = null; }
-  stopFrontCamera(); stopRearCamera();
-});
-rotateBtn.addEventListener("click", function(){ angle = randomAngle(); updateScene(); });
-manualBtn.addEventListener("click", async function(){
-  try {
-    await startRearCamera();
-    setManualModeUI();
-    stabilizeStep();
-  } catch(e) {
-    console.error(e);
-    alert("카메라 권한을 허용해 주세요.");
+
+  const state = {
+    mode: 'manual',
+    currentAngle: 20,
+    mainStream: null,
+    blinkStream: null,
+    rearCaptured: false,
+    capturedDataUrl: '',
+    faceLandmarker: null,
+    faceLandmarkerReady: false,
+    detectLoopId: null,
+    blinkState: 'open',
+    closedFrames: 0,
+    openFrames: 0,
+    blinkCooldownUntil: 0
+  };
+
+  const $ = id => document.getElementById(id);
+  const landingScreen = $('landingScreen'), simScreen = $('simScreen'), startBtn = $('startBtn'), closeBtn = $('closeBtn');
+  const manualBtn = $('manualBtn'), autoBtn = $('autoBtn');
+  const cameraVideo = $('cameraVideo'), captureImage = $('captureImage'), overlayCanvas = $('overlayCanvas'), eyelidLayer = $('eyelidLayer');
+  const statusPill = $('statusPill'), statusText = $('statusText'), helperText = $('helperText');
+  const miniBlink = $('miniBlink'), blinkVideo = $('blinkVideo'), blinkCanvas = $('blinkCanvas'), camFallback = $('camFallback');
+  const deviateBtn = $('deviateBtn'), primaryBtn = $('primaryBtn'), resetBtn = $('resetBtn'), descTitle = $('descTitle'), descText = $('descText'), aiLoading = $('aiLoading');
+  const ctx = overlayCanvas.getContext('2d');
+  const miniCtx = blinkCanvas.getContext('2d');
+
+  function showScreen(name){
+    landingScreen.classList.toggle('active', name === 'landing');
+    simScreen.classList.toggle('active', name === 'sim');
   }
-});
-autoBtn.addEventListener("click", async function(){
-  try {
-    await startRearCamera();
-    if (!autoMode) await setAutoMode();
-  } catch(e) {
-    console.error(e);
-    alert("카메라 권한을 허용해 주세요.");
+  function chooseRandomAngle(){
+    const arr = [-25,-20,-15,-10,-5,5,10,15,20,25];
+    return arr[Math.floor(Math.random()*arr.length)];
   }
-});
-updateScene();
+  function getBlur(angle){
+    const a = Math.abs(angle);
+    if (a>=25) return 12;
+    if (a>=20) return 10;
+    if (a>=15) return 7.8;
+    if (a>=10) return 5.5;
+    if (a>=5) return 3;
+    return 0;
+  }
+  function runBlinkEffect(){
+    eyelidLayer.classList.remove('blink');
+    void eyelidLayer.offsetWidth;
+    eyelidLayer.classList.add('blink');
+  }
+  function getStatusLabel(){
+    if (state.currentAngle===0) return '축 안정';
+    const dir = state.currentAngle<0?'좌측':'우측';
+    return `${dir} ${Math.abs(state.currentAngle)}° 회전 발생`;
+  }
+
+  function updateDescription(){
+    if (state.currentAngle === 0){
+      descTitle.textContent = '난시 렌즈 축 안정의 중요성';
+      descText.innerHTML = '아큐브 ASD™는 <span class="blue">자연스러운 눈 깜박임</span>으로 렌즈 움직임을 안정화하여 선명한 시야를 제공합니다.';
+      return;
+    }
+    descTitle.textContent = '난시 렌즈는 축이 회전되면 시야가 흐려집니다.';
+    if (state.mode === 'manual'){
+      descText.innerHTML = '후면 카메라 라이브 화면에서 “<span class="blue">깜박임 실행</span>” 버튼으로 회전된 축을 안정화 시켜 보세요.';
+    } else {
+      descText.innerHTML = state.rearCaptured
+        ? '자동인식이 진행 중입니다. 좌측 상단 미니 카메라에서 순목을 인식해 회전된 축을 안정화합니다.'
+        : '후면 카메라 화면에서 “<span class="orange">시작</span>” 버튼을 눌러 자동인식을 시작해 보세요.';
+    }
+  }
+
+  function applyBlur(){
+    const blur = getBlur(state.currentAngle);
+    const brightness = Math.max(0.78, 1 - Math.abs(state.currentAngle)*0.006);
+    if (state.mode === 'auto' && state.rearCaptured){
+      captureImage.style.display = 'block';
+      captureImage.style.filter = `blur(${blur}px) brightness(${brightness})`;
+      cameraVideo.style.filter = 'none';
+    } else {
+      captureImage.style.display = 'none';
+      cameraVideo.style.filter = `blur(${blur}px) brightness(${brightness})`;
+      captureImage.style.filter = 'none';
+    }
+  }
+
+  function updatePrimary(){
+    if (state.mode === 'manual'){
+      primaryBtn.textContent='깜박임 실행';
+      miniBlink.style.display='none';
+      return;
+    }
+    primaryBtn.textContent = state.rearCaptured ? '재시작' : '시작';
+    miniBlink.style.display = state.rearCaptured ? 'block' : 'none';
+  }
+
+  function updateStatus(){
+    statusText.textContent = getStatusLabel();
+    statusPill.classList.toggle('deviated', state.currentAngle!==0);
+    updateDescription();
+    updatePrimary();
+    applyBlur();
+  }
+
+  function rotateTowardStable(){
+    if (state.currentAngle>0) state.currentAngle -=5;
+    else if (state.currentAngle<0) state.currentAngle +=5;
+    updateStatus();
+  }
+
+  function triggerBlinkCorrection(){
+    if (state.currentAngle===0) return;
+    runBlinkEffect();
+    rotateTowardStable();
+  }
+
+  async function stopStream(stream){
+    if (!stream) return;
+    stream.getTracks().forEach(t=>t.stop());
+  }
+
+  async function startMainCamera(){
+    helperText.style.display='block';
+    helperText.textContent='카메라를 준비 중입니다';
+    camFallback.classList.add('hidden');
+    try{
+      await stopStream(state.mainStream);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio:false,
+        video:{ facingMode:{ideal:'environment'}, width:{ideal:1080}, height:{ideal:1440} }
+      });
+      state.mainStream = stream;
+      cameraVideo.srcObject = stream;
+      await cameraVideo.play().catch(()=>{});
+      helperText.style.display='none';
+    }catch(err){
+      helperText.style.display='none';
+      camFallback.classList.remove('hidden');
+      console.error(err);
+    }
+  }
+
+  async function startFrontMiniCamera(){
+    try{
+      await stopStream(state.blinkStream);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio:false,
+        video:{ facingMode:{ideal:'user'}, width:{ideal:320}, height:{ideal:480} }
+      });
+      state.blinkStream = stream;
+      blinkVideo.srcObject = stream;
+      await blinkVideo.play().catch(()=>{});
+      blinkVideo.style.transform = 'scaleX(-1) scale(1.35)';
+      blinkCanvas.style.transform = 'scaleX(-1) scale(1.35)';
+    }catch(err){
+      console.warn('blink stream unavailable', err);
+    }
+  }
+
+  function stopMiniCamera(){
+    if (state.blinkStream){
+      state.blinkStream.getTracks().forEach(t=>t.stop());
+      state.blinkStream = null;
+    }
+    blinkVideo.srcObject = null;
+  }
+
+  async function setupFaceLandmarker(){
+    if (state.faceLandmarkerReady || !vision) return;
+    aiLoading.style.display='block';
+    try{
+      const { FaceLandmarker, FilesetResolver } = vision;
+      const filesetResolver = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm");
+      state.faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+        baseOptions: {
+          modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task"
+        },
+        outputFaceBlendshapes: false,
+        runningMode: "VIDEO",
+        numFaces: 1
+      });
+      state.faceLandmarkerReady = true;
+    }catch(err){
+      console.error("FaceLandmarker init failed", err);
+    }finally{
+      aiLoading.style.display='none';
+      updateStatus();
+    }
+  }
+
+  function pointDistance(a, b){
+    const dx=a.x-b.x, dy=a.y-b.y;
+    return Math.hypot(dx,dy);
+  }
+  function eyeAspectRatio(landmarks, idx){
+    const p1=landmarks[idx[0]], p2=landmarks[idx[1]], p3=landmarks[idx[2]], p4=landmarks[idx[3]], p5=landmarks[idx[4]], p6=landmarks[idx[5]];
+    const vertical = pointDistance(p2,p6)+pointDistance(p3,p5);
+    const horizontal = 2*pointDistance(p1,p4);
+    return horizontal ? vertical/horizontal : 0;
+  }
+
+  function detectBlinkFromLandmarks(landmarks){
+    const leftIdx=[33,160,158,133,153,144], rightIdx=[362,385,387,263,373,380];
+    const ear = (eyeAspectRatio(landmarks,leftIdx)+eyeAspectRatio(landmarks,rightIdx))/2;
+    const now = Date.now(), CLOSED=0.19, OPEN=0.24;
+
+    if (ear < CLOSED){
+      state.closedFrames +=1;
+      state.openFrames=0;
+      if (state.blinkState==='open') state.blinkState='closing';
+    } else if (ear > OPEN){
+      state.openFrames +=1;
+      if ((state.blinkState==='closing' || state.blinkState==='closed') && state.closedFrames>=1 && now>state.blinkCooldownUntil){
+        state.blinkCooldownUntil = now+900;
+        state.blinkState='open';
+        state.closedFrames=0;
+        state.openFrames=0;
+        triggerBlinkCorrection();
+        return;
+      }
+      state.blinkState='open';
+      state.closedFrames=0;
+    } else {
+      if (state.blinkState==='closing') state.blinkState='closed';
+    }
+  }
+
+  function stopDetectLoop(){
+    if (state.detectLoopId){
+      cancelAnimationFrame(state.detectLoopId);
+      state.detectLoopId=null;
+    }
+    state.blinkState='open';
+    state.closedFrames=0;
+    state.openFrames=0;
+  }
+
+  function clearMiniCanvas(){
+    miniCtx.clearRect(0,0, blinkCanvas.width||1, blinkCanvas.height||1);
+  }
+
+  function drawMiniLandmarks(landmarks){
+    if (!state.rearCaptured) return;
+    const rect = blinkCanvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    const w = Math.max(1, Math.round(rect.width * ratio)), h = Math.max(1, Math.round(rect.height * ratio));
+    if (blinkCanvas.width !== w || blinkCanvas.height !== h){
+      blinkCanvas.width=w; blinkCanvas.height=h;
+    }
+    miniCtx.clearRect(0,0,w,h);
+    miniCtx.strokeStyle='rgba(255,255,255,.88)';
+    miniCtx.lineWidth=Math.max(1.5, w*0.01);
+    const left=[33,160,158,133,153,144,33], right=[362,385,387,263,373,380,362];
+    function path(indices){
+      miniCtx.beginPath();
+      indices.forEach((i,idx)=>{
+        const p=landmarks[i], x=p.x*w, y=p.y*h;
+        if(idx===0) miniCtx.moveTo(x,y); else miniCtx.lineTo(x,y);
+      });
+      miniCtx.stroke();
+    }
+    path(left); path(right);
+  }
+
+  async function runBlinkDetectionLoop(){
+    stopDetectLoop();
+    if (state.mode !== 'auto' || !state.faceLandmarkerReady) return;
+    const detect = () => {
+      const sourceVideo = state.rearCaptured ? blinkVideo : null;
+      if (sourceVideo && sourceVideo.readyState >= 2 && state.currentAngle !== 0){
+        try{
+          const result = state.faceLandmarker.detectForVideo(sourceVideo, performance.now());
+          if (result && result.faceLandmarks && result.faceLandmarks.length > 0){
+            detectBlinkFromLandmarks(result.faceLandmarks[0]);
+            drawMiniLandmarks(result.faceLandmarks[0]);
+          } else {
+            clearMiniCanvas();
+          }
+        }catch(e){
+          clearMiniCanvas();
+        }
+      } else {
+        clearMiniCanvas();
+      }
+      state.detectLoopId = requestAnimationFrame(detect);
+    };
+    detect();
+  }
+
+  async function setupDetection(){
+    stopDetectLoop();
+    stopMiniCamera();
+    clearMiniCanvas();
+    if (state.mode !== 'auto') return;
+    await setupFaceLandmarker();
+    if (state.rearCaptured) await startFrontMiniCamera();
+    runBlinkDetectionLoop();
+  }
+
+  function captureRearFrame(){
+    if (!cameraVideo.videoWidth) return;
+    const c = document.createElement('canvas');
+    c.width = cameraVideo.videoWidth;
+    c.height = cameraVideo.videoHeight;
+    const x = c.getContext('2d');
+    x.drawImage(cameraVideo, 0, 0);
+    state.capturedDataUrl = c.toDataURL('image/jpeg', .92);
+    captureImage.src = state.capturedDataUrl;
+    state.rearCaptured = true;
+    updateStatus();
+    setupDetection();
+  }
+
+  async function restartRearAutoCapture(){
+    stopDetectLoop();
+    stopMiniCamera();
+    state.currentAngle = chooseRandomAngle();
+    state.rearCaptured = false;
+    state.capturedDataUrl = '';
+    captureImage.src = '';
+    captureImage.style.display = 'none';
+    updateStatus();
+    await startMainCamera();
+    await new Promise(r => setTimeout(r, 180));
+    captureRearFrame();
+  }
+
+  function resetAll(){
+    state.currentAngle=0;
+    state.rearCaptured=false;
+    state.capturedDataUrl='';
+    captureImage.src='';
+    captureImage.style.display='none';
+    stopDetectLoop();
+    stopMiniCamera();
+    updateStatus();
+  }
+
+  function drawOverlay(){
+    const rect = overlayCanvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    const width = Math.max(1, Math.round(rect.width * ratio));
+    const height = Math.max(1, Math.round(rect.height * ratio));
+    if (overlayCanvas.width !== width || overlayCanvas.height !== height){
+      overlayCanvas.width=width; overlayCanvas.height=height;
+    }
+    ctx.clearRect(0,0,width,height);
+    const cx = width*.5, cy = height*.56, r = Math.min(width,height)*.38;
+    ctx.save();
+    ctx.globalAlpha=.34;
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.strokeStyle='#70A0D7';
+    ctx.lineWidth=Math.max(2,width*.0045);
+    ctx.stroke();
+    ctx.restore();
+
+    const shapeW=r*.18, shapeH=r*.42, offX=r*.66, offY=0, angleRad=state.currentAngle*Math.PI/180;
+
+    function roundRect(context,x,y,w,h,rr){
+      context.beginPath();
+      context.moveTo(x+rr,y);
+      context.arcTo(x+w,y,x+w,y+h,rr);
+      context.arcTo(x+w,y+h,x,y+h,rr);
+      context.arcTo(x,y+h,x,y,rr);
+      context.arcTo(x,y,x+w,y,rr);
+      context.closePath();
+    }
+    function drawPill(x,y,rot){
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.rotate(rot);
+      ctx.globalAlpha=.28;
+      ctx.fillStyle='#8DE8FF';
+      roundRect(ctx,-shapeW/2,-shapeH/2,shapeW,shapeH,shapeW/2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    drawPill(cx - offX*Math.cos(angleRad), cy - offX*Math.sin(angleRad) - offY, angleRad);
+    drawPill(cx + offX*Math.cos(angleRad), cy + offX*Math.sin(angleRad) + offY, angleRad);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angleRad);
+    ctx.lineWidth=Math.max(3,width*.006);
+    ctx.strokeStyle='rgba(70,75,82,.75)';
+    ctx.setLineDash([Math.max(16,width*.03), Math.max(10,width*.018)]);
+    ctx.beginPath();
+    ctx.moveTo(-r*.98,0);
+    ctx.lineTo(r*.98,0);
+    ctx.stroke();
+
+    const pointR=Math.max(9,width*.02),
+          pointColor=state.currentAngle===0?'#16BE4A':'#FFAF16',
+          pointGlow=state.currentAngle===0?'rgba(22,190,74,.24)':'rgba(255,175,22,.26)';
+    [-r*.98,r*.98].forEach(x=>{
+      ctx.beginPath(); ctx.fillStyle=pointGlow; ctx.arc(x,0,pointR*1.75,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.fillStyle=pointColor; ctx.arc(x,0,pointR,0,Math.PI*2); ctx.fill();
+    });
+    ctx.restore();
+    requestAnimationFrame(drawOverlay);
+  }
+
+  startBtn.addEventListener('click', async () => {
+    showScreen('sim');
+    await startMainCamera();
+    updateStatus();
+  });
+
+  closeBtn.addEventListener('click', async () => {
+    showScreen('landing');
+    stopDetectLoop();
+    stopMiniCamera();
+    await stopStream(state.mainStream);
+    state.mainStream=null;
+  });
+
+  manualBtn.addEventListener('click', async () => {
+    state.mode='manual';
+    manualBtn.classList.add('active');
+    autoBtn.classList.remove('active');
+    state.currentAngle = chooseRandomAngle();
+    stopDetectLoop();
+    stopMiniCamera();
+    state.rearCaptured = false;
+    state.capturedDataUrl = '';
+    captureImage.src = '';
+    captureImage.style.display='none';
+    await startMainCamera();
+    updateStatus();
+  });
+
+  autoBtn.addEventListener('click', async () => {
+    state.mode='auto';
+    autoBtn.classList.add('active');
+    manualBtn.classList.remove('active');
+    state.currentAngle = chooseRandomAngle();
+    state.rearCaptured = false;
+    state.capturedDataUrl = '';
+    captureImage.src = '';
+    captureImage.style.display='none';
+    await startMainCamera();
+    stopDetectLoop();
+    stopMiniCamera();
+    updateStatus();
+  });
+
+  deviateBtn.addEventListener('click', () => {
+    state.currentAngle = chooseRandomAngle();
+    updateStatus();
+  });
+
+  primaryBtn.addEventListener('click', async () => {
+    if (state.mode==='manual') {
+      triggerBlinkCorrection();
+    } else {
+      if (state.rearCaptured) {
+        await restartRearAutoCapture();
+      } else {
+        captureRearFrame();
+      }
+    }
+  });
+
+  resetBtn.addEventListener('click', () => { resetAll(); });
+  eyelidLayer.addEventListener('animationend', () => eyelidLayer.classList.remove('blink'));
+  window.addEventListener('resize', () => { applyBlur(); });
+
+  updateStatus();
+  drawOverlay();
+})();
 </script>
 </body>
 </html>
