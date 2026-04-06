@@ -188,9 +188,14 @@
     object-fit:cover;
     background:#CBD7E2;
     transition:filter .25s ease, transform .25s ease;
+    z-index:1;
   }
   .capture{display:none}
-  .overlay,.eyelid,.mini-canvas{pointer-events:none}
+  .overlay{
+    pointer-events:none;
+    z-index:5;
+  }
+  .eyelid,.mini-canvas{pointer-events:none}
 
   .viewer-deviate{
     position:absolute;
@@ -1055,11 +1060,11 @@
     ctx.clearRect(0,0,width,height);
     const cx = width*.5, cy = height*.53, r = Math.min(width,height)*.38;
     ctx.save();
-    ctx.globalAlpha=.34;
+    ctx.globalAlpha=.5;
     ctx.beginPath();
     ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.strokeStyle='#70A0D7';
-    ctx.lineWidth=Math.max(2,width*.0045);
+    ctx.strokeStyle='#5E8FD8';
+    ctx.lineWidth=Math.max(3,width*.005);
     ctx.stroke();
     ctx.restore();
 
@@ -1091,8 +1096,8 @@
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(angleRad);
-    ctx.lineWidth=Math.max(3,width*.006);
-    ctx.strokeStyle='rgba(70,75,82,.75)';
+    ctx.lineWidth=Math.max(4,width*.006);
+    ctx.strokeStyle='rgba(40,60,90,0.9)';
     ctx.setLineDash([Math.max(16,width*.03), Math.max(10,width*.018)]);
     ctx.beginPath();
     ctx.moveTo(-r*.98,0);
