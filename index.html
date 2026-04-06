@@ -59,13 +59,13 @@
 
   .card{
     position:relative;
-    overflow:hidden;
-    min-height:320px;
-    padding:24px 24px 24px;
-    border-radius:36px;
-    background:linear-gradient(180deg,#ffffff 0%, #F8FBFF 100%);
-    border:1px solid #DCE9F6;
-    box-shadow:var(--shadow);
+    overflow:visible;
+    min-height:auto;
+    padding:0;
+    border-radius:0;
+    background:transparent;
+    border:none;
+    box-shadow:none;
   }
   .pack{
     position:absolute;
@@ -426,7 +426,7 @@
   .note{
     margin-top:10px;font-size:11px;line-height:1.4;color:#6E7D8E;
   }
-  .done-row{margin-top:14px}
+  .done-row{display:none}
   .done{
     width:100%;height:54px;border:none;border-radius:18px;background:#061626;color:#fff;
     font-size:16px;font-weight:900;box-shadow:0 12px 20px rgba(6,22,38,.14);cursor:pointer;
@@ -549,6 +549,66 @@
     box-shadow:0 10px 20px rgba(0,74,147,.10) !important;
   }
 
+
+  /* premium button refresh */
+  .toggle{
+    background:rgba(255,255,255,.82) !important;
+    border:1px solid rgba(205,221,240,.95) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 10px 20px rgba(15,53,110,.06) !important;
+    backdrop-filter:blur(10px);
+  }
+  .toggle button{
+    color:#6B84A3 !important;
+    font-weight:900 !important;
+    letter-spacing:-.35px !important;
+  }
+  .toggle button.active{
+    background:linear-gradient(180deg,#2F74DA 0%, #1E62CC 100%) !important;
+    color:#fff !important;
+    box-shadow:
+      0 10px 20px rgba(0,94,184,.18),
+      inset 0 1px 0 rgba(255,255,255,.18) !important;
+  }
+
+  .slot{
+    background:rgba(255,255,255,.82) !important;
+    border:1px solid rgba(205,221,240,.95) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 10px 20px rgba(15,53,110,.06) !important;
+    backdrop-filter:blur(10px);
+  }
+  .btn-primary{
+    background:linear-gradient(180deg,#2F74DA 0%, #1E62CC 100%) !important;
+    color:#fff !important;
+    font-size:17px !important;
+    font-weight:900 !important;
+    letter-spacing:-.3px !important;
+    box-shadow:
+      0 10px 20px rgba(0,94,184,.18),
+      inset 0 1px 0 rgba(255,255,255,.18) !important;
+  }
+
+  .viewer-deviate{
+    background:rgba(255,255,255,.88) !important;
+    color:#1E62CC !important;
+    border:1px solid rgba(205,221,240,.98) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 12px 22px rgba(15,53,110,.10) !important;
+    backdrop-filter:blur(10px);
+    font-weight:900 !important;
+  }
+
+  .start{
+    background:linear-gradient(180deg,#2F74DA 0%, #1E62CC 100%) !important;
+    box-shadow:
+      0 14px 26px rgba(0,94,184,.20),
+      inset 0 1px 0 rgba(255,255,255,.16) !important;
+  }
+
 </style>
 </head>
 <body>
@@ -622,7 +682,7 @@
                 <div class="note">해당 시뮬레이션은 이해를 돕기 위한 데모 화면이며, 실제 시야 경험과는 차이가 있을 수 있습니다. KR_2026_233</div>
               </div>
             </div>
-            <div class="done-row"><button class="done" id="resetBtn">확인 완료</button></div>
+            
           </div>
         </div>
       </div>
@@ -995,7 +1055,7 @@
       overlayCanvas.width=width; overlayCanvas.height=height;
     }
     ctx.clearRect(0,0,width,height);
-    const cx = width*.5, cy = height*.56, r = Math.min(width,height)*.38;
+    const cx = width*.5, cy = height*.52, r = Math.min(width,height)*.38;
     ctx.save();
     ctx.globalAlpha=.34;
     ctx.beginPath();
