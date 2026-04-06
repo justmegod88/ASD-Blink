@@ -23,7 +23,7 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{
     margin:0;
-    background:#EEF5FD;
+    background:#DCE6F0;
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
     color:var(--text);
   }
@@ -195,7 +195,7 @@
   .viewer-deviate{
     position:absolute;
     right:14px;
-    top:14px;
+    bottom:14px;
     z-index:7;
     min-width:122px;
     height:40px;
@@ -214,7 +214,7 @@
   .status{
     position:absolute;
     left:14px;
-    top:14px;
+    bottom:14px;
     z-index:6;
     min-height:44px;
     padding:0 14px 0 11px;
@@ -273,12 +273,9 @@
   }
 
   .mini{
-    position:absolute !important;
-    right:14px !important;
-    top:14px !important;
     position:absolute;
     left:14px;
-    top:14px;
+    bottom:14px;
     z-index:8;
     width:108px;
     height:72px;
@@ -447,6 +444,13 @@
   .cam-card p{margin:0;font-size:15px;line-height:1.45;color:#5E7692;font-weight:700}
   .hidden{display:none!important}
 </style>
+
+<style>
+.status{position:absolute !important; left:14px !important; top:14px !important; bottom:auto !important;}
+.deviate-btn{position:absolute !important; right:14px !important; bottom:14px !important; top:auto !important;}
+.mini{position:absolute !important; right:14px !important; top:14px !important;}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -457,8 +461,21 @@
       </div>
 
       <div class="card">
-        
-        
+        <img class="pack" alt="packshot" src="data:image/svg+xml;utf8,
+        <svg xmlns='http://www.w3.org/2000/svg' width='260' height='170' viewBox='0 0 260 170'>
+          <defs><linearGradient id='g1' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ffffff'/><stop offset='1' stop-color='%23eaf6ff'/></linearGradient><linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2300a9d8'/><stop offset='1' stop-color='%23005eb8'/></linearGradient></defs>
+          <rect x='12' y='26' rx='16' ry='16' width='180' height='108' fill='url(%23g1)' stroke='%23d6e6f6' stroke-width='3'/>
+          <rect x='154' y='10' rx='16' ry='16' width='92' height='116' fill='url(%23g2)' opacity='.95'/>
+          <text x='34' y='60' font-size='28' font-weight='700' fill='%23163c66' font-family='Arial'>ACUVUE</text>
+          <text x='34' y='100' font-size='40' font-weight='300' fill='%23163c66' font-family='Arial'>ACUVUE</text>
+          <text x='34' y='126' font-size='18' fill='%23163c66' font-family='Arial'>OASYS MAX</text>
+          <circle cx='122' cy='92' r='28' fill='none' stroke='%2300a9d8' stroke-width='3' opacity='.55'/>
+          <text x='182' y='36' font-size='14' font-weight='700' fill='white' font-family='Arial'>MAX</text>
+        </svg>">
+        <div class="copy">
+          <h2>저녁까지<br>선명한 시야</h2>
+          <p>아큐브® 난시 기술력</p>
+        </div>
         <div class="start-wrap">
           <button class="start" id="startBtn"><span class="ic">→</span>체험 시작</button>
         </div>
