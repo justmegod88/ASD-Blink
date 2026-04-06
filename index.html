@@ -649,16 +649,26 @@
     applyBlur();
   }
 
-  function rotateTowardStable(){
+  async function rotateTowardStable(){
     if (state.currentAngle>0) state.currentAngle -=5;
     else if (state.currentAngle<0) state.currentAngle +=5;
     updateStatus();
+    if (state.mode === 'auto' && state.currentAngle === 0) {
+      stopDetectLoop();
+      stopMiniCamera();
+      state.rearCaptured = false;
+      state.capturedDataUrl = '';
+      captureImage.src = '';
+      captureImage.style.display = 'none';
+      await startMainCamera();
+      updateStatus();
+    }
   }
 
-  function triggerBlinkCorrection(){
+  async function triggerBlinkCorrection(){
     if (state.currentAngle===0) return;
     runBlinkEffect();
-    rotateTowardStable();
+    await rotateTowardStable();
   }
 
   async function stopStream(stream){
@@ -861,12 +871,10 @@
   async function restartRearAutoCapture(){
     stopDetectLoop();
     stopMiniCamera();
-    state.currentAngle = chooseRandomAngle();
     state.rearCaptured = false;
     state.capturedDataUrl = '';
     captureImage.src = '';
     captureImage.style.display = 'none';
-    updateStatus();
     await startMainCamera();
     await new Promise(r => setTimeout(r, 180));
     captureRearFrame();
