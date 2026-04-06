@@ -637,7 +637,7 @@
       miniBlink.style.display='none';
       return;
     }
-    primaryBtn.textContent = state.rearCaptured ? '재시작' : '시작';
+    primaryBtn.textContent = '자동 실행';
     miniBlink.style.display = state.rearCaptured ? 'block' : 'none';
   }
 
@@ -868,17 +868,18 @@
     setupDetection();
   }
 
-  async function restartRearAutoCapture(){
+  async function runAutoFlow(){
     stopDetectLoop();
     stopMiniCamera();
     state.rearCaptured = false;
     state.capturedDataUrl = '';
     captureImage.src = '';
     captureImage.style.display = 'none';
+    state.currentAngle = chooseRandomAngle();
+    updateStatus();
     await startMainCamera();
     await new Promise(r => setTimeout(r, 180));
     captureRearFrame();
-    state.currentAngle = chooseRandomAngle();
     updateStatus();
   }
 
@@ -1012,11 +1013,7 @@
     if (state.mode==='manual') {
       triggerBlinkCorrection();
     } else {
-      if (state.rearCaptured) {
-        await restartRearAutoCapture();
-      } else {
-        captureRearFrame();
-      }
+      await runAutoFlow();
     }
   });
 
