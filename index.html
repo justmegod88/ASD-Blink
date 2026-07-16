@@ -2193,11 +2193,11 @@
     #asdOverlay.camera-on.auto-captured #asdCameraVideo{ display:none; }
 
     #asdModeToggle{
-      position:absolute; left:14px; top:14px; z-index:8; display:none;
+      position:absolute; left:14px; top:14px; z-index:8; display:none !important;
       background:rgba(255,255,255,.92); border:1px solid #D6E3F1; border-radius:16px; padding:3px;
       box-shadow:0 8px 16px rgba(11,31,51,.09); backdrop-filter:blur(8px); gap:3px;
     }
-    #asdOverlay.camera-on #asdModeToggle{ display:flex; }
+    #asdOverlay.camera-on #asdModeToggle{ display:none !important; }
     #asdModeToggle button{
       border:none; background:transparent; color:#6C8098; min-width:68px; height:34px; padding:0 13px;
       border-radius:12px; font-size:13px; font-weight:900; letter-spacing:-.02em; cursor:pointer;
@@ -4229,14 +4229,16 @@ function initASDPatch(){
       if (a >= 15) return 3.8;
       if (a >= 10) return 2.7;
       if (a >= 5) return 1.2;
-      return 0.25;
+      return 0;
     }
     function applyCameraFilter(){
       if (!asdCameraVideo) return;
       const blur = getBlur();
       const brightness = Math.max(0.92, 1 - Math.abs(asdAngleValue) * 0.0025).toFixed(2);
-      const liveFilter = `blur(${blur.toFixed(2)}px) saturate(.96) brightness(${brightness})`;
-      const capturedFilter = `blur(${blur.toFixed(2)}px) saturate(.96) brightness(${brightness})`;
+      const liveFilter = `blur(${blur.toFixed(2)}px) saturate(.98) brightness(${brightness})`;
+      const capturedFilter = Math.abs(asdAngleValue) === 0
+        ? 'blur(0px) contrast(1.10) saturate(1.05) brightness(1.02)'
+        : `blur(${blur.toFixed(2)}px) contrast(1.02) saturate(.98) brightness(${brightness})`;
 
       if (asdCaptureImage){
         asdCaptureImage.style.filter = capturedFilter;
@@ -4451,8 +4453,8 @@ function initASDPatch(){
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: useRearCamera ? { ideal:'environment' } : { ideal:'user' },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
+            width: { ideal: 3840 },
+            height: { ideal: 2160 }
           },
           audio: false
         });
@@ -4864,7 +4866,7 @@ function initASDPatch(){
       c.height = asdCameraVideo.videoHeight;
       const x = c.getContext('2d');
       x.drawImage(asdCameraVideo, 0, 0);
-      asdCaptureImage.src = c.toDataURL('image/jpeg', .92);
+      asdCaptureImage.src = c.toDataURL('image/jpeg', 1.0);
       asdCaptureImage.classList.remove('placeholder');
       asdRearCaptured = true;
       updateModeUI();
@@ -4962,6 +4964,7 @@ function initASDPatch(){
         asdOverlay.classList.remove('auto-running','stabilizing');
         if(asdCaptureImage) asdCaptureImage.style.display = 'block';
         if(asdCameraVideo) asdCameraVideo.style.display = 'none';
+        applyCameraFilter();
         updateModeUI();
       }
     }
