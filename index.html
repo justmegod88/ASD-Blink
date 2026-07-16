@@ -2186,7 +2186,7 @@
     /* merged ASD rear-auto patch */
     #asdCaptureImage{
       position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none;
-      background:#dfe6ef; z-index:1;
+      background:#dfe6ef; z-index:2; filter:none;
     }
     #asdCaptureImage.placeholder{ display:block; }
     #asdOverlay.camera-on.auto-captured #asdCaptureImage{ display:block; }
@@ -4859,32 +4859,59 @@ function initASDPatch(){
       detect();
     }
 
-    function captureASDRearFrame(){
-      if(!asdCameraVideo || !asdCameraVideo.videoWidth || !asdCaptureImage) return false;
+    async function waitForASDRearFrameReady(timeoutMs = 3500){
+      if(!asdCameraVideo) return false;
+      const started = performance.now();
+      while(performance.now() - started < timeoutMs){
+        const ready = asdCameraVideo.readyState >= 2 &&
+          asdCameraVideo.videoWidth > 0 && asdCameraVideo.videoHeight > 0 &&
+          !asdCameraVideo.paused && !asdCameraVideo.ended;
+        if(ready){
+          // iOS Safari에서는 metadata 직후 canvas로 복사하면 검은 프레임이 생길 수 있어
+          // 실제 영상 프레임이 두세 번 그려질 때까지 기다린다.
+          await new Promise(resolve => {
+            if(typeof asdCameraVideo.requestVideoFrameCallback === 'function'){
+              asdCameraVideo.requestVideoFrameCallback(() =>
+                asdCameraVideo.requestVideoFrameCallback(() => resolve())
+              );
+            }else{
+              setTimeout(resolve, 450);
+            }
+          });
+          return true;
+        }
+        await new Promise(resolve => setTimeout(resolve, 60));
+      }
+      return false;
+    }
+
+    async function captureASDRearFrame(){
+      if(!asdCameraVideo || !asdCaptureImage) return false;
+      const ready = await waitForASDRearFrameReady();
+      if(!ready) return false;
+
       const c = document.createElement('canvas');
       c.width = asdCameraVideo.videoWidth;
       c.height = asdCameraVideo.videoHeight;
-      const x = c.getContext('2d');
-      x.drawImage(asdCameraVideo, 0, 0);
-      asdCaptureImage.src = c.toDataURL('image/jpeg', 1.0);
+      const x = c.getContext('2d', { alpha:false });
+      if(!x) return false;
+      x.drawImage(asdCameraVideo, 0, 0, c.width, c.height);
+
+      // PNG로 저장해 재압축에 따른 흐림을 피한다.
+      const dataUrl = c.toDataURL('image/png');
+      const loaded = await new Promise(resolve => {
+        const timer = setTimeout(() => resolve(false), 1800);
+        asdCaptureImage.onload = () => { clearTimeout(timer); resolve(true); };
+        asdCaptureImage.onerror = () => { clearTimeout(timer); resolve(false); };
+        asdCaptureImage.src = dataUrl;
+      });
+      if(!loaded) return false;
+
       asdCaptureImage.classList.remove('placeholder');
+      asdCaptureImage.style.display = 'block';
       asdRearCaptured = true;
       updateModeUI();
       return true;
-    }
-
-    function waitForASDRearFrameReady(timeoutMs = 1800){
-      return new Promise((resolve) => {
-        if(!asdCameraVideo) return resolve(false);
-        if(asdCameraVideo.videoWidth && asdCameraVideo.videoHeight) return resolve(true);
-        const started = performance.now();
-        const check = () => {
-          if(asdCameraVideo.videoWidth && asdCameraVideo.videoHeight) return resolve(true);
-          if(performance.now() - started > timeoutMs) return resolve(false);
-          requestAnimationFrame(check);
-        };
-        check();
-      });
     }
 
     async function runASDAutoFlow(){
@@ -4898,8 +4925,7 @@ function initASDPatch(){
         await startASDCamera();
       }
 
-      await waitForASDRearFrameReady();
-      const captured = captureASDRearFrame();
+      const captured = await captureASDRearFrame();
       if(!captured){
         alert('후방 카메라 화면을 불러온 뒤 다시 시작해 주세요.');
         return;
