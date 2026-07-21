@@ -890,7 +890,7 @@
       transform:scaleY(-1);
     }
     #asdGuideCircle{
-      position:absolute; left:50%; top:52%; width:80%; height:80%;
+      position:absolute; left:50%; top:52%; height:80%; width:auto; aspect-ratio:1 / 1;
       transform:translate(-50%,-50%) rotate(0deg);
       border-radius:999px;
       border:3px solid rgba(196,224,255,.92);
@@ -902,6 +902,13 @@
       transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, opacity .18s ease;
       opacity:.96;
     }
+
+    /* Keep the contact-lens guide perfectly circular inside rectangular camera frames. */
+    @supports (width: 1cqh){
+      #asdCameraGuide{ container-type:size; }
+      #asdGuideCircle{ width:80cqh; height:80cqh; }
+    }
+
     #asdGuideCircle::before{
       content:"";
       position:absolute;
