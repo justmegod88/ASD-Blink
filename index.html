@@ -2619,6 +2619,89 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 }
 @media(max-width:600px){#asdCaptureHoldMessage span{font-size:16px;padding:12px 18px;}}
 </style>
+
+<style id="asdLensIntroPatch">
+  /* 첫 화면: 렌즈 표시 없이 회전으로 흐려진 카메라 화면만 노출 */
+  #asdOverlay.lens-not-started #asdCameraGuide,
+  #asdOverlay.lens-not-started #asdActiveZones,
+  #asdOverlay.lens-not-started #asdLensImg,
+  #asdOverlay.lens-not-started #asdAngleBadge{
+    opacity:0 !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+  }
+
+  /* 실제 투명 렌즈가 먼저 살짝 나타나는 단계 */
+  #asdLensImg{
+    z-index:4;
+  }
+  #asdOverlay.lens-intro #asdLensImg{
+    display:block !important;
+    visibility:visible !important;
+    animation:asdRealLensIntro .72s ease-out both;
+  }
+  #asdOverlay.lens-intro #asdCameraGuide{
+    display:block !important;
+    visibility:visible !important;
+  }
+  #asdOverlay.lens-intro #asdGuideCircle,
+  #asdOverlay.lens-intro #asdGuideAxis,
+  #asdOverlay.lens-intro #asdGuideSideLeft,
+  #asdOverlay.lens-intro #asdGuideSideRight,
+  #asdOverlay.lens-intro .asdGuideDot,
+  #asdOverlay.lens-intro #asdStatusText{
+    animation:asdGuideReveal .72s ease-out both;
+  }
+  #asdOverlay.lens-intro #asdActiveZones,
+  #asdOverlay.lens-intro #asdAngleBadge{
+    animation:asdGuideReveal .72s ease-out both;
+  }
+
+  @keyframes asdRealLensIntro{
+    0%{ opacity:0; transform:translate(calc(-50% + var(--irisX, 0px)), calc(-64% + var(--irisY, 0px))) scale(.92) rotate(var(--asdIntroAngle, 15deg)); filter:saturate(1.02) contrast(1.02) drop-shadow(0 6px 14px rgba(75,145,210,.05)); }
+    22%{ opacity:.34; }
+    58%{ opacity:.26; transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(1.01) rotate(var(--asdIntroAngle, 15deg)); filter:saturate(1.06) contrast(1.04) drop-shadow(0 7px 16px rgba(75,145,210,.12)); }
+    100%{ opacity:0; transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(1) rotate(var(--asdIntroAngle, 15deg)); }
+  }
+  @keyframes asdGuideReveal{
+    0%,42%{ opacity:0; }
+    100%{ opacity:1; }
+  }
+
+  /* 소비자가 콘택트렌즈로 인식하기 쉽도록 실제 렌즈 같은 이중 림과 하이라이트 적용 */
+  #asdGuideCircle{
+    border:2px solid rgba(204,230,255,.88) !important;
+    background:
+      radial-gradient(circle at 35% 26%, rgba(255,255,255,.075) 0 9%, rgba(255,255,255,0) 26%),
+      radial-gradient(circle at 64% 72%, rgba(111,184,255,.045) 0 16%, rgba(111,184,255,0) 38%);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.38),
+      0 0 0 4px rgba(132,192,255,.055),
+      0 0 18px rgba(86,142,255,.13),
+      inset 0 0 0 1px rgba(255,255,255,.18),
+      inset 10px -8px 24px rgba(87,159,225,.055),
+      inset -8px 10px 20px rgba(255,255,255,.045) !important;
+  }
+  #asdGuideCircle::before{
+    inset:-5px !important;
+    border:1px solid rgba(177,216,255,.30) !important;
+    box-shadow:0 0 16px rgba(86,142,255,.09), inset 0 0 8px rgba(255,255,255,.05) !important;
+  }
+  #asdGuideCircle::after{
+    content:"";
+    position:absolute;
+    inset:4%;
+    border-radius:50%;
+    border-top:1.5px solid rgba(255,255,255,.52);
+    border-left:1px solid rgba(255,255,255,.20);
+    border-right:1px solid rgba(129,190,246,.12);
+    border-bottom:1.5px solid rgba(86,142,255,.20);
+    transform:rotate(-18deg);
+    pointer-events:none;
+    filter:blur(.05px);
+  }
+</style>
+
 </head>
 <body>
 <div id="missionBarWrap">
@@ -2688,7 +2771,7 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 <div id="asdPageWrap">
 <section id="asdIntroCopy">
   <div class="asdIntroKicker">ASTIGMATISM VISION EXPERIENCE</div>
-  <h1 class="asdIntroTitle"><span class="em">렌즈 축 회전에</span> 따른 시야를 확인하고<br><span class="em2">축안정 효과</span>를 체험해 보세요</h1>
+  <h1 class="asdIntroTitle"><span class="em">렌즈 축회전에</span>따른 시야를 확인하고<br><span class="em2">축안정 효과</span>를 체험해 보세요</h1>
   <p class="asdIntroDesc">렌즈 축이 회전했을 때의 시야 변화와<br> 눈 깜박임을 통한 ASD™ 축 안정화를 직접 확인할 수 있습니다.</p>
   <div class="asdIntroFlow"><span>축  회전 유발</span><i>→</i><span>눈 깜박임</span><i>→</i><span>축 안정</span></div>
 </section>
@@ -4611,6 +4694,8 @@ function initASDPatch(){
 
     function resetASDPatchedState(){
       asdMode = 'auto';
+      asdOverlay.classList.add('lens-not-started');
+      asdOverlay.classList.remove('lens-intro');
       asdRearCaptured = false;
       asdAutoPromptActive = false;
       asdAngleValue = 15;
@@ -5317,6 +5402,7 @@ function initASDPatch(){
       if (asdBlinkBusy) return;
       if(asdMode === 'auto'){
         if(asdRearCaptured && asdAutoPromptActive) return;
+        await playASDLensIntro();
         await runASDAutoFlow();
         return;
       }
@@ -5389,6 +5475,17 @@ function initASDPatch(){
     }
 
 
+    async function playASDLensIntro(){
+      if(!asdOverlay || !asdOverlay.classList.contains('lens-not-started')) return;
+      asdOverlay.style.setProperty('--asdIntroAngle', `${asdAngleValue || 15}deg`);
+      asdOverlay.classList.remove('lens-not-started');
+      asdOverlay.classList.add('lens-intro');
+      renderGuide();
+      await new Promise(resolve => window.setTimeout(resolve, 760));
+      asdOverlay.classList.remove('lens-intro');
+      if(asdLensImg) asdLensImg.style.opacity = '0';
+    }
+
     // 원래 모형 버전 / 실제 카메라 버전 분리: 기존 하위 리스너가 먼저 동작하지 않도록 캡처 단계에서 처리
     asdBlinkBtn.addEventListener('click', async function(ev){
       ev.preventDefault();
@@ -5396,6 +5493,7 @@ function initASDPatch(){
       if (asdBlinkBusy) return;
       if(asdMode === 'auto'){
         if(asdRearCaptured && asdAutoPromptActive) return;
+        await playASDLensIntro();
         await runASDAutoFlow();
         return;
       }
