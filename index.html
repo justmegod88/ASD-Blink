@@ -2467,7 +2467,6 @@ body{ margin:0 !important; position:relative !important; }
   will-change:transform,opacity;
 }
 #asdOverlay.camera-on.lens-intro-playing #asdCameraLensIntro{ display:block; }
-#asdOverlay.camera-on.lens-intro-playing #asdCameraGuide,
 #asdOverlay.camera-on.lens-intro-playing #asdActiveZones,
 #asdOverlay.camera-on.lens-intro-playing #asdAngleBadge{
   opacity:0 !important;
@@ -2488,6 +2487,20 @@ body{ margin:0 !important; position:relative !important; }
   max-height:80%;
   background:transparent !important;
 }
+
+/* ===== 209: canvas camera preview removes iOS native pause overlay ===== */
+#asdCameraPreviewCanvas{
+  position:absolute; inset:0; width:100%; height:100%; display:none;
+  object-fit:cover; background:#dfe6ef; z-index:1;
+}
+#asdOverlay.camera-on #asdCameraPreviewCanvas{ display:block; }
+#asdOverlay.camera-on #asdCameraVideo{
+  opacity:0 !important; visibility:hidden !important;
+  width:1px !important; height:1px !important; left:-9999px !important; top:-9999px !important;
+}
+#asdCaptureImage{ z-index:2; }
+#asdCameraLensIntro{ z-index:8; }
+#asdCameraGuide{ z-index:5; }
 
 /* ===== 208: clean initial camera view + one-time centered lens intro ===== */
 /* 시작 전에는 분석 원·축·렌즈·상태 문구를 모두 숨긴다. */
@@ -2797,6 +2810,7 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 <div id="asdScene">
 <div aria-hidden="true" id="asdCameraStage">
 <video autoplay="" id="asdCameraVideo" muted="" playsinline=""></video>
+<canvas aria-hidden="true" id="asdCameraPreviewCanvas"></canvas>
 <img alt="" aria-hidden="true" id="asdCaptureImage"/>
 </div>
 <img alt="" aria-hidden="true" id="asdCameraLensIntro" src="lens.png"/>
@@ -4413,6 +4427,9 @@ function initASDPatch(){
     const asdBlinkBtn = document.getElementById('asdBlinkBtn');
     const asdCameraBtn = document.getElementById('asdCameraBtn');
     const asdCameraVideo = document.getElementById('asdCameraVideo');
+    const asdCameraPreviewCanvas = document.getElementById('asdCameraPreviewCanvas');
+    const asdCameraPreviewCtx = asdCameraPreviewCanvas ? asdCameraPreviewCanvas.getContext('2d', {alpha:false}) : null;
+    let asdCameraPreviewRaf = 0;
     const asdCaptureHoldMessage = document.getElementById('asdCaptureHoldMessage');
     const asdCaptureImage = document.getElementById('asdCaptureImage');
     const asdModeManual = document.getElementById('asdModeManual');
@@ -4720,6 +4737,33 @@ function initASDPatch(){
     renderAngle();
     }
 
+    function stopASDCameraPreview(){
+      if(asdCameraPreviewRaf){ cancelAnimationFrame(asdCameraPreviewRaf); asdCameraPreviewRaf=0; }
+    }
+    function startASDCameraPreview(){
+      stopASDCameraPreview();
+      if(!asdCameraPreviewCanvas || !asdCameraPreviewCtx || !asdCameraVideo) return;
+      const draw=()=>{
+        if(!asdCameraOn || !asdCameraStream) return;
+        if(asdCameraVideo.readyState>=2 && asdCameraVideo.videoWidth>0){
+          const rect=asdCameraPreviewCanvas.getBoundingClientRect();
+          const dpr=Math.min(window.devicePixelRatio||1,2);
+          const w=Math.max(1,Math.round(rect.width*dpr));
+          const h=Math.max(1,Math.round(rect.height*dpr));
+          if(asdCameraPreviewCanvas.width!==w || asdCameraPreviewCanvas.height!==h){ asdCameraPreviewCanvas.width=w; asdCameraPreviewCanvas.height=h; }
+          const vw=asdCameraVideo.videoWidth, vh=asdCameraVideo.videoHeight;
+          const scale=Math.max(w/vw,h/vh);
+          const sw=w/scale, sh=h/scale;
+          const sx=(vw-sw)/2, sy=(vh-sh)/2;
+          asdCameraPreviewCtx.filter='blur(2.2px) saturate(.92)';
+          asdCameraPreviewCtx.drawImage(asdCameraVideo,sx,sy,sw,sh,0,0,w,h);
+          asdCameraPreviewCtx.filter='none';
+        }
+        asdCameraPreviewRaf=requestAnimationFrame(draw);
+      };
+      draw();
+    }
+
     async function startASDCamera(){
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
         alert('이 브라우저에서는 카메라 기능을 지원하지 않습니다.');
@@ -4782,6 +4826,7 @@ function initASDPatch(){
     }
 
     function stopASDCamera(){
+      stopASDCameraPreview();
       if (asdCameraStream){
         asdCameraStream.getTracks().forEach(track => track.stop());
         asdCameraStream = null;
@@ -5307,19 +5352,32 @@ function initASDPatch(){
       asdCameraLensIntro.style.transform = 'translate(-50%,-50%) scale(.16) rotate(0deg)';
       asdOverlay.classList.add('lens-intro-playing');
 
+      const guideParts = [asdCameraGuide, asdGuideCircle, asdGuideAxis, asdGuideSideLeft, asdGuideSideRight, asdGuideDotLeft, asdGuideDotRight].filter(Boolean);
+      guideParts.forEach(el => { el.style.visibility = 'visible'; el.style.opacity = '0'; });
+
       const animation = asdCameraLensIntro.animate([
         { transform:'translate(-50%,-50%) scale(.16) rotate(0deg)', opacity:0, offset:0 },
-        { transform:'translate(-50%,-50%) scale(.28) rotate(0deg)', opacity:.30, offset:.18 },
-        { transform:'translate(-50%,-50%) scale(.72) rotate(0deg)', opacity:.30, offset:.68 },
-        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.30, offset:.88 },
+        { transform:'translate(-50%,-50%) scale(.30) rotate(0deg)', opacity:.30, offset:.20 },
+        { transform:'translate(-50%,-50%) scale(.66) rotate(0deg)', opacity:.30, offset:.58 },
+        { transform:'translate(-50%,-50%) scale(.90) rotate(0deg)', opacity:.24, offset:.78 },
+        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.10, offset:.94 },
         { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:0, offset:1 }
       ], {
-        duration:820,
-        easing:'cubic-bezier(.20,.82,.24,1)',
+        duration:1450,
+        easing:'cubic-bezier(.22,.72,.22,1)',
         fill:'forwards'
       });
 
-      try{ await animation.finished; }catch(e){}
+      const guideAnimations = guideParts.map(el => el.animate([
+        { opacity:0, offset:0 },
+        { opacity:0, offset:.58 },
+        { opacity:.28, offset:.74 },
+        { opacity:.72, offset:.90 },
+        { opacity:1, offset:1 }
+      ], { duration:1450, easing:'ease-in-out', fill:'forwards' }));
+
+      try{ await Promise.all([animation.finished, ...guideAnimations.map(a=>a.finished)]); }catch(e){}
+      guideParts.forEach(el => { el.style.opacity = ''; el.style.visibility = ''; });
       asdCameraLensIntro.style.display = 'none';
       asdOverlay.classList.remove('lens-intro-playing');
       asdOverlay.classList.add('asd-experience-started');
@@ -5346,6 +5404,7 @@ function initASDPatch(){
         return;
       }
 
+      stopASDCameraPreview();
       if (asdCameraStream){
         asdCameraStream.getTracks().forEach(track => track.stop());
         asdCameraStream = null;
