@@ -2539,6 +2539,21 @@ body{ margin:0 !important; position:relative !important; }
 #asdOverlay.camera-on.asd-experience-started #asdNativeOverlayShield,
 #asdOverlay.camera-on.lens-intro-playing #asdNativeOverlayShield{ display:none; }
 
+
+/* ===== 211: live camera canvas overlay removes iOS native pause icon without hiding the picture ===== */
+#asdNativeOverlayShield{ display:none !important; }
+#asdCameraDisplayCanvas{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; display:block; z-index:2; opacity:0;
+  pointer-events:none; background:transparent; border-radius:inherit;
+  transition:opacity .12s linear;
+}
+#asdOverlay.camera-on #asdCameraDisplayCanvas.camera-frame-ready{ opacity:1; }
+#asdOverlay.camera-on #asdCameraVideo.canvas-covered{ opacity:0 !important; }
+#asdOverlay.camera-on.lens-intro-playing #asdCameraDisplayCanvas{ opacity:1 !important; }
+#asdCameraLensIntro{ z-index:8 !important; }
+#asdCameraGuide{ z-index:5 !important; }
+
 /* Smoothly blend the lens into the analysis guide instead of switching abruptly. */
 #asdCameraGuide{
   transition:opacity .48s ease, visibility .48s ease !important;
@@ -2830,7 +2845,7 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 </div>
 <div id="asdScene">
 <div aria-hidden="true" id="asdCameraStage">
-<video autoplay="" id="asdCameraVideo" muted="" playsinline="" webkit-playsinline="" preload="auto" disablepictureinpicture="" disableremoteplayback=""></video><div aria-hidden="true" id="asdNativeOverlayShield"></div>
+<video autoplay="" id="asdCameraVideo" muted="" playsinline="" webkit-playsinline="" preload="auto" disablepictureinpicture="" disableremoteplayback=""></video><canvas aria-hidden="true" id="asdCameraDisplayCanvas"></canvas>
 <img alt="" aria-hidden="true" id="asdCaptureImage"/>
 </div>
 <img alt="" aria-hidden="true" id="asdCameraLensIntro" src="lens.png"/>
@@ -5348,20 +5363,21 @@ function initASDPatch(){
       asdOverlay.classList.add('lens-intro-playing');
 
       const animation = asdCameraLensIntro.animate([
-        { transform:'translate(-50%,-50%) scale(.18) rotate(0deg)', opacity:0, offset:0 },
-        { transform:'translate(-50%,-50%) scale(.30) rotate(0deg)', opacity:.30, offset:.16 },
-        { transform:'translate(-50%,-50%) scale(.62) rotate(0deg)', opacity:.30, offset:.48 },
-        { transform:'translate(-50%,-50%) scale(.88) rotate(0deg)', opacity:.28, offset:.72 },
-        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.18, offset:.88 },
+        { transform:'translate(-50%,-50%) scale(.22) rotate(0deg)', opacity:0, offset:0 },
+        { transform:'translate(-50%,-50%) scale(.34) rotate(0deg)', opacity:.30, offset:.18 },
+        { transform:'translate(-50%,-50%) scale(.58) rotate(0deg)', opacity:.30, offset:.46 },
+        { transform:'translate(-50%,-50%) scale(.82) rotate(0deg)', opacity:.28, offset:.68 },
+        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.24, offset:.82 },
+        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.14, offset:.92 },
         { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:0, offset:1 }
       ], {
-        duration:1450,
-        easing:'cubic-bezier(.22,.72,.24,1)',
+        duration:2200,
+        easing:'cubic-bezier(.20,.62,.24,1)',
         fill:'forwards'
       });
 
-      /* Begin fading in the guide before the lens disappears for a true crossfade. */
-      await new Promise(resolve => setTimeout(resolve, 900));
+      /* Guide begins before the lens ends, creating a long, natural crossfade. */
+      await new Promise(resolve => setTimeout(resolve, 1380));
       asdOverlay.classList.add('asd-experience-started');
       renderGuide();
       requestAnimationFrame(() => {
@@ -5777,6 +5793,55 @@ function goHomeMain(event){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',launchASDOnly,{once:true});
   else launchASDOnly();
+})();
+</script>
+
+<script id="asd-live-canvas-fix">
+(function(){
+  const video=document.getElementById('asdCameraVideo');
+  const canvas=document.getElementById('asdCameraDisplayCanvas');
+  const overlay=document.getElementById('asdOverlay');
+  if(!video||!canvas||!overlay) return;
+  const ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});
+  let firstFrame=false;
+  function drawCover(){
+    const cw=Math.max(2,Math.round(canvas.clientWidth*(window.devicePixelRatio||1)));
+    const ch=Math.max(2,Math.round(canvas.clientHeight*(window.devicePixelRatio||1)));
+    if(canvas.width!==cw||canvas.height!==ch){ canvas.width=cw; canvas.height=ch; }
+    const vw=video.videoWidth, vh=video.videoHeight;
+    if(!vw||!vh||video.readyState<2) return false;
+    const sr=vw/vh, dr=cw/ch; let sx=0,sy=0,sw=vw,sh=vh;
+    if(sr>dr){ sw=vh*dr; sx=(vw-sw)/2; } else { sh=vw/dr; sy=(vh-sh)/2; }
+    ctx.save();
+    // Front camera preview follows the same mirroring as the original video.
+    const mirrored=(video.style.transform||'').includes('scaleX(-1)');
+    if(mirrored){ ctx.translate(cw,0); ctx.scale(-1,1); }
+    ctx.drawImage(video,sx,sy,sw,sh,0,0,cw,ch);
+    ctx.restore();
+    return true;
+  }
+  function frame(){
+    const cameraOn=overlay.classList.contains('camera-on') && video.srcObject;
+    if(cameraOn && drawCover()){
+      if(!firstFrame){
+        firstFrame=true;
+        canvas.classList.add('camera-frame-ready');
+        video.classList.add('canvas-covered');
+      }
+    }else{
+      firstFrame=false;
+      canvas.classList.remove('camera-frame-ready');
+      video.classList.remove('canvas-covered');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+    requestAnimationFrame(frame);
+  }
+  video.controls=false;
+  video.removeAttribute('controls');
+  video.setAttribute('playsinline','');
+  video.setAttribute('webkit-playsinline','');
+  video.muted=true; video.defaultMuted=true;
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
