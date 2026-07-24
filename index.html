@@ -5801,16 +5801,18 @@ function initASDPatch(){
     // ASD 전용 페이지: 진입 즉시 자동 모드 + 후방 카메라를 실행한다.
     resetASDPatchedState();
     asdOverlay.classList.remove('asd-experience-started','lens-intro-playing');
-    asdOverlay.classList.add('show');
+    asdOverlay.classList.add('show','camera-on');
     asdOverlay.setAttribute('aria-hidden','false');
     asdMode = 'auto';
+    asdCameraOn = true;
+    asdCameraBtn.classList.add('active');
     updateModeUI();
     renderAngle();
     window.setTimeout(async function(){
       await startASDCamera();
       updateModeUI();
       renderAngle();
-    }, 180);
+    }, 0);
   }
 
 
