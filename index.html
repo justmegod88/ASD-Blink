@@ -4747,20 +4747,33 @@ function initASDPatch(){
     }
     function refreshHint(){
       if(!asdHint) return;
+
+      // 1) 시작하기 단계: 하단 i 안내 영역 숨김
       if(asdMode === 'auto' && asdInitialStart){
-        asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">‘시작하기’ 버튼을 눌러주세요.</span></span></div>`;
+        asdHint.innerHTML = '';
+        asdHint.style.display = 'none';
         return;
       }
+
+      const isAutoPrompt = asdMode === 'auto' && asdCameraOn && asdAutoPromptActive;
+      const isCameraHoldStep = asdMode === 'auto' && asdCameraOn && !asdAutoPromptActive && Math.abs(asdAngleValue) !== 0;
+
+      // 2) 카메라를 한곳에 고정해 주세요 단계: 하단 i 안내 영역 숨김
+      if(isCameraHoldStep){
+        asdHint.innerHTML = '';
+        asdHint.style.display = 'none';
+        return;
+      }
+
+      // 눈을 깜박여 주세요 단계 및 완료 안내는 기존 그대로 유지
+      asdHint.style.display = 'flex';
       if(Math.abs(asdAngleValue) === 0){
         setASDHintSuccess();
+      } else if(isAutoPrompt){
+        asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">카메라 위치 확인 후 눈을 깜박여</span> 회전된 축을 안정화 시켜보세요.</span></div>`;
       } else {
-        const isAutoPrompt = asdMode === 'auto' && asdCameraOn && asdAutoPromptActive;
-        if(isAutoPrompt){
-          asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">카메라 위치 확인 후 눈을 깜박여</span> 회전된 축을 안정화 시켜보세요.</span></div>`;
-        } else {
-          const guideLabel = getASDGuideLabel();
-          asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">${guideLabel}</span>을 눌러 회전된 축을 안정화 시켜 보세요.</span></div>`;
-        }
+        const guideLabel = getASDGuideLabel();
+        asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">${guideLabel}</span>을 눌러 회전된 축을 안정화 시켜 보세요.</span></div>`;
       }
     }
     function updateModeUI(){
