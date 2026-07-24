@@ -5396,7 +5396,10 @@ function initASDPatch(){
     async function runASDAutoFlow(){
       if (asdMode !== 'auto') return;
 
-      /* 완료 후 다시 시작: 캡처 화면을 해제하고 실제 카메라 화면으로 다시 전환한 뒤 새 체험을 시작한다. */
+      /* 안정화 완료 후 다시 시작인지 먼저 기록한다. 이 경우 렌즈 인트로는 다시 재생하지 않는다. */
+      const isCameraRestart = asdRearCaptured && !asdAutoPromptActive && Math.abs(asdAngleValue) === 0;
+
+      /* 완료 후 다시 시작: 캡처 화면을 해제하고 실제 카메라 화면으로 다시 전환한다. */
       if(asdRearCaptured && !asdAutoPromptActive){
         stopASDDetectLoop();
         await stopASDMiniCamera();
@@ -5428,9 +5431,11 @@ function initASDPatch(){
       renderAngle();
       applyCameraFilter();
 
-      /* 캡처는 렌즈 인트로와 동시에 조용히 진행해 별도 단계처럼 보이지 않게 한다. */
+      /* 첫 시작에만 렌즈 인트로를 보여준다. 다시 시작은 카메라 화면을 바로 재캡처한다. */
       const capturePromise=captureASDRearFrame();
-      await playASDCameraLensIntro();
+      if(!isCameraRestart){
+        await playASDCameraLensIntro();
+      }
       const captured=await capturePromise;
       if(!captured){
         alert('후방 카메라 화면을 불러온 뒤 다시 시작해 주세요.');
@@ -5566,6 +5571,16 @@ function initASDPatch(){
         await runASDAutoFlow();
         return;
       }
+      /* 카메라 OFF: 안정화 완료 후 '다시 시작'을 누르면 축을 다시 회전시키고 버튼을 '눈 깜박임'으로 되돌린다. */
+      if(!asdCameraOn && Math.abs(asdAngleValue) === 0){
+        const steps = [-15,-10,10,15];
+        asdAngleValue = steps[Math.floor(Math.random()*steps.length)];
+        writeAngleToGlobal();
+        asdOverlay.classList.remove('asd-stable','stabilizing');
+        renderAngle();
+        updateModeUI();
+        return;
+      }
       asdBlinkBusy = true;
       playASDBlinkAnimation();
       await applyBlinkStep();
@@ -5643,6 +5658,16 @@ function initASDPatch(){
       if(asdMode === 'auto'){
         if(asdRearCaptured && asdAutoPromptActive) return;
         await runASDAutoFlow();
+        return;
+      }
+      /* 카메라 OFF: 안정화 완료 후 '다시 시작'을 누르면 축을 다시 회전시키고 버튼을 '눈 깜박임'으로 되돌린다. */
+      if(!asdCameraOn && Math.abs(asdAngleValue) === 0){
+        const steps = [-15,-10,10,15];
+        asdAngleValue = steps[Math.floor(Math.random()*steps.length)];
+        writeAngleToGlobal();
+        asdOverlay.classList.remove('asd-stable','stabilizing');
+        renderAngle();
+        updateModeUI();
         return;
       }
       asdBlinkBusy = true;
