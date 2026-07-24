@@ -2634,16 +2634,8 @@ html, body, button, input, select, textarea, .asdOverlay, #asdOverlay {
 #asdOverlay:not(.asd-experience-started) #asdHint{
   display:none !important;
 }
-#asdPrepareGuide{
-  position:absolute; left:50%; bottom:22px; transform:translateX(-50%);
-  z-index:32; display:none; max-width:calc(100% - 32px);
-  padding:12px 20px; border-radius:999px;
-  background:rgba(15,23,42,.82); color:#fff;
-  font-size:17px; line-height:1.25; font-weight:900;
-  letter-spacing:-.035em; text-align:center; white-space:nowrap;
-  box-shadow:0 12px 28px rgba(0,0,0,.24); pointer-events:none;
-}
-#asdOverlay.asd-capture-preparing #asdPrepareGuide{display:block;}
+
+
 #asdOverlay.asd-capture-preparing #asdInitialGuide,
 #asdOverlay.asd-capture-preparing #asdStartGuideMessage,
 #asdOverlay.asd-capture-preparing #asdRestartCameraGuide{display:none!important;}
@@ -2685,7 +2677,18 @@ html, body, button, input, select, textarea, .asdOverlay, #asdOverlay {
   100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1.2);opacity:0;}
 }
 @media(max-width:560px){
-  #asdPrepareGuide{bottom:18px;padding:11px 16px;font-size:15px;}
+}
+
+
+#asdOverlay.asd-capture-preparing #asdBlinkBtn{
+  pointer-events:none !important;
+  opacity:.72 !important;
+  cursor:default !important;
+  font-size:14px !important;
+  line-height:1.25 !important;
+  white-space:normal !important;
+  text-align:center !important;
+  padding:0 14px !important;
 }
 
 </style>
@@ -2981,7 +2984,7 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 <div aria-hidden="true" id="asdCameraStage">
 <video autoplay="" id="asdCameraVideo" muted="" playsinline="" webkit-playsinline="" preload="auto" disablepictureinpicture="" disableremoteplayback=""></video><canvas aria-hidden="true" id="asdCameraDisplayCanvas"></canvas>
 <img alt="" aria-hidden="true" id="asdCaptureImage"/>
-<div id="asdPrepareGuide">카메라를 한곳에 고정해 주세요</div>
+
 <div id="asdStableCelebration" aria-hidden="true">
   <span></span><span></span><span></span><span></span>
   <span></span><span></span><span></span><span></span>
@@ -4731,9 +4734,9 @@ function initASDPatch(){
       if(asdMode === 'auto'){
         if(asdInitialStart) return '시작하기';
         if(isStable) return '다시 시작';
-        if(asdOverlay.classList.contains('asd-capture-preparing')) return '준비 중';
+        if(asdOverlay.classList.contains('asd-capture-preparing')) return '카메라를 한곳에 고정해 주세요';
         if(asdAutoPromptActive) return '눈을 깜박여 주세요';
-        return '준비 중';
+        return '카메라를 한곳에 고정해 주세요';
       }
       if(!asdCameraOn && isStable) return '다시 시작';
       return '눈 깜박임';
