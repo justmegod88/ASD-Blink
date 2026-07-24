@@ -2488,6 +2488,36 @@ body{ margin:0 !important; position:relative !important; }
   max-height:80%;
   background:transparent !important;
 }
+
+/* ===== 208: clean initial camera view + one-time centered lens intro ===== */
+/* 시작 전에는 분석 원·축·렌즈·상태 문구를 모두 숨긴다. */
+#asdOverlay.camera-on:not(.asd-experience-started) #asdCameraGuide,
+#asdOverlay.camera-on:not(.asd-experience-started) #asdActiveZones,
+#asdOverlay.camera-on:not(.asd-experience-started) #asdAngleBadge,
+#asdOverlay.camera-on:not(.asd-experience-started) #asdStatusText{
+  opacity:0 !important;
+  visibility:hidden !important;
+}
+
+/* 렌즈 애니메이션은 실시간 카메라 위에서만 보이며 70% 투명(실제 opacity 30%)으로 표시한다. */
+#asdOverlay.camera-on.lens-intro-playing #asdCameraLensIntro{
+  opacity:.30;
+}
+
+/* iOS/Safari의 중앙 재생·일시정지 오버레이를 최대한 차단한다. */
+#asdCameraVideo{
+  -webkit-appearance:none !important;
+}
+#asdCameraVideo::-webkit-media-controls-enclosure,
+#asdCameraVideo::-webkit-media-controls-overlay-enclosure,
+#asdCameraVideo::-webkit-media-controls-overlay-play-button,
+#asdCameraVideo::-webkit-media-controls-start-playback-button,
+#asdCameraVideo::-webkit-media-controls-play-button{
+  display:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  -webkit-appearance:none !important;
+}
 </style>
 
 
@@ -4726,6 +4756,12 @@ function initASDPatch(){
         asdCameraVideo.removeAttribute('controls');
         asdCameraVideo.setAttribute('playsinline','');
         asdCameraVideo.setAttribute('webkit-playsinline','');
+        asdCameraVideo.setAttribute('autoplay','');
+        asdCameraVideo.muted = true;
+        asdCameraVideo.defaultMuted = true;
+        asdCameraVideo.disablePictureInPicture = true;
+        asdCameraVideo.setAttribute('controlslist','nodownload noplaybackrate nofullscreen noremoteplayback');
+        asdCameraVideo.setAttribute('disableremoteplayback','');
         asdCameraVideo.style.display = 'block';
         asdCameraVideo.style.transform = useRearCamera ? 'scale(1)' : 'scaleX(-1) scale(1)';
         asdCameraVideo.style.transformOrigin = 'center center';
@@ -5243,8 +5279,11 @@ function initASDPatch(){
       return true;
     }
 
+    let asdCameraIntroPlayed = false;
+
     async function playASDCameraLensIntro(){
-      if(!asdOverlay || !asdCameraLensIntro || !asdCameraOn) return;
+      if(!asdOverlay || !asdCameraLensIntro || !asdCameraOn || asdCameraIntroPlayed) return;
+      asdCameraIntroPlayed = true;
 
       // Native video UI must never appear over the live camera.
       try{
@@ -5270,9 +5309,9 @@ function initASDPatch(){
 
       const animation = asdCameraLensIntro.animate([
         { transform:'translate(-50%,-50%) scale(.16) rotate(0deg)', opacity:0, offset:0 },
-        { transform:'translate(-50%,-50%) scale(.28) rotate(0deg)', opacity:.50, offset:.18 },
-        { transform:'translate(-50%,-50%) scale(.72) rotate(0deg)', opacity:.50, offset:.68 },
-        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.50, offset:.88 },
+        { transform:'translate(-50%,-50%) scale(.28) rotate(0deg)', opacity:.30, offset:.18 },
+        { transform:'translate(-50%,-50%) scale(.72) rotate(0deg)', opacity:.30, offset:.68 },
+        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.30, offset:.88 },
         { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:0, offset:1 }
       ], {
         duration:820,
@@ -5283,6 +5322,7 @@ function initASDPatch(){
       try{ await animation.finished; }catch(e){}
       asdCameraLensIntro.style.display = 'none';
       asdOverlay.classList.remove('lens-intro-playing');
+      asdOverlay.classList.add('asd-experience-started');
       renderGuide();
     }
 
@@ -5298,6 +5338,7 @@ function initASDPatch(){
       }
 
       await playASDCameraLensIntro();
+      asdOverlay.classList.add('asd-experience-started');
 
       const captured = await captureASDRearFrame();
       if(!captured){
@@ -5545,6 +5586,7 @@ function initASDPatch(){
 
     // ASD 전용 페이지: 진입 즉시 자동 모드 + 후방 카메라를 실행한다.
     resetASDPatchedState();
+    asdOverlay.classList.remove('asd-experience-started','lens-intro-playing');
     asdOverlay.classList.add('show');
     asdOverlay.setAttribute('aria-hidden','false');
     asdMode = 'auto';
