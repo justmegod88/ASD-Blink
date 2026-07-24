@@ -2519,27 +2519,6 @@ body{ margin:0 !important; position:relative !important; }
   -webkit-appearance:none !important;
 }
 
-/* ===== 210: keep live camera visible while masking iOS native center overlay only ===== */
-#asdNativeOverlayShield{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:58px;
-  height:58px;
-  transform:translate(-50%,-50%);
-  border-radius:18px;
-  z-index:7;
-  display:none;
-  pointer-events:none;
-  background:rgba(223,230,239,.01);
-  -webkit-backdrop-filter:blur(13px);
-  backdrop-filter:blur(13px);
-}
-#asdOverlay.camera-on:not(.asd-experience-started) #asdNativeOverlayShield{ display:block; }
-#asdOverlay.camera-on.asd-experience-started #asdNativeOverlayShield,
-#asdOverlay.camera-on.lens-intro-playing #asdNativeOverlayShield{ display:none; }
-
-
 /* ===== 211: live camera canvas overlay removes iOS native pause icon without hiding the picture ===== */
 #asdNativeOverlayShield{ display:none !important; }
 #asdCameraDisplayCanvas{
@@ -2567,6 +2546,15 @@ body{ margin:0 !important; position:relative !important; }
   visibility:visible !important;
   opacity:0 !important;
 }
+
+/* ===== 212: remove center mask completely + seamless lens-to-guide morph ===== */
+#asdNativeOverlayShield{display:none!important;visibility:hidden!important;opacity:0!important;width:0!important;height:0!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+#asdCameraVideo{pointer-events:none!important;}
+#asdCameraGuide{transition:opacity .72s cubic-bezier(.22,.72,.22,1), visibility .72s ease!important;}
+#asdOverlay.camera-on.lens-intro-playing #asdCameraGuide{display:block!important;visibility:visible!important;}
+#asdOverlay.camera-on.lens-intro-playing.intro-ring-in #asdCameraGuide{opacity:1!important;}
+#asdOverlay.camera-on.lens-intro-playing:not(.intro-ring-in) #asdCameraGuide{opacity:0!important;}
+#asdCameraLensIntro{width:80%!important;height:80%!important;left:50%!important;top:52%!important;}
 </style>
 
 
@@ -5340,60 +5328,50 @@ function initASDPatch(){
       if(!asdOverlay || !asdCameraLensIntro || !asdCameraOn || asdCameraIntroPlayed) return;
       asdCameraIntroPlayed = true;
 
-      // Native video UI must never appear over the live camera.
       try{
         asdCameraVideo.controls = false;
         asdCameraVideo.removeAttribute('controls');
         asdCameraVideo.setAttribute('playsinline','');
         asdCameraVideo.setAttribute('webkit-playsinline','');
+        asdCameraVideo.disablePictureInPicture = true;
       }catch(e){}
 
-      asdCameraLensIntro.getAnimations().forEach(animation => animation.cancel());
-      asdCameraLensIntro.style.display = 'block';
-      // Keep the real live camera image visible behind the lens animation.
-      asdCameraVideo.style.opacity = '1';
-      asdCameraVideo.style.visibility = 'visible';
-      asdCameraVideo.style.background = 'transparent';
-      if(asdCameraStage){
-        asdCameraStage.style.background = 'transparent';
-      }
+      const shield=document.getElementById('asdNativeOverlayShield');
+      if(shield) shield.remove();
 
-      asdCameraLensIntro.style.opacity = '0';
-      asdCameraLensIntro.style.transform = 'translate(-50%,-50%) scale(.16) rotate(0deg)';
+      asdOverlay.classList.remove('intro-ring-in');
+      asdCameraLensIntro.getAnimations().forEach(a=>a.cancel());
+      asdCameraLensIntro.style.display='block';
+      asdCameraLensIntro.style.opacity='0';
+      asdCameraLensIntro.style.transform='translate(-50%,-50%) scale(.20) rotate(0deg)';
       asdOverlay.classList.add('lens-intro-playing');
 
-      const animation = asdCameraLensIntro.animate([
-        { transform:'translate(-50%,-50%) scale(.22) rotate(0deg)', opacity:0, offset:0 },
-        { transform:'translate(-50%,-50%) scale(.34) rotate(0deg)', opacity:.30, offset:.18 },
-        { transform:'translate(-50%,-50%) scale(.58) rotate(0deg)', opacity:.30, offset:.46 },
-        { transform:'translate(-50%,-50%) scale(.82) rotate(0deg)', opacity:.28, offset:.68 },
-        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.24, offset:.82 },
-        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.14, offset:.92 },
-        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:0, offset:1 }
-      ], {
-        duration:2200,
-        easing:'cubic-bezier(.20,.62,.24,1)',
+      // 렌즈가 최종 분석 원과 같은 중심·크기까지 천천히 커진다.
+      const lensAnimation=asdCameraLensIntro.animate([
+        {transform:'translate(-50%,-50%) scale(.20) rotate(0deg)',opacity:0,offset:0},
+        {transform:'translate(-50%,-50%) scale(.28) rotate(0deg)',opacity:.30,offset:.12},
+        {transform:'translate(-50%,-50%) scale(.48) rotate(0deg)',opacity:.30,offset:.36},
+        {transform:'translate(-50%,-50%) scale(.72) rotate(0deg)',opacity:.30,offset:.62},
+        {transform:'translate(-50%,-50%) scale(.92) rotate(0deg)',opacity:.28,offset:.80},
+        {transform:'translate(-50%,-50%) scale(1) rotate(0deg)',opacity:.24,offset:.88},
+        {transform:'translate(-50%,-50%) scale(1) rotate(0deg)',opacity:0,offset:1}
+      ],{
+        duration:2600,
+        easing:'cubic-bezier(.22,.72,.22,1)',
         fill:'forwards'
       });
 
-      /* Guide begins before the lens ends, creating a long, natural crossfade. */
-      await new Promise(resolve => setTimeout(resolve, 1380));
+      // 렌즈가 최종 크기에 거의 도달했을 때 같은 위치에서 원을 겹쳐 올린다.
+      await new Promise(r=>setTimeout(r,1850));
       asdOverlay.classList.add('asd-experience-started');
       renderGuide();
-      requestAnimationFrame(() => {
-        if(asdCameraGuide){
-          asdCameraGuide.style.visibility='visible';
-          asdCameraGuide.style.opacity='1';
-        }
-      });
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        asdOverlay.classList.add('intro-ring-in');
+      }));
 
-      try{ await animation.finished; }catch(e){}
-      asdCameraLensIntro.style.display = 'none';
-      asdOverlay.classList.remove('lens-intro-playing');
-      if(asdCameraGuide){
-        asdCameraGuide.style.visibility='';
-        asdCameraGuide.style.opacity='';
-      }
+      try{await lensAnimation.finished;}catch(e){}
+      asdCameraLensIntro.style.display='none';
+      asdOverlay.classList.remove('lens-intro-playing','intro-ring-in');
       renderGuide();
     }
 
@@ -5842,6 +5820,22 @@ function goHomeMain(event){
   video.setAttribute('webkit-playsinline','');
   video.muted=true; video.defaultMuted=true;
   requestAnimationFrame(frame);
+})();
+</script>
+
+<script id="asd-212-remove-native-overlay">
+(function(){
+  function clean(){
+    const shield=document.getElementById('asdNativeOverlayShield');
+    if(shield) shield.remove();
+    const v=document.getElementById('asdCameraVideo');
+    if(v){
+      v.controls=false; v.removeAttribute('controls');
+      v.setAttribute('playsinline',''); v.setAttribute('webkit-playsinline','');
+      v.disablePictureInPicture=true; v.style.pointerEvents='none';
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',clean,{once:true}); else clean();
 })();
 </script>
 </body>
