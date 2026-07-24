@@ -5665,5 +5665,104 @@ function goHomeMain(event){
   else launchASDOnly();
 })();
 </script>
+
+<style id="asdLensIntroFix205">
+/* 205: 카메라 OFF에서는 원래 렌즈/축 그래픽을 그대로 표시 */
+#asdOverlay.lens-not-started:not(.camera-on) #asdCameraGuide,
+#asdOverlay.lens-not-started:not(.camera-on) #asdActiveZones,
+#asdOverlay.lens-not-started:not(.camera-on) #asdLensImg,
+#asdOverlay.lens-not-started:not(.camera-on) #asdAngleBadge{
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+}
+#asdOverlay.lens-not-started:not(.camera-on) #asdCameraGuide{
+  display:block !important;
+}
+#asdOverlay.lens-not-started:not(.camera-on) #asdLensImg{
+  display:block !important;
+}
+
+/* 카메라 ON + 시작 전에는 흐린 카메라 화면만 표시 */
+#asdOverlay.camera-on.lens-not-started #asdCameraGuide,
+#asdOverlay.camera-on.lens-not-started #asdActiveZones,
+#asdOverlay.camera-on.lens-not-started #asdLensImg,
+#asdOverlay.camera-on.lens-not-started #asdAngleBadge{
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
+/* 시작 클릭 시: 렌즈가 중앙에서 커지며 페이드아웃 → 분석 원으로 연결 */
+#asdOverlay.camera-on.lens-intro #asdLensImg{
+  transform-origin:center center !important;
+  animation:asdRealLensCenterZoom205 .78s cubic-bezier(.20,.74,.24,1) both !important;
+}
+#asdOverlay.camera-on.lens-intro #asdGuideCircle,
+#asdOverlay.camera-on.lens-intro #asdGuideAxis,
+#asdOverlay.camera-on.lens-intro #asdGuideSideLeft,
+#asdOverlay.camera-on.lens-intro #asdGuideSideRight,
+#asdOverlay.camera-on.lens-intro .asdGuideDot,
+#asdOverlay.camera-on.lens-intro #asdStatusText,
+#asdOverlay.camera-on.lens-intro #asdActiveZones,
+#asdOverlay.camera-on.lens-intro #asdAngleBadge{
+  animation:asdGuideReveal205 .78s ease-out both !important;
+}
+@keyframes asdRealLensCenterZoom205{
+  0%{
+    opacity:0;
+    transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(.20) rotate(var(--asdIntroAngle, 15deg));
+    filter:saturate(1.03) contrast(1.03) drop-shadow(0 3px 8px rgba(75,145,210,.08));
+  }
+  16%{ opacity:.48; }
+  58%{
+    opacity:.38;
+    transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(.82) rotate(var(--asdIntroAngle, 15deg));
+    filter:saturate(1.07) contrast(1.05) drop-shadow(0 7px 18px rgba(75,145,210,.16));
+  }
+  100%{
+    opacity:0;
+    transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(1.08) rotate(var(--asdIntroAngle, 15deg));
+    filter:saturate(1.04) contrast(1.03) drop-shadow(0 7px 18px rgba(75,145,210,0));
+  }
+}
+@keyframes asdGuideReveal205{
+  0%,58%{ opacity:0; }
+  100%{ opacity:1; }
+}
+
+/* iPhone/Safari가 카메라 영상 중앙에 표시하는 재생·일시정지 오버레이 제거 */
+#asdCameraVideo::-webkit-media-controls,
+#asdCameraVideo::-webkit-media-controls-panel,
+#asdCameraVideo::-webkit-media-controls-play-button,
+#asdCameraVideo::-webkit-media-controls-start-playback-button,
+#asdCameraVideo::-webkit-media-controls-overlay-play-button{
+  display:none !important;
+  -webkit-appearance:none !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+#asdCameraVideo{ -webkit-appearance:none !important; }
+</style>
+<script id="asdLensIntroFix205Script">
+(function(){
+  const video = document.getElementById('asdCameraVideo');
+  if(!video) return;
+  video.removeAttribute('controls');
+  video.controls = false;
+  video.setAttribute('playsinline','');
+  video.setAttribute('webkit-playsinline','');
+  video.muted = true;
+  const keepPlaying = function(){
+    if(video.srcObject && video.paused){
+      const p = video.play();
+      if(p && typeof p.catch === 'function') p.catch(function(){});
+    }
+  };
+  video.addEventListener('loadedmetadata', keepPlaying);
+  video.addEventListener('pause', function(){ setTimeout(keepPlaying, 0); });
+})();
+</script>
+
 </body>
 </html>
