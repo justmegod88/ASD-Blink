@@ -2750,6 +2750,19 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 }
 @media(max-width:600px){#asdCaptureHoldMessage span{font-size:16px;padding:12px 18px;}}
 </style>
+
+<style id="asd-final-simple-flow">
+/* 최종 단순화: 중간 안내/보조 버튼/캔버스 오버레이 제거 */
+#asdCaptureHoldMessage{display:none!important;visibility:hidden!important;opacity:0!important;}
+#asdRotateBtn{display:none!important;}
+#asdBlinkBtn{flex:1 1 100%!important;}
+#asdCameraDisplayCanvas{display:none!important;opacity:0!important;}
+#asdOverlay.camera-on #asdCameraVideo.ready{opacity:1!important;}
+#asdOverlay.camera-on #asdCameraVideo.canvas-covered{opacity:1!important;}
+#asdOverlay.camera-on.lens-intro-playing #asdCameraVideo{display:block!important;opacity:1!important;visibility:visible!important;}
+#asdCameraLensIntro{z-index:8!important;}
+#asdCameraGuide{z-index:7!important;}
+</style>
 </head>
 <body>
 <div id="missionBarWrap">
@@ -4571,7 +4584,7 @@ function initASDPatch(){
       if(!asdCameraOn && asdMode === 'auto') return '시작';
       if(!asdCameraOn) return '눈 깜박임';
       if(asdMode === 'auto'){
-        if(isStable) return '시작';
+        if(isStable) return '다시 시작';
         if(asdAutoPromptActive) return '눈을 깜박여 주세요';
         return '시작';
       }
@@ -5336,38 +5349,33 @@ function initASDPatch(){
         asdCameraVideo.disablePictureInPicture = true;
       }catch(e){}
 
-      const shield=document.getElementById('asdNativeOverlayShield');
-      if(shield) shield.remove();
-
       asdOverlay.classList.remove('intro-ring-in');
       asdCameraLensIntro.getAnimations().forEach(a=>a.cancel());
       asdCameraLensIntro.style.display='block';
       asdCameraLensIntro.style.opacity='0';
-      asdCameraLensIntro.style.transform='translate(-50%,-50%) scale(.20) rotate(0deg)';
-      asdOverlay.classList.add('lens-intro-playing');
+      asdCameraLensIntro.style.transform=`translate(-50%,-50%) scale(.20) rotate(${asdAngleValue}deg)`;
+      asdOverlay.classList.add('lens-intro-playing','asd-experience-started');
+      renderGuide();
 
-      // 렌즈가 최종 분석 원과 같은 중심·크기까지 천천히 커진다.
+      /* 시작 순간부터 이미 축이 돌아간 흐린 화면이다. */
+      applyCameraFilter();
+
       const lensAnimation=asdCameraLensIntro.animate([
-        {transform:'translate(-50%,-50%) scale(.20) rotate(0deg)',opacity:0,offset:0},
-        {transform:'translate(-50%,-50%) scale(.28) rotate(0deg)',opacity:.30,offset:.12},
-        {transform:'translate(-50%,-50%) scale(.48) rotate(0deg)',opacity:.30,offset:.36},
-        {transform:'translate(-50%,-50%) scale(.72) rotate(0deg)',opacity:.30,offset:.62},
-        {transform:'translate(-50%,-50%) scale(.92) rotate(0deg)',opacity:.28,offset:.80},
-        {transform:'translate(-50%,-50%) scale(1) rotate(0deg)',opacity:.24,offset:.88},
-        {transform:'translate(-50%,-50%) scale(1) rotate(0deg)',opacity:0,offset:1}
+        {transform:`translate(-50%,-50%) scale(.20) rotate(${asdAngleValue}deg)`,opacity:0,offset:0},
+        {transform:`translate(-50%,-50%) scale(.34) rotate(${asdAngleValue}deg)`,opacity:.30,offset:.14},
+        {transform:`translate(-50%,-50%) scale(.62) rotate(${asdAngleValue}deg)`,opacity:.30,offset:.48},
+        {transform:`translate(-50%,-50%) scale(.86) rotate(${asdAngleValue}deg)`,opacity:.24,offset:.72},
+        {transform:`translate(-50%,-50%) scale(1) rotate(${asdAngleValue}deg)`,opacity:.12,offset:.90},
+        {transform:`translate(-50%,-50%) scale(1) rotate(${asdAngleValue}deg)`,opacity:0,offset:1}
       ],{
-        duration:2600,
+        duration:1800,
         easing:'cubic-bezier(.22,.72,.22,1)',
         fill:'forwards'
       });
 
-      // 렌즈가 최종 크기에 거의 도달했을 때 같은 위치에서 원을 겹쳐 올린다.
-      await new Promise(r=>setTimeout(r,1850));
-      asdOverlay.classList.add('asd-experience-started');
-      renderGuide();
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        asdOverlay.classList.add('intro-ring-in');
-      }));
+      /* 렌즈가 커지는 도중 같은 위치의 분석 원이 겹쳐 나타난다. */
+      await new Promise(r=>setTimeout(r,920));
+      asdOverlay.classList.add('intro-ring-in');
 
       try{await lensAnimation.finished;}catch(e){}
       asdCameraLensIntro.style.display='none';
@@ -5377,43 +5385,67 @@ function initASDPatch(){
 
     async function runASDAutoFlow(){
       if (asdMode !== 'auto') return;
+
+      /* 완료 후 다시 시작: 기존 캡처 화면에서 곧바로 축만 다시 회전시킨다. */
+      if(asdRearCaptured && !asdAutoPromptActive){
+        const steps=[-15,-10,10,15];
+        asdAngleValue=steps[Math.floor(Math.random()*steps.length)];
+        writeAngleToGlobal();
+        asdAutoPromptActive=true;
+        asdOverlay.classList.remove('asd-stable','stabilizing');
+        asdOverlay.classList.add('asd-experience-started','camera-on','auto-captured');
+        renderAngle();
+        applyCameraFilter();
+        await ensureASDFaceLandmarker();
+        await startASDMiniCamera();
+        runASDDetectLoop();
+        updateModeUI();
+        return;
+      }
+
       if (asdRearCaptured && asdAutoPromptActive){
         updateModeUI();
         return;
       }
 
-      if (!asdCameraOn || !asdCameraStream) {
-        await startASDCamera();
-      }
+      if (!asdCameraOn || !asdCameraStream) await startASDCamera();
 
-      await playASDCameraLensIntro();
+      /* 시작부터 축이 돌아간 상태와 흐림을 먼저 적용한다. */
+      const steps=[-15,-10,10,15];
+      asdAngleValue=steps[Math.floor(Math.random()*steps.length)];
+      writeAngleToGlobal();
+      asdOverlay.classList.remove('asd-stable','stabilizing');
       asdOverlay.classList.add('asd-experience-started');
+      renderAngle();
+      applyCameraFilter();
 
-      const captured = await captureASDRearFrame();
+      /* 캡처는 렌즈 인트로와 동시에 조용히 진행해 별도 단계처럼 보이지 않게 한다. */
+      const capturePromise=captureASDRearFrame();
+      await playASDCameraLensIntro();
+      const captured=await capturePromise;
       if(!captured){
         alert('후방 카메라 화면을 불러온 뒤 다시 시작해 주세요.');
         return;
       }
 
       if (asdCameraStream){
-        asdCameraStream.getTracks().forEach(track => track.stop());
-        asdCameraStream = null;
+        asdCameraStream.getTracks().forEach(track=>track.stop());
+        asdCameraStream=null;
       }
-      try{ asdCameraVideo.pause(); }catch(e){}
-      asdCameraVideo.srcObject = null;
+      try{asdCameraVideo.pause();}catch(e){}
+      asdCameraVideo.srcObject=null;
       asdCameraVideo.classList.remove('ready');
-      asdCameraVideo.style.display = 'none';
-      asdCameraOn = true;
-      asdOverlay.classList.add('camera-on','auto-captured');
+      asdCameraVideo.style.display='none';
+      asdCameraOn=true;
+      asdRearCaptured=true;
+      asdAutoPromptActive=true;
+      asdOverlay.classList.add('camera-on','auto-captured','asd-experience-started');
       asdCameraBtn.classList.add('active');
 
       stopASDDetectLoop();
       await stopASDMiniCamera();
-      asdAutoPromptActive = true;
-      const steps = [-15,-10,10,15];
-      asdAngleValue = steps[Math.floor(Math.random() * steps.length)];
-      writeAngleToGlobal();
       renderAngle();
+      applyCameraFilter();
       await ensureASDFaceLandmarker();
       await startASDMiniCamera();
       runASDDetectLoop();
@@ -5836,6 +5868,19 @@ function goHomeMain(event){
     }
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',clean,{once:true}); else clean();
+})();
+</script>
+
+<script id="asd-final-video-restore">
+(function(){
+  function restore(){
+    const v=document.getElementById('asdCameraVideo');
+    const c=document.getElementById('asdCameraDisplayCanvas');
+    if(c){c.style.display='none';c.classList.remove('camera-frame-ready');}
+    if(v){v.classList.remove('canvas-covered');}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',restore); else restore();
+  setTimeout(restore,300); setTimeout(restore,1000);
 })();
 </script>
 </body>
