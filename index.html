@@ -153,13 +153,16 @@ html, body{
       display:flex; align-items:center; justify-content:center; gap:8px;
     }
 .asdActionBtn:active{ transform:scale(.98); }
-#asdRotateBtn{ color:#2563eb; background:#f8fbff; }
+
 #asdBlinkBtn{ color:#fff; background:#2563eb; border-color:#2563eb; box-shadow:0 14px 26px rgba(37,99,235,.16); }
 #asdBlinkBtn.prompting{
       animation: asdBlinkBtnPulse .9s ease-in-out infinite;
     }
 #asdOverlay.auto-mode #asdBlinkBtn{
-      display:none !important;
+      display:flex !important;
+      flex:1 1 auto !important;
+      visibility:visible !important;
+      opacity:1 !important;
     }
 @keyframes asdBlinkBtnPulse{
       0%,100%{ transform:scale(1); box-shadow:0 14px 26px rgba(37,99,235,.16); }
@@ -677,7 +680,7 @@ html, body{
 #asdScene{width:calc(100% - 28px)!important;max-width:680px!important;margin:0 auto!important;min-height:420px!important;aspect-ratio:1.45/1!important;border-radius:16px!important;background:#111b2a!important;box-shadow:none!important;}
 #asdControlBar{max-width:680px;margin:0 auto;padding:12px 14px 14px!important;gap:10px!important;}
 .asdActionBtn{height:50px!important;border-radius:13px!important;font-size:14px!important;box-shadow:0 8px 18px rgba(20,52,90,.08)!important;}
-#asdRotateBtn{background:#fff!important;color:#005EB8!important;border:1.5px solid #9bc5f4!important;}
+
 #asdBlinkBtn{background:#005EB8!important;border-color:#005EB8!important;color:#fff!important;}
 #asdCameraBtn{flex:0 0 50px!important;width:50px!important;min-width:50px!important;max-width:50px!important;}
 #asdHint{margin:0 14px 14px!important;padding:13px 14px!important;border-radius:14px!important;background:#f5f9fe!important;border-top:0!important;}
@@ -757,7 +760,7 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 }
 @media(max-width:600px){#asdCaptureHoldMessage span{font-size:16px;padding:12px 18px;}}
 #asdCaptureHoldMessage{display:none!important;visibility:hidden!important;opacity:0!important;}
-#asdRotateBtn{display:none!important;}
+
 #asdBlinkBtn{flex:1 1 100%!important;}
 #asdCameraDisplayCanvas{display:none!important;opacity:0!important;}
 #asdOverlay.camera-on #asdCameraVideo.ready{opacity:1!important;}
@@ -871,6 +874,22 @@ body>*:not(#asdOverlay):not(#missionASD){display:none!important;}
   }
 }
 
+
+#asdOverlay.auto-mode #asdBlinkBtn{
+  min-width:0 !important;
+  width:auto !important;
+  max-width:none !important;
+  height:56px !important;
+  border-radius:20px !important;
+  font-size:16px !important;
+  line-height:1.2 !important;
+  padding:0 16px !important;
+  white-space:normal !important;
+  text-align:center !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
 </style>
 </head>
 <body>
@@ -939,7 +958,7 @@ body>*:not(#asdOverlay):not(#missionASD){display:none!important;}
 <div id="asdAngleBadge">좌측 20° 회전 발생</div>
 </div>
 <div id="asdControlBar">
-<button class="asdActionBtn" id="asdRotateBtn" type="button">축회전 유발</button>
+
 <button class="asdActionBtn" id="asdBlinkBtn" type="button">눈 깜박임</button>
 <button aria-label="카메라" class="asdActionBtn" id="asdCameraBtn" type="button">
 <svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1" viewbox="0 0 24 24">
@@ -968,7 +987,7 @@ function initASDPatch(){
     const missionASD = document.getElementById('missionASD');
     const asdOverlay = document.getElementById('asdOverlay');
     const asdClose = document.getElementById('asdClose');
-    const asdRotateBtn = document.getElementById('asdRotateBtn');
+    const asdRotateBtn = null;
     const asdBlinkBtn = document.getElementById('asdBlinkBtn');
     const asdCameraBtn = document.getElementById('asdCameraBtn');
     const asdCameraVideo = document.getElementById('asdCameraVideo');
@@ -2072,23 +2091,6 @@ function initASDPatch(){
     asdOverlay.addEventListener('click', function(ev){
       if (ev.target === asdOverlay) closeASDPatched();
     }, true);
-
-    asdRotateBtn.onclick = async function(ev){
-      ev.preventDefault();
-      ev.stopPropagation();
-      if (asdBlinkBusy) return;
-      const steps = [-15,-10,10,15];
-      let next = steps[Math.floor(Math.random() * steps.length)];
-      if (next === asdAngleValue){
-        next = steps[(steps.indexOf(next) + 1) % steps.length];
-      }
-      asdAngleValue = next;
-      writeAngleToGlobal();
-      renderAngle();
-      if(asdCameraOn && asdMode === 'auto'){
-        await runASDAutoFlow();
-      }
-    };
 
     asdBlinkBtn.onclick = async function(ev){
       ev.preventDefault();
