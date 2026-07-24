@@ -4581,6 +4581,7 @@ function initASDPatch(){
     }
     function getASDBlinkButtonLabel(){
       const isStable = Math.abs(asdAngleValue) === 0;
+      if(!asdCameraOn && isStable) return '다시 시작';
       if(!asdCameraOn && asdMode === 'auto') return '시작';
       if(!asdCameraOn) return '눈 깜박임';
       if(asdMode === 'auto'){
@@ -4775,6 +4776,11 @@ function initASDPatch(){
         alert('이 브라우저에서는 카메라 기능을 지원하지 않습니다.');
         return;
       }
+      /* 권한 팝업이 뜨기 전에 먼저 카메라 ON 화면 상태로 전환한다. */
+      asdCameraOn = true;
+      asdOverlay.classList.add('camera-on');
+      asdCameraBtn.classList.add('active');
+      updateModeUI();
       try{
         const useRearCamera = (asdMode === 'manual' || asdMode === 'auto');
 
@@ -4833,6 +4839,10 @@ function initASDPatch(){
         asdCameraBtn.classList.add('active');
         renderAngle();
       }catch(e){
+        asdCameraOn = false;
+        asdOverlay.classList.remove('camera-on','auto-running','auto-captured');
+        asdCameraBtn.classList.remove('active');
+        updateModeUI();
         alert('카메라 권한을 허용해야 사용할 수 있습니다.');
       }
     }
@@ -5386,21 +5396,20 @@ function initASDPatch(){
     async function runASDAutoFlow(){
       if (asdMode !== 'auto') return;
 
-      /* 완료 후 다시 시작: 기존 캡처 화면에서 곧바로 축만 다시 회전시킨다. */
+      /* 완료 후 다시 시작: 캡처 화면을 해제하고 실제 카메라 화면으로 다시 전환한 뒤 새 체험을 시작한다. */
       if(asdRearCaptured && !asdAutoPromptActive){
-        const steps=[-15,-10,10,15];
-        asdAngleValue=steps[Math.floor(Math.random()*steps.length)];
-        writeAngleToGlobal();
-        asdAutoPromptActive=true;
-        asdOverlay.classList.remove('asd-stable','stabilizing');
-        asdOverlay.classList.add('asd-experience-started','camera-on','auto-captured');
-        renderAngle();
-        applyCameraFilter();
-        await ensureASDFaceLandmarker();
-        await startASDMiniCamera();
-        runASDDetectLoop();
-        updateModeUI();
-        return;
+        stopASDDetectLoop();
+        await stopASDMiniCamera();
+        asdRearCaptured=false;
+        asdAutoPromptActive=false;
+        asdCameraIntroPlayed=false;
+        clearASDPlaceholderImage();
+        if(asdCaptureImage){
+          asdCaptureImage.style.display='none';
+          asdCaptureImage.src='';
+        }
+        asdOverlay.classList.remove('auto-captured','auto-running','asd-stable','stabilizing');
+        if(!asdCameraStream) await startASDCamera();
       }
 
       if (asdRearCaptured && asdAutoPromptActive){
