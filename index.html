@@ -6,6 +6,7 @@
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport"/>
 <title>ASD™ 축안정화</title>
 <style>
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
     :root{
       --acuvue-blue:#005EB8;
       --acuvue-blue-2:#1E78D6;
@@ -2555,6 +2556,11 @@ body{ margin:0 !important; position:relative !important; }
 #asdOverlay.camera-on.lens-intro-playing.intro-ring-in #asdCameraGuide{opacity:1!important;}
 #asdOverlay.camera-on.lens-intro-playing:not(.intro-ring-in) #asdCameraGuide{opacity:0!important;}
 #asdCameraLensIntro{width:80%!important;height:80%!important;left:50%!important;top:52%!important;}
+
+/* Toss-like typography: Pretendard first, then native system fallbacks */
+html, body, button, input, select, textarea, .asdOverlay, #asdOverlay {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif !important;
+}
 </style>
 
 
@@ -4750,8 +4756,13 @@ function initASDPatch(){
       }
       const isStable = Math.abs(asdAngleValue) === 0;
       asdOverlay.classList.toggle('asd-stable', isStable);
-      asdOverlay.classList.toggle('stabilizing', !isStable);
-      if(asdStatusText) asdStatusText.style.display = isStable ? 'none' : 'flex';
+      /* '축 안정 중…'은 축이 회전된 순간이 아니라, 실제 눈 깜박임으로 안정화를 시작한 뒤에만 표시 */
+      if(isStable){
+        asdOverlay.classList.remove('stabilizing');
+      }
+      if(asdStatusText){
+        asdStatusText.style.display = asdOverlay.classList.contains('stabilizing') ? 'flex' : 'none';
+      }
       renderGuide();
       updateModeUI();
     }
@@ -5508,6 +5519,8 @@ function initASDPatch(){
     async function triggerASDAutoCorrection(){
       if(asdAngleValue === 0 || asdBlinkBusy) return;
       asdBlinkBusy = true;
+      asdOverlay.classList.add('stabilizing');
+      if(asdStatusText) asdStatusText.style.display = 'flex';
       playASDBlinkAnimation();
       await applyBlinkStep();
       setTimeout(()=>{ asdBlinkBusy = false; }, 260);
@@ -5582,6 +5595,8 @@ function initASDPatch(){
         return;
       }
       asdBlinkBusy = true;
+      asdOverlay.classList.add('stabilizing');
+      if(asdStatusText) asdStatusText.style.display = 'flex';
       playASDBlinkAnimation();
       await applyBlinkStep();
       setTimeout(function(){ asdBlinkBusy = false; }, 260);
@@ -5671,6 +5686,8 @@ function initASDPatch(){
         return;
       }
       asdBlinkBusy = true;
+      asdOverlay.classList.add('stabilizing');
+      if(asdStatusText) asdStatusText.style.display = 'flex';
       playASDBlinkAnimation();
       await applyBlinkStep();
       setTimeout(function(){ asdBlinkBusy = false; }, 245);
