@@ -959,7 +959,7 @@ body>*:not(#asdOverlay):not(#missionASD){display:none!important;}
 </div>
 <div id="asdControlBar">
 
-<button class="asdActionBtn" id="asdBlinkBtn" type="button">눈 깜박임</button>
+<button class="asdActionBtn" id="asdBlinkBtn" type="button">시작하기</button>
 <button aria-label="카메라" class="asdActionBtn" id="asdCameraBtn" type="button">
 <svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1" viewbox="0 0 24 24">
 <path d="M4 7h3l2-2h6l2 2h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"></path>
@@ -1018,7 +1018,7 @@ function initASDPatch(){
     const ASD_ACTIVE_BAR_OFFSET = 7.3;
 
 
-    if(!missionASD || !asdOverlay || !asdRotateBtn || !asdBlinkBtn || !asdCameraBtn || !asdCameraVideo || !asdLensImg || !asdAngleBadge){
+    if(!missionASD || !asdOverlay || !asdBlinkBtn || !asdCameraBtn || !asdCameraVideo || !asdLensImg || !asdAngleBadge){
       return;
     }
 
@@ -2210,22 +2210,7 @@ function initASDPatch(){
       setTimeout(function(){ asdBlinkBusy = false; }, 245);
     }, true);
 
-    asdRotateBtn.addEventListener('click', async function(ev){
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-      if (asdBlinkBusy) return;
-      const steps = [-15,-10,10,15];
-      let next = steps[Math.floor(Math.random() * steps.length)];
-      if (next === asdAngleValue){
-        next = steps[(steps.indexOf(next) + 1) % steps.length];
-      }
-      asdAngleValue = next;
-      writeAngleToGlobal();
-      renderAngle();
-      if(asdCameraOn && asdMode === 'auto'){
-        await runASDAutoFlow();
-      }
-    }, true);
+    
 
     window.addEventListener('beforeunload', function(){
       stopASDDetectLoop();
@@ -2269,6 +2254,7 @@ function initASDPatch(){
     }
     if(cameraBtn) cameraBtn.classList.add('active');
     setTimeout(function(){
+      if(typeof updateModeUI === 'function') updateModeUI();
       if(cameraBtn && overlay) cameraBtn.click();
     },0);
   }
