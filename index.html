@@ -2424,6 +2424,55 @@ body{ margin:0 !important; position:relative !important; }
   image-rendering:auto; backface-visibility:hidden; transform:translateZ(0);
 }
 
+
+
+/* ===== 206: camera-only centered lens intro / native video overlay removal ===== */
+#asdCameraVideo,
+#asdMiniFaceVideo{
+  pointer-events:none !important;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+}
+#asdCameraVideo::-webkit-media-controls,
+#asdCameraVideo::-webkit-media-controls-panel,
+#asdCameraVideo::-webkit-media-controls-play-button,
+#asdCameraVideo::-webkit-media-controls-start-playback-button,
+#asdCameraVideo::-webkit-media-controls-overlay-play-button,
+#asdMiniFaceVideo::-webkit-media-controls,
+#asdMiniFaceVideo::-webkit-media-controls-panel,
+#asdMiniFaceVideo::-webkit-media-controls-play-button,
+#asdMiniFaceVideo::-webkit-media-controls-start-playback-button,
+#asdMiniFaceVideo::-webkit-media-controls-overlay-play-button{
+  display:none !important;
+  -webkit-appearance:none !important;
+  opacity:0 !important;
+}
+
+#asdCameraLensIntro{
+  position:absolute;
+  left:50%;
+  top:52%;
+  width:80%;
+  height:auto;
+  z-index:8;
+  display:none;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,-50%) scale(.16) rotate(0deg);
+  transform-origin:50% 50%;
+  object-fit:contain;
+  mix-blend-mode:normal;
+  filter:saturate(1.08) contrast(1.06) drop-shadow(0 9px 18px rgba(15,23,42,.16));
+  will-change:transform,opacity;
+}
+#asdOverlay.camera-on.lens-intro-playing #asdCameraLensIntro{ display:block; }
+#asdOverlay.camera-on.lens-intro-playing #asdCameraGuide,
+#asdOverlay.camera-on.lens-intro-playing #asdActiveZones,
+#asdOverlay.camera-on.lens-intro-playing #asdAngleBadge{
+  opacity:0 !important;
+  visibility:hidden !important;
+}
+
 </style>
 
 
@@ -2619,89 +2668,6 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 }
 @media(max-width:600px){#asdCaptureHoldMessage span{font-size:16px;padding:12px 18px;}}
 </style>
-
-<style id="asdLensIntroPatch">
-  /* 첫 화면: 렌즈 표시 없이 회전으로 흐려진 카메라 화면만 노출 */
-  #asdOverlay.lens-not-started #asdCameraGuide,
-  #asdOverlay.lens-not-started #asdActiveZones,
-  #asdOverlay.lens-not-started #asdLensImg,
-  #asdOverlay.lens-not-started #asdAngleBadge{
-    opacity:0 !important;
-    visibility:hidden !important;
-    pointer-events:none !important;
-  }
-
-  /* 실제 투명 렌즈가 먼저 살짝 나타나는 단계 */
-  #asdLensImg{
-    z-index:4;
-  }
-  #asdOverlay.lens-intro #asdLensImg{
-    display:block !important;
-    visibility:visible !important;
-    animation:asdRealLensIntro .72s ease-out both;
-  }
-  #asdOverlay.lens-intro #asdCameraGuide{
-    display:block !important;
-    visibility:visible !important;
-  }
-  #asdOverlay.lens-intro #asdGuideCircle,
-  #asdOverlay.lens-intro #asdGuideAxis,
-  #asdOverlay.lens-intro #asdGuideSideLeft,
-  #asdOverlay.lens-intro #asdGuideSideRight,
-  #asdOverlay.lens-intro .asdGuideDot,
-  #asdOverlay.lens-intro #asdStatusText{
-    animation:asdGuideReveal .72s ease-out both;
-  }
-  #asdOverlay.lens-intro #asdActiveZones,
-  #asdOverlay.lens-intro #asdAngleBadge{
-    animation:asdGuideReveal .72s ease-out both;
-  }
-
-  @keyframes asdRealLensIntro{
-    0%{ opacity:0; transform:translate(calc(-50% + var(--irisX, 0px)), calc(-64% + var(--irisY, 0px))) scale(.92) rotate(var(--asdIntroAngle, 15deg)); filter:saturate(1.02) contrast(1.02) drop-shadow(0 6px 14px rgba(75,145,210,.05)); }
-    22%{ opacity:.34; }
-    58%{ opacity:.26; transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(1.01) rotate(var(--asdIntroAngle, 15deg)); filter:saturate(1.06) contrast(1.04) drop-shadow(0 7px 16px rgba(75,145,210,.12)); }
-    100%{ opacity:0; transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(1) rotate(var(--asdIntroAngle, 15deg)); }
-  }
-  @keyframes asdGuideReveal{
-    0%,42%{ opacity:0; }
-    100%{ opacity:1; }
-  }
-
-  /* 소비자가 콘택트렌즈로 인식하기 쉽도록 실제 렌즈 같은 이중 림과 하이라이트 적용 */
-  #asdGuideCircle{
-    border:2px solid rgba(204,230,255,.88) !important;
-    background:
-      radial-gradient(circle at 35% 26%, rgba(255,255,255,.075) 0 9%, rgba(255,255,255,0) 26%),
-      radial-gradient(circle at 64% 72%, rgba(111,184,255,.045) 0 16%, rgba(111,184,255,0) 38%);
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.38),
-      0 0 0 4px rgba(132,192,255,.055),
-      0 0 18px rgba(86,142,255,.13),
-      inset 0 0 0 1px rgba(255,255,255,.18),
-      inset 10px -8px 24px rgba(87,159,225,.055),
-      inset -8px 10px 20px rgba(255,255,255,.045) !important;
-  }
-  #asdGuideCircle::before{
-    inset:-5px !important;
-    border:1px solid rgba(177,216,255,.30) !important;
-    box-shadow:0 0 16px rgba(86,142,255,.09), inset 0 0 8px rgba(255,255,255,.05) !important;
-  }
-  #asdGuideCircle::after{
-    content:"";
-    position:absolute;
-    inset:4%;
-    border-radius:50%;
-    border-top:1.5px solid rgba(255,255,255,.52);
-    border-left:1px solid rgba(255,255,255,.20);
-    border-right:1px solid rgba(129,190,246,.12);
-    border-bottom:1.5px solid rgba(86,142,255,.20);
-    transform:rotate(-18deg);
-    pointer-events:none;
-    filter:blur(.05px);
-  }
-</style>
-
 </head>
 <body>
 <div id="missionBarWrap">
@@ -2788,6 +2754,7 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 <video autoplay="" id="asdCameraVideo" muted="" playsinline=""></video>
 <img alt="" aria-hidden="true" id="asdCaptureImage"/>
 </div>
+<img alt="" aria-hidden="true" id="asdCameraLensIntro" src="lens.png"/>
 <div aria-live="polite" id="asdCaptureHoldMessage"><span>카메라를 잠시 고정해 주세요</span></div>
 <div aria-hidden="true" id="asdModeToggle">
 <button class="active" id="asdModeManual" type="button">수동</button>
@@ -3087,6 +3054,7 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
     const thicknessBar = document.getElementById('thicknessBar');
     const asdEyeMV = document.getElementById('asdEyeMV');
     const asdLensImg = document.getElementById('asdLensImg');
+    const asdCameraLensIntro = document.getElementById('asdCameraLensIntro');
     const asdBlinkBtn = document.getElementById('asdBlinkBtn');
     const asdRotateBtn = document.getElementById('asdRotateBtn');
     const asdAngleBadge = document.getElementById('asdAngleBadge');
@@ -4694,8 +4662,6 @@ function initASDPatch(){
 
     function resetASDPatchedState(){
       asdMode = 'auto';
-      asdOverlay.classList.add('lens-not-started');
-      asdOverlay.classList.remove('lens-intro');
       asdRearCaptured = false;
       asdAutoPromptActive = false;
       asdAngleValue = 15;
@@ -4741,6 +4707,10 @@ function initASDPatch(){
         asdCameraStream = stream;
         asdCameraVideo.classList.remove('ready');
         asdCameraVideo.srcObject = stream;
+        asdCameraVideo.controls = false;
+        asdCameraVideo.removeAttribute('controls');
+        asdCameraVideo.setAttribute('playsinline','');
+        asdCameraVideo.setAttribute('webkit-playsinline','');
         asdCameraVideo.style.display = 'block';
         asdCameraVideo.style.transform = useRearCamera ? 'scale(1)' : 'scaleX(-1) scale(1)';
         asdCameraVideo.style.transformOrigin = 'center center';
@@ -5258,6 +5228,41 @@ function initASDPatch(){
       return true;
     }
 
+    async function playASDCameraLensIntro(){
+      if(!asdOverlay || !asdCameraLensIntro || !asdCameraOn) return;
+
+      // Native video UI must never appear over the live camera.
+      try{
+        asdCameraVideo.controls = false;
+        asdCameraVideo.removeAttribute('controls');
+        asdCameraVideo.setAttribute('playsinline','');
+        asdCameraVideo.setAttribute('webkit-playsinline','');
+      }catch(e){}
+
+      asdCameraLensIntro.getAnimations().forEach(animation => animation.cancel());
+      asdCameraLensIntro.style.display = 'block';
+      asdCameraLensIntro.style.opacity = '0';
+      asdCameraLensIntro.style.transform = 'translate(-50%,-50%) scale(.16) rotate(0deg)';
+      asdOverlay.classList.add('lens-intro-playing');
+
+      const animation = asdCameraLensIntro.animate([
+        { transform:'translate(-50%,-50%) scale(.16) rotate(0deg)', opacity:0, offset:0 },
+        { transform:'translate(-50%,-50%) scale(.25) rotate(0deg)', opacity:.82, offset:.18 },
+        { transform:'translate(-50%,-50%) scale(.72) rotate(0deg)', opacity:.88, offset:.68 },
+        { transform:'translate(-50%,-50%) scale(1.02) rotate(0deg)', opacity:.72, offset:.86 },
+        { transform:'translate(-50%,-50%) scale(1.10) rotate(0deg)', opacity:0, offset:1 }
+      ], {
+        duration:820,
+        easing:'cubic-bezier(.20,.82,.24,1)',
+        fill:'forwards'
+      });
+
+      try{ await animation.finished; }catch(e){}
+      asdCameraLensIntro.style.display = 'none';
+      asdOverlay.classList.remove('lens-intro-playing');
+      renderGuide();
+    }
+
     async function runASDAutoFlow(){
       if (asdMode !== 'auto') return;
       if (asdRearCaptured && asdAutoPromptActive){
@@ -5268,6 +5273,8 @@ function initASDPatch(){
       if (!asdCameraOn || !asdCameraStream) {
         await startASDCamera();
       }
+
+      await playASDCameraLensIntro();
 
       const captured = await captureASDRearFrame();
       if(!captured){
@@ -5402,7 +5409,6 @@ function initASDPatch(){
       if (asdBlinkBusy) return;
       if(asdMode === 'auto'){
         if(asdRearCaptured && asdAutoPromptActive) return;
-        await playASDLensIntro();
         await runASDAutoFlow();
         return;
       }
@@ -5475,17 +5481,6 @@ function initASDPatch(){
     }
 
 
-    async function playASDLensIntro(){
-      if(!asdOverlay || !asdOverlay.classList.contains('lens-not-started')) return;
-      asdOverlay.style.setProperty('--asdIntroAngle', `${asdAngleValue || 15}deg`);
-      asdOverlay.classList.remove('lens-not-started');
-      asdOverlay.classList.add('lens-intro');
-      renderGuide();
-      await new Promise(resolve => window.setTimeout(resolve, 760));
-      asdOverlay.classList.remove('lens-intro');
-      if(asdLensImg) asdLensImg.style.opacity = '0';
-    }
-
     // 원래 모형 버전 / 실제 카메라 버전 분리: 기존 하위 리스너가 먼저 동작하지 않도록 캡처 단계에서 처리
     asdBlinkBtn.addEventListener('click', async function(ev){
       ev.preventDefault();
@@ -5493,7 +5488,6 @@ function initASDPatch(){
       if (asdBlinkBusy) return;
       if(asdMode === 'auto'){
         if(asdRearCaptured && asdAutoPromptActive) return;
-        await playASDLensIntro();
         await runASDAutoFlow();
         return;
       }
@@ -5665,104 +5659,5 @@ function goHomeMain(event){
   else launchASDOnly();
 })();
 </script>
-
-<style id="asdLensIntroFix205">
-/* 205: 카메라 OFF에서는 원래 렌즈/축 그래픽을 그대로 표시 */
-#asdOverlay.lens-not-started:not(.camera-on) #asdCameraGuide,
-#asdOverlay.lens-not-started:not(.camera-on) #asdActiveZones,
-#asdOverlay.lens-not-started:not(.camera-on) #asdLensImg,
-#asdOverlay.lens-not-started:not(.camera-on) #asdAngleBadge{
-  opacity:1 !important;
-  visibility:visible !important;
-  pointer-events:auto !important;
-}
-#asdOverlay.lens-not-started:not(.camera-on) #asdCameraGuide{
-  display:block !important;
-}
-#asdOverlay.lens-not-started:not(.camera-on) #asdLensImg{
-  display:block !important;
-}
-
-/* 카메라 ON + 시작 전에는 흐린 카메라 화면만 표시 */
-#asdOverlay.camera-on.lens-not-started #asdCameraGuide,
-#asdOverlay.camera-on.lens-not-started #asdActiveZones,
-#asdOverlay.camera-on.lens-not-started #asdLensImg,
-#asdOverlay.camera-on.lens-not-started #asdAngleBadge{
-  opacity:0 !important;
-  visibility:hidden !important;
-  pointer-events:none !important;
-}
-
-/* 시작 클릭 시: 렌즈가 중앙에서 커지며 페이드아웃 → 분석 원으로 연결 */
-#asdOverlay.camera-on.lens-intro #asdLensImg{
-  transform-origin:center center !important;
-  animation:asdRealLensCenterZoom205 .78s cubic-bezier(.20,.74,.24,1) both !important;
-}
-#asdOverlay.camera-on.lens-intro #asdGuideCircle,
-#asdOverlay.camera-on.lens-intro #asdGuideAxis,
-#asdOverlay.camera-on.lens-intro #asdGuideSideLeft,
-#asdOverlay.camera-on.lens-intro #asdGuideSideRight,
-#asdOverlay.camera-on.lens-intro .asdGuideDot,
-#asdOverlay.camera-on.lens-intro #asdStatusText,
-#asdOverlay.camera-on.lens-intro #asdActiveZones,
-#asdOverlay.camera-on.lens-intro #asdAngleBadge{
-  animation:asdGuideReveal205 .78s ease-out both !important;
-}
-@keyframes asdRealLensCenterZoom205{
-  0%{
-    opacity:0;
-    transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(.20) rotate(var(--asdIntroAngle, 15deg));
-    filter:saturate(1.03) contrast(1.03) drop-shadow(0 3px 8px rgba(75,145,210,.08));
-  }
-  16%{ opacity:.48; }
-  58%{
-    opacity:.38;
-    transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(.82) rotate(var(--asdIntroAngle, 15deg));
-    filter:saturate(1.07) contrast(1.05) drop-shadow(0 7px 18px rgba(75,145,210,.16));
-  }
-  100%{
-    opacity:0;
-    transform:translate(calc(-50% + var(--irisX, 0px)), calc(-50% + var(--irisY, 0px))) scale(1.08) rotate(var(--asdIntroAngle, 15deg));
-    filter:saturate(1.04) contrast(1.03) drop-shadow(0 7px 18px rgba(75,145,210,0));
-  }
-}
-@keyframes asdGuideReveal205{
-  0%,58%{ opacity:0; }
-  100%{ opacity:1; }
-}
-
-/* iPhone/Safari가 카메라 영상 중앙에 표시하는 재생·일시정지 오버레이 제거 */
-#asdCameraVideo::-webkit-media-controls,
-#asdCameraVideo::-webkit-media-controls-panel,
-#asdCameraVideo::-webkit-media-controls-play-button,
-#asdCameraVideo::-webkit-media-controls-start-playback-button,
-#asdCameraVideo::-webkit-media-controls-overlay-play-button{
-  display:none !important;
-  -webkit-appearance:none !important;
-  opacity:0 !important;
-  pointer-events:none !important;
-}
-#asdCameraVideo{ -webkit-appearance:none !important; }
-</style>
-<script id="asdLensIntroFix205Script">
-(function(){
-  const video = document.getElementById('asdCameraVideo');
-  if(!video) return;
-  video.removeAttribute('controls');
-  video.controls = false;
-  video.setAttribute('playsinline','');
-  video.setAttribute('webkit-playsinline','');
-  video.muted = true;
-  const keepPlaying = function(){
-    if(video.srcObject && video.paused){
-      const p = video.play();
-      if(p && typeof p.catch === 'function') p.catch(function(){});
-    }
-  };
-  video.addEventListener('loadedmetadata', keepPlaying);
-  video.addEventListener('pause', function(){ setTimeout(keepPlaying, 0); });
-})();
-</script>
-
 </body>
 </html>
