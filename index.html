@@ -2539,6 +2539,30 @@ body.popup-open #homeBtnMain{
     #asdHint .hintTitle{font-size:14px!important}.asdIntroDesc br{display:none;}
     #asdCard>.toric-popup-disclaimer{margin:0 12px 12px!important;font-size:9.5px!important;}
   }
+
+/* ASD 전용 페이지: 노출되지 않는 PVP·프리즘·블루라이트 UI 제거 */
+#missionBarWrap, #bottomBtns, #globalToricDisclaimer, #pvpBig, #pvpOverlay,
+#pvpSimOverlay, #comfortOverlay, #blueSimOverlay, #blueInfo, #blueBackGlow,
+#blueRayLayer, #blueRayLayerBack, #thicknessBar, #maxPackshot, model-viewer,
+#homeButton, .home-button { display:none !important; }
+html, body { overflow:auto !important; min-height:100%; background:#eef5ff !important; }
+#asdOverlay{
+  display:flex !important;
+  position:relative !important;
+  inset:auto !important;
+  min-height:100vh;
+  padding:0 !important;
+  background:#eef5ff !important;
+  backdrop-filter:none !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+}
+#asdPageWrap{ width:100%; }
+#asdClose{ display:none !important; }
+#asdCameraStage, #asdCaptureImage{ border-radius:inherit; overflow:hidden; }
+#asdCaptureImage{ color:transparent !important; font-size:0 !important; }
+#asdCaptureImage:not([src]), #asdCaptureImage[src=""]{ display:none !important; }
+#asdOverlay.camera-on:not(.auto-captured) #asdCameraVideo{ display:block !important; }
 </style>
 </head>
 <body>
@@ -2624,7 +2648,7 @@ body.popup-open #homeBtnMain{
 <div id="asdScene">
 <div aria-hidden="true" id="asdCameraStage">
 <video autoplay="" id="asdCameraVideo" muted="" playsinline=""></video>
-<img alt="Rear capture" id="asdCaptureImage"/>
+<img alt="" aria-hidden="true" id="asdCaptureImage"/>
 </div>
 <div aria-hidden="true" id="asdModeToggle">
 <button class="active" id="asdModeManual" type="button">수동</button>
@@ -5001,15 +5025,36 @@ function initASDPatch(){
       const ready = await waitForASDRearFrameReady();
       if(!ready) return false;
 
+      const scene = document.getElementById('asdScene');
+      const rect = scene ? scene.getBoundingClientRect() : { width: asdCameraVideo.videoWidth, height: asdCameraVideo.videoHeight };
+      const outW = Math.max(2, Math.round(rect.width || asdCameraVideo.videoWidth));
+      const outH = Math.max(2, Math.round(rect.height || asdCameraVideo.videoHeight));
+      const vw = asdCameraVideo.videoWidth;
+      const vh = asdCameraVideo.videoHeight;
+
       const c = document.createElement('canvas');
-      c.width = asdCameraVideo.videoWidth;
-      c.height = asdCameraVideo.videoHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      c.width = Math.round(outW * dpr);
+      c.height = Math.round(outH * dpr);
       const x = c.getContext('2d', { alpha:false });
       if(!x) return false;
-      x.drawImage(asdCameraVideo, 0, 0, c.width, c.height);
 
-      // PNG로 저장해 재압축에 따른 흐림을 피한다.
-      const dataUrl = c.toDataURL('image/png');
+      // video의 object-fit:cover와 똑같이 중앙 크롭해서 검은 모서리/레터박스를 없앤다.
+      const srcRatio = vw / vh;
+      const dstRatio = c.width / c.height;
+      let sx = 0, sy = 0, sw = vw, sh = vh;
+      if(srcRatio > dstRatio){
+        sw = vh * dstRatio;
+        sx = (vw - sw) / 2;
+      }else{
+        sh = vw / dstRatio;
+        sy = (vh - sh) / 2;
+      }
+      x.fillStyle = '#dfe6ef';
+      x.fillRect(0,0,c.width,c.height);
+      x.drawImage(asdCameraVideo, sx, sy, sw, sh, 0, 0, c.width, c.height);
+
+      const dataUrl = c.toDataURL('image/jpeg', 0.96);
       const loaded = await new Promise(resolve => {
         const timer = setTimeout(() => resolve(false), 1800);
         asdCaptureImage.onload = () => { clearTimeout(timer); resolve(true); };
@@ -5019,8 +5064,12 @@ function initASDPatch(){
       if(!loaded) return false;
 
       asdCaptureImage.classList.remove('placeholder');
-      asdCaptureImage.style.display = 'block';
       asdRearCaptured = true;
+      // 이미지가 완전히 준비된 뒤에만 캡처 화면으로 전환해 로딩 화면이 보이지 않게 한다.
+      requestAnimationFrame(()=>{
+        asdCaptureImage.style.display = 'block';
+        asdOverlay.classList.add('auto-captured');
+      });
       updateModeUI();
       return true;
     }
@@ -5402,6 +5451,21 @@ function goHomeMain(event){
   }else{
     openDirectMode();
   }
+})();
+</script>
+
+<script>
+(function(){
+  function launchASDOnly(){
+    const overlay=document.getElementById('asdOverlay');
+    if(overlay){ overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false'); }
+    setTimeout(function(){
+      const cameraBtn=document.getElementById('asdCameraBtn');
+      if(cameraBtn && overlay && !overlay.classList.contains('camera-on')) cameraBtn.click();
+    },450);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',launchASDOnly,{once:true});
+  else launchASDOnly();
 })();
 </script>
 </body>
