@@ -2453,7 +2453,7 @@ body{ margin:0 !important; position:relative !important; }
   left:50%;
   top:52%;
   width:80%;
-  height:auto;
+  height:80%;
   z-index:8;
   display:none;
   opacity:0;
@@ -2462,6 +2462,7 @@ body{ margin:0 !important; position:relative !important; }
   transform-origin:50% 50%;
   object-fit:contain;
   mix-blend-mode:normal;
+  background:transparent !important;
   filter:saturate(1.08) contrast(1.06) drop-shadow(0 9px 18px rgba(15,23,42,.16));
   will-change:transform,opacity;
 }
@@ -2473,6 +2474,20 @@ body{ margin:0 !important; position:relative !important; }
   visibility:hidden !important;
 }
 
+
+/* ===== 207: live-camera background + 50% lens, capped at guide-circle size ===== */
+#asdOverlay.camera-on.lens-intro-playing #asdCameraStage,
+#asdOverlay.camera-on.lens-intro-playing #asdCameraVideo{
+  display:block !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  background:transparent !important;
+}
+#asdOverlay.camera-on.lens-intro-playing #asdCameraLensIntro{
+  max-width:80%;
+  max-height:80%;
+  background:transparent !important;
+}
 </style>
 
 
@@ -5241,16 +5256,24 @@ function initASDPatch(){
 
       asdCameraLensIntro.getAnimations().forEach(animation => animation.cancel());
       asdCameraLensIntro.style.display = 'block';
+      // Keep the real live camera image visible behind the lens animation.
+      asdCameraVideo.style.opacity = '1';
+      asdCameraVideo.style.visibility = 'visible';
+      asdCameraVideo.style.background = 'transparent';
+      if(asdCameraStage){
+        asdCameraStage.style.background = 'transparent';
+      }
+
       asdCameraLensIntro.style.opacity = '0';
       asdCameraLensIntro.style.transform = 'translate(-50%,-50%) scale(.16) rotate(0deg)';
       asdOverlay.classList.add('lens-intro-playing');
 
       const animation = asdCameraLensIntro.animate([
         { transform:'translate(-50%,-50%) scale(.16) rotate(0deg)', opacity:0, offset:0 },
-        { transform:'translate(-50%,-50%) scale(.25) rotate(0deg)', opacity:.82, offset:.18 },
-        { transform:'translate(-50%,-50%) scale(.72) rotate(0deg)', opacity:.88, offset:.68 },
-        { transform:'translate(-50%,-50%) scale(1.02) rotate(0deg)', opacity:.72, offset:.86 },
-        { transform:'translate(-50%,-50%) scale(1.10) rotate(0deg)', opacity:0, offset:1 }
+        { transform:'translate(-50%,-50%) scale(.28) rotate(0deg)', opacity:.50, offset:.18 },
+        { transform:'translate(-50%,-50%) scale(.72) rotate(0deg)', opacity:.50, offset:.68 },
+        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:.50, offset:.88 },
+        { transform:'translate(-50%,-50%) scale(1.00) rotate(0deg)', opacity:0, offset:1 }
       ], {
         duration:820,
         easing:'cubic-bezier(.20,.82,.24,1)',
