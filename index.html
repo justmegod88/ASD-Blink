@@ -4471,10 +4471,23 @@ function initASDPatch(){
       const rightY = centerY + outerRadius * sin;
 
       if (asdGuideDotLeft && asdGuideDotRight){
-        asdGuideDotLeft.style.left = `${leftX}%`;
-        asdGuideDotLeft.style.top = `${leftY}%`;
-        asdGuideDotRight.style.left = `${rightX}%`;
-        asdGuideDotRight.style.top = `${rightY}%`;
+        /* 작은 원의 중심을 렌즈 외곽선 중심에 정확히 고정 */
+        const sceneRect = asdScene ? asdScene.getBoundingClientRect() : null;
+        const circleRect = asdGuideCircle ? asdGuideCircle.getBoundingClientRect() : null;
+        if (sceneRect && circleRect && circleRect.width > 0){
+          const circleCenterX = circleRect.left - sceneRect.left + circleRect.width / 2;
+          const circleCenterY = circleRect.top - sceneRect.top + circleRect.height / 2;
+          const circleRadius = Math.min(circleRect.width, circleRect.height) / 2;
+          asdGuideDotLeft.style.left = `${circleCenterX - circleRadius * cos}px`;
+          asdGuideDotLeft.style.top = `${circleCenterY - circleRadius * sin}px`;
+          asdGuideDotRight.style.left = `${circleCenterX + circleRadius * cos}px`;
+          asdGuideDotRight.style.top = `${circleCenterY + circleRadius * sin}px`;
+        } else {
+          asdGuideDotLeft.style.left = `${leftX}%`;
+          asdGuideDotLeft.style.top = `${leftY}%`;
+          asdGuideDotRight.style.left = `${rightX}%`;
+          asdGuideDotRight.style.top = `${rightY}%`;
+        }
       }
 
       const asdGuideSideLeft = document.getElementById('asdGuideSideLeft');
