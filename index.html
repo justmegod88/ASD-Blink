@@ -2630,6 +2630,64 @@ html, body, button, input, select, textarea, .asdOverlay, #asdOverlay {
   display:none !important;
 }
 
+
+#asdOverlay:not(.asd-experience-started) #asdHint{
+  display:none !important;
+}
+#asdPrepareGuide{
+  position:absolute; left:50%; bottom:22px; transform:translateX(-50%);
+  z-index:32; display:none; max-width:calc(100% - 32px);
+  padding:12px 20px; border-radius:999px;
+  background:rgba(15,23,42,.82); color:#fff;
+  font-size:17px; line-height:1.25; font-weight:900;
+  letter-spacing:-.035em; text-align:center; white-space:nowrap;
+  box-shadow:0 12px 28px rgba(0,0,0,.24); pointer-events:none;
+}
+#asdOverlay.asd-capture-preparing #asdPrepareGuide{display:block;}
+#asdOverlay.asd-capture-preparing #asdInitialGuide,
+#asdOverlay.asd-capture-preparing #asdStartGuideMessage,
+#asdOverlay.asd-capture-preparing #asdRestartCameraGuide{display:none!important;}
+#asdOverlay.asd-capture-preparing #asdBlinkBtn{
+  pointer-events:none!important; opacity:.72!important;
+}
+#asdOverlay.asd-stable #asdGuideCircle{
+  animation:asdStableRingPop 1.05s ease-out 1;
+}
+@keyframes asdStableRingPop{
+  0%{transform:translate(-50%,-50%) rotate(0deg) scale(1);}
+  35%{
+    transform:translate(-50%,-50%) rotate(0deg) scale(1.07);
+    box-shadow:0 0 0 7px rgba(34,197,94,.16),0 0 34px rgba(34,197,94,.48),0 0 64px rgba(86,142,255,.28);
+  }
+  100%{transform:translate(-50%,-50%) rotate(0deg) scale(1);}
+}
+#asdStableCelebration{
+  position:absolute; inset:0; z-index:35; pointer-events:none;
+  display:none; overflow:hidden;
+}
+#asdOverlay.asd-stable.celebrate-stable #asdStableCelebration{display:block;}
+#asdStableCelebration span{
+  position:absolute; left:50%; top:52%; width:10px; height:10px;
+  border-radius:999px; background:#22c55e; opacity:0;
+  animation:asdConfettiBurst .9s ease-out forwards;
+}
+#asdStableCelebration span:nth-child(1){--x:0px;--y:120px;}
+#asdStableCelebration span:nth-child(2){background:#60a5fa;animation-delay:.03s;--x:95px;--y:-95px;}
+#asdStableCelebration span:nth-child(3){background:#f59e0b;animation-delay:.06s;--x:125px;--y:-15px;}
+#asdStableCelebration span:nth-child(4){background:#22c55e;animation-delay:.09s;--x:92px;--y:80px;}
+#asdStableCelebration span:nth-child(5){background:#60a5fa;animation-delay:.04s;--x:-95px;--y:-90px;}
+#asdStableCelebration span:nth-child(6){background:#f59e0b;animation-delay:.08s;--x:-125px;--y:-5px;}
+#asdStableCelebration span:nth-child(7){background:#22c55e;animation-delay:.12s;--x:-88px;--y:82px;}
+#asdStableCelebration span:nth-child(8){background:#fff;animation-delay:.10s;--x:0px;--y:-125px;}
+@keyframes asdConfettiBurst{
+  0%{transform:translate(-50%,-50%) scale(.35);opacity:0;}
+  18%{opacity:1;}
+  100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1.2);opacity:0;}
+}
+@media(max-width:560px){
+  #asdPrepareGuide{bottom:18px;padding:11px 16px;font-size:15px;}
+}
+
 </style>
 
 
@@ -2841,7 +2899,7 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 </head>
 <body>
 <div id="missionBarWrap">
-<div id="missionBarHeader">아큐브<sup class="reg-mark">®</sup>&nbsp;&nbsp;난시 렌즈 기술</div>
+<div id="missionBarHeader">아큐브<sup class="reg-mark">®</sup> 난시 렌즈 기술</div>
 
 <button id="homeBtnMain" aria-label="홈으로 이동" onclick="goHomeMain(event)">
   <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2903,18 +2961,18 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 </div>
 
 <div aria-hidden="true" id="asdOverlay">
-<div id="asdPageTopbar">아큐브<sup class="reg-mark">®</sup>&nbsp;&nbsp;난시 시야 체험</div>
+<div id="asdPageTopbar">아큐브<sup class="reg-mark">®</sup>  난시 시야 체험</div>
 <div id="asdPageWrap">
 <section id="asdIntroCopy">
   <div class="asdIntroKicker">ASTIGMATISM VISION EXPERIENCE</div>
-  <h1 class="asdIntroTitle"><span class="em">렌즈 축회전에</span>&nbsp;따른 시야를 확인하고<br><span class="em2">축 안정 효과</span>를 체험해 보세요</h1>
+  <h1 class="asdIntroTitle"><span class="em">렌즈 축회전에</span>따른 시야를 확인하고<br><span class="em2">축안정 효과</span>를 체험해 보세요</h1>
   <p class="asdIntroDesc">렌즈 축이 회전했을 때의 시야 변화와<br> 눈 깜박임을 통한 ASD™ 축 안정화를 직접 확인할 수 있습니다.</p>
-  <div class="asdIntroFlow"><span>시작하기(축 회전 발생)</span><i>→</i><span>눈 깜박임</span><i>→</i><span>축 안정</span></div>
+  <div class="asdIntroFlow"><span>축  회전 유발</span><i>→</i><span>눈 깜박임</span><i>→</i><span>축 안정</span></div>
 </section>
 <div id="asdCard">
 <div id="asdHeader">
 <div id="asdHeaderTitleWrap">
-<div id="asdHeaderTitle">ASD™ 축 안정화</div>
+<div id="asdHeaderTitle">ASD™ 축안정화</div>
 <div id="asdHeaderSubTitle">Accelerated Stabilization Design </div>
 </div>
 <button id="asdClose" type="button">X</button>
@@ -2923,6 +2981,11 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 <div aria-hidden="true" id="asdCameraStage">
 <video autoplay="" id="asdCameraVideo" muted="" playsinline="" webkit-playsinline="" preload="auto" disablepictureinpicture="" disableremoteplayback=""></video><canvas aria-hidden="true" id="asdCameraDisplayCanvas"></canvas>
 <img alt="" aria-hidden="true" id="asdCaptureImage"/>
+<div id="asdPrepareGuide">카메라를 한곳에 고정해 주세요</div>
+<div id="asdStableCelebration" aria-hidden="true">
+  <span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span>
+</div>
 <div id="asdStartGuideMessage">아래 시작하기 버튼을 눌러주세요</div>
 </div>
 <img alt="" aria-hidden="true" id="asdCameraLensIntro" src="lens.png"/>
@@ -3944,6 +4007,13 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
       asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">‘눈 깜박임’</span>을 눌러 회전된 축을 안정화 시켜 보세요.</span></div>`;
     }
     function setASDHintSuccess(){
+      asdOverlay.classList.remove('celebrate-stable');
+      void asdOverlay.offsetWidth;
+      asdOverlay.classList.add('celebrate-stable');
+      window.setTimeout(function(){
+        asdOverlay.classList.remove('celebrate-stable');
+      }, 1100);
+
       asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈 축 안정의 중요성</span><span class="hintBody">아큐브 ASD™는 <span class="green"><span style="color:#2563eb;font-weight:600;">자연스러운 눈 깜박임으로 렌즈 움직임을 안정화하여 선명한 시야</span></span>를 제공합니다.</span></div><button id="asdConfirmBtn" type="button">확인 완료</button>`;
       document.getElementById('asdConfirmBtn')?.addEventListener('click', (e)=>{ e.stopPropagation(); closeASD(); markASDDone(true); });
     }
@@ -4661,8 +4731,9 @@ function initASDPatch(){
       if(asdMode === 'auto'){
         if(asdInitialStart) return '시작하기';
         if(isStable) return '다시 시작';
+        if(asdOverlay.classList.contains('asd-capture-preparing')) return '준비 중';
         if(asdAutoPromptActive) return '눈을 깜박여 주세요';
-        return '한곳을 주시해 주세요';
+        return '준비 중';
       }
       if(!asdCameraOn && isStable) return '다시 시작';
       return '눈 깜박임';
@@ -5483,6 +5554,9 @@ function initASDPatch(){
     async function runASDAutoFlow(){
       if (asdMode !== 'auto') return;
 
+      asdOverlay.classList.add('asd-capture-preparing');
+      updateModeUI();
+
       if(asdInitialStart){
         asdInitialStart = false;
         asdOverlay.classList.add('asd-experience-started');
@@ -5531,6 +5605,8 @@ function initASDPatch(){
       }
       const captured=await capturePromise;
       if(!captured){
+        asdOverlay.classList.remove('asd-capture-preparing');
+        updateModeUI();
         alert('후방 카메라 화면을 불러온 뒤 다시 시작해 주세요.');
         return;
       }
@@ -5546,6 +5622,7 @@ function initASDPatch(){
       asdCameraOn=true;
       asdRearCaptured=true;
       asdAutoPromptActive=true;
+      asdOverlay.classList.remove('asd-capture-preparing');
       asdOverlay.classList.add('camera-on','auto-captured','asd-experience-started');
       asdCameraBtn.classList.add('active');
 
@@ -5800,7 +5877,7 @@ function initASDPatch(){
 
     // ASD 전용 페이지: 진입 즉시 자동 모드 + 후방 카메라를 실행한다.
     resetASDPatchedState();
-    asdOverlay.classList.remove('asd-experience-started','lens-intro-playing');
+    asdOverlay.classList.remove('asd-experience-started','lens-intro-playing','asd-capture-preparing','celebrate-stable');
     asdOverlay.classList.add('show','camera-on');
     asdOverlay.setAttribute('aria-hidden','false');
     asdMode = 'auto';
