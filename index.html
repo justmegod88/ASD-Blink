@@ -628,13 +628,6 @@ html,body{width:100%;height:100%;margin:0;overflow:auto;background:#eef4fb;}
 #asdOverlay{display:flex!important;}
 #asdClose{display:none!important;}
 
-#asdOverlay.auto-mode #asdRotateBtn{
-  font-size:12px !important;
-  line-height:1.25 !important;
-  white-space:normal !important;
-  padding:0 10px !important;
-  text-align:center !important;
-}
 </style>
 </head>
 <body>
@@ -850,12 +843,12 @@ function initASDPatch(){
     function getASDBlinkButtonLabel(){
       const isStable = Math.abs(asdAngleValue) === 0;
       if(!asdCameraOn && isStable) return '다시 시작';
-      if(!asdCameraOn && asdMode === 'auto') return '카메라를 한곳에 고정해 주세요';
+      if(!asdCameraOn && asdMode === 'auto') return '시작';
       if(!asdCameraOn) return '눈 깜박임';
       if(asdMode === 'auto'){
         if(isStable) return '다시 시작';
         if(asdAutoPromptActive) return '눈을 깜박여 주세요';
-        return '카메라를 한곳에 고정해 주세요';
+        return '시작';
       }
       return '눈 깜박임';
     }
@@ -1981,20 +1974,16 @@ function initASDPatch(){
     // ASD 전용 페이지: 진입 즉시 자동 모드 + 후방 카메라를 실행한다.
     resetASDPatchedState();
     asdOverlay.classList.remove('asd-experience-started','lens-intro-playing');
-    asdOverlay.classList.add('show','camera-on','auto-mode');
+    asdOverlay.classList.add('show');
     asdOverlay.setAttribute('aria-hidden','false');
-    asdCameraOn = true;
-    asdCameraBtn.classList.add('active');
     asdMode = 'auto';
     updateModeUI();
     renderAngle();
-
-    /* 첫 화면부터 카메라 ON 상태로 보이게 한 뒤 실제 스트림을 즉시 연결 */
-    requestAnimationFrame(async function(){
+    window.setTimeout(async function(){
       await startASDCamera();
       updateModeUI();
       renderAngle();
-    });
+    }, 180);
   }
 
 
@@ -2009,12 +1998,11 @@ function initASDPatch(){
 (function(){
   function launchASDOnly(){
     const overlay=document.getElementById('asdOverlay');
-    const cameraBtn=document.getElementById('asdCameraBtn');
-    if(overlay){
-      overlay.classList.add('show','camera-on','auto-mode');
-      overlay.setAttribute('aria-hidden','false');
-    }
-    if(cameraBtn) cameraBtn.classList.add('active');
+    if(overlay){ overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false'); }
+    setTimeout(function(){
+      const cameraBtn=document.getElementById('asdCameraBtn');
+      if(cameraBtn && overlay && !overlay.classList.contains('camera-on')) cameraBtn.click();
+    },450);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',launchASDOnly,{once:true});
   else launchASDOnly();
