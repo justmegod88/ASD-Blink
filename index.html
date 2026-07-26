@@ -5829,13 +5829,37 @@ function initASDPatch(){
         clearASDPlaceholderImage();
         updateModeUI();
       } else {
-        // 실제 카메라 버전: 후방 1배율 미리보기로 시작
+        // 카메라를 다시 켤 때는 이미 렌즈 가이드를 경험했으므로
+        // '카메라를 한곳에 고정해 주세요'부터 시작해 자동으로 눈 깜박임 인식 단계까지 진행한다.
         asdMode = 'auto';
+        asdInitialStart = false;
         asdRearCaptured = false;
         asdAutoPromptActive = false;
+        asdStableButtonHold = false;
+        asdCameraIntroPlayed = true;
+        if(asdStableButtonTimer){
+          clearTimeout(asdStableButtonTimer);
+          asdStableButtonTimer = null;
+        }
+        asdOverlay.classList.remove(
+          'lens-intro-playing',
+          'asd-capture-preparing',
+          'celebrate-stable',
+          'asd-stable',
+          'stabilizing',
+          'auto-running',
+          'auto-captured'
+        );
+        asdOverlay.classList.add('asd-experience-started');
         clearASDPlaceholderImage();
+        if(asdCaptureImage){
+          asdCaptureImage.style.display = 'none';
+          asdCaptureImage.src = '';
+        }
         await startASDCamera();
         updateModeUI();
+        renderAngle();
+        await runASDAutoFlow();
       }
     };
 
