@@ -2971,7 +2971,7 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 <span class="disc-note">1.Reducing Friction in the Eye: A Comparative Study of Lubrication by Surface Anchored Synthetic and Natural Ocular Mucin Analogues.Sterner O, et al. <em>ACS Applied Materials &amp; Interfaces</em>. 2017;9(23):20150~20160.</span></div>
 </div>
 
-<div aria-hidden="true" id="asdOverlay">
+<div aria-hidden="false" class="show camera-on auto-mode" id="asdOverlay">
 <div id="asdPageTopbar">아큐브<sup class="reg-mark">®</sup>&nbsp;&nbsp;난시 시야 체험</div>
 <div id="asdPageWrap">
 <section id="asdIntroCopy">
@@ -3039,7 +3039,7 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 <div id="asdControlBar">
 <button class="asdActionBtn" id="asdRotateBtn" type="button">축회전 유발</button>
 <button class="asdActionBtn" id="asdBlinkBtn" type="button">시작하기</button>
-<button aria-label="카메라" class="asdActionBtn" id="asdCameraBtn" type="button">
+<button aria-label="카메라" class="asdActionBtn active" id="asdCameraBtn" type="button">
 <svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1" viewbox="0 0 24 24">
 <path d="M4 7h3l2-2h6l2 2h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"></path>
 <circle cx="12" cy="13" r="3.5"></circle>
@@ -6072,9 +6072,6 @@ function goHomeMain(event){
       /* 진입 순간부터 카메라 ON 상태를 먼저 표시해 모형 화면이 잠깐 보이지 않게 한다. */
       overlay.classList.add('camera-on');
       overlay.classList.remove('asd-experience-started');
-      if(cameraStage) cameraStage.style.display='block';
-      if(eyeMV) eyeMV.style.opacity='0';
-      if(upperLid) upperLid.style.opacity='0';
       if(cameraBtn) cameraBtn.classList.add('active');
       overlay.classList.add('show');
       overlay.setAttribute('aria-hidden','false');
