@@ -3141,6 +3141,38 @@ body{
 }
 
 </style>
+
+<style id="asd-intro-spacing-half">
+/* 요청한 상·하단 세로 여백 축소 + 단계 영역 아래 간격 추가 미세 축소 */
+#asdPageWrap{
+  padding-top:6px !important;
+}
+#asdIntroCopy{
+  margin-bottom:3px !important;
+  padding-top:9px !important;
+  padding-bottom:7px !important;
+}
+#asdIntroCopy::before{
+  top:9px !important;
+  bottom:7px !important;
+}
+
+@media(max-width:560px){
+  #asdPageWrap{
+    padding-top:5px !important;
+  }
+  #asdIntroCopy{
+    margin-bottom:2px !important;
+    padding-top:8px !important;
+    padding-bottom:6px !important;
+  }
+  #asdIntroCopy::before{
+    top:8px !important;
+    bottom:6px !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="missionBarWrap">
