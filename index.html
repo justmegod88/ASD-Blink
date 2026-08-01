@@ -2699,6 +2699,110 @@ html, body, button, input, select, textarea, .asdOverlay, #asdOverlay {
   padding:0 14px !important;
 }
 
+
+#asdCaptureImage{
+  image-rendering:auto;
+  -webkit-optimize-contrast:auto;
+  backface-visibility:hidden;
+}
+
+
+/* 205 modern stepper redesign */
+.asdIntroFlow.asdModernStepper{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  align-items:start !important;
+  gap:0 !important;
+  width:100% !important;
+  margin-top:18px !important;
+  padding:0 4px !important;
+  box-sizing:border-box !important;
+  overflow:visible !important;
+}
+.asdIntroFlow.asdModernStepper .stepperTrack{
+  position:absolute !important;
+  left:16.66% !important;
+  right:16.66% !important;
+  top:18px !important;
+  height:4px !important;
+  border-radius:999px !important;
+  background:linear-gradient(90deg,#8CC5FF 0%,#5BA8F4 48%,#5ACB80 100%) !important;
+  box-shadow:0 3px 10px rgba(0,94,184,.15) !important;
+  z-index:0 !important;
+}
+.asdIntroFlow.asdModernStepper .stepperItem{
+  position:relative !important;
+  z-index:1 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  min-width:0 !important;
+  text-align:center !important;
+}
+.asdIntroFlow.asdModernStepper .stepperDot{
+  width:38px !important;
+  height:38px !important;
+  border-radius:999px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:#fff !important;
+  border:3px solid #5EA9F1 !important;
+  box-shadow:0 8px 18px rgba(0,94,184,.14),0 0 0 5px rgba(0,94,184,.06) !important;
+  box-sizing:border-box !important;
+}
+.asdIntroFlow.asdModernStepper .stepperDot span{
+  font-size:14px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  color:#005EB8 !important;
+}
+.asdIntroFlow.asdModernStepper .step-three .stepperDot{
+  border-color:#39B86A !important;
+  box-shadow:0 8px 18px rgba(30,155,72,.16),0 0 0 5px rgba(30,155,72,.07) !important;
+}
+.asdIntroFlow.asdModernStepper .step-three .stepperDot span{
+  color:#1E9B48 !important;
+}
+.asdIntroFlow.asdModernStepper .stepperLabel{
+  display:block !important;
+  min-height:34px !important;
+  font-size:12px !important;
+  line-height:1.28 !important;
+  font-weight:950 !important;
+  letter-spacing:-.04em !important;
+  color:#174A7C !important;
+  word-break:keep-all !important;
+}
+.asdIntroFlow.asdModernStepper .step-three .stepperLabel{
+  color:#1E8F46 !important;
+}
+@media(max-width:560px){
+  .asdIntroFlow.asdModernStepper{
+    margin-top:15px !important;
+    padding:0 !important;
+  }
+  .asdIntroFlow.asdModernStepper .stepperTrack{
+    top:16px !important;
+    height:3px !important;
+  }
+  .asdIntroFlow.asdModernStepper .stepperDot{
+    width:34px !important;
+    height:34px !important;
+    border-width:3px !important;
+  }
+  .asdIntroFlow.asdModernStepper .stepperDot span{
+    font-size:12px !important;
+  }
+  .asdIntroFlow.asdModernStepper .stepperLabel{
+    font-size:11px !important;
+    min-height:30px !important;
+  }
+}
+
 </style>
 
 
@@ -2797,9 +2901,84 @@ html, body, button, input, select, textarea, .asdOverlay, #asdOverlay {
   .asdIntroTitle{margin:0;font-size:25px;line-height:1.18;font-weight:950;letter-spacing:-.065em;}
   .asdIntroTitle .em{color:#005EB8}.asdIntroTitle .em2{color:#1e9b48}
   .asdIntroDesc{margin:9px 0 0;color:#65788e;font-size:14px;line-height:1.5;font-weight:850;letter-spacing:-.04em;}
-  .asdIntroFlow{display:flex;align-items:center;gap:7px;margin-top:14px;font-size:12px;font-weight:950;letter-spacing:-.045em;flex-wrap:wrap;}
-  .asdIntroFlow span{display:inline-flex;align-items:center;justify-content:center;height:30px;padding:0 12px;border-radius:999px;background:rgba(0,94,184,.08);color:#005EB8;}
-  .asdIntroFlow span:last-child{background:rgba(30,155,72,.10);color:#1e9b48}.asdIntroFlow i{font-style:normal;color:#8da0b6;font-weight:950;}
+  
+  .asdIntroFlow.asdChevronFlow{
+    display:flex;
+    align-items:stretch;
+    gap:10px;
+    margin-top:16px;
+    flex-wrap:nowrap;
+    width:100%;
+  }
+  .asdIntroFlow.asdChevronFlow .flowStep{
+    position:relative;
+    min-width:0;
+    flex:1 1 0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    min-height:48px;
+    padding:10px 22px 10px 18px;
+    border-radius:14px;
+    font-weight:950;
+    letter-spacing:-.04em;
+    line-height:1.05;
+    box-shadow:0 10px 20px rgba(15,23,42,.06), inset 0 0 0 1px rgba(255,255,255,.58);
+    overflow:visible;
+  }
+  .asdIntroFlow.asdChevronFlow .flowStep::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    right:-14px;
+    width:28px;
+    height:28px;
+    transform:translateY(-50%) rotate(45deg);
+    border-radius:5px;
+    box-shadow:inset -1px 1px 0 rgba(255,255,255,.58);
+    z-index:2;
+  }
+  .asdIntroFlow.asdChevronFlow .flowStep:last-child::after{ display:none; }
+  .asdIntroFlow.asdChevronFlow .flowMain{
+    position:relative;
+    z-index:3;
+    display:block;
+    font-size:15px;
+    white-space:nowrap;
+  }
+  .asdIntroFlow.asdChevronFlow .flowSub{
+    position:relative;
+    z-index:3;
+    display:block;
+    font-size:10px;
+    line-height:1.1;
+    opacity:.95;
+    white-space:nowrap;
+  }
+  .asdIntroFlow.asdChevronFlow .step-start{
+    background:linear-gradient(180deg,#EAF3FF 0%, #DCEBFF 100%);
+    color:#005EB8;
+  }
+  .asdIntroFlow.asdChevronFlow .step-start::after{
+    background:linear-gradient(180deg,#EAF3FF 0%, #DCEBFF 100%);
+  }
+  .asdIntroFlow.asdChevronFlow .step-blink{
+    background:linear-gradient(180deg,#E9F4FF 0%, #D6ECFF 100%);
+    color:#1D5DBD;
+  }
+  .asdIntroFlow.asdChevronFlow .step-blink::after{
+    background:linear-gradient(180deg,#E9F4FF 0%, #D6ECFF 100%);
+  }
+  .asdIntroFlow.asdChevronFlow .step-stable{
+    background:linear-gradient(180deg,#E8F8EC 0%, #D7F2DE 100%);
+    color:#1E9B48;
+  }
+  .asdIntroFlow.asdChevronFlow .step-stable::after{
+    background:linear-gradient(180deg,#E8F8EC 0%, #D7F2DE 100%);
+  }
+
   #asdCard{width:100%!important;max-width:none!important;margin:0 0 12px!important;border-radius:22px!important;border:1.5px solid #dbe5f1!important;background:#fff!important;box-shadow:0 14px 34px rgba(20,52,90,.10)!important;overflow:hidden!important;}
   #asdHeader{padding:15px 16px 10px!important;border-bottom:0!important;background:#fff!important;}
   #asdHeaderTitle{font-size:18px!important;color:#15304b!important;letter-spacing:-.035em!important;}
@@ -2820,7 +2999,24 @@ html, body, button, input, select, textarea, .asdOverlay, #asdOverlay {
     #asdPageTopbar{height:64px;font-size:19px;justify-content:flex-start;padding-left:24px;}
     #asdPageWrap{padding:10px 8px 22px;}
     #asdIntroCopy{margin:0 0 12px;padding:16px 4px 17px 14px;}
-    .asdIntroTitle{font-size:23px;line-height:1.2}.asdIntroDesc{font-size:13px;margin-top:8px}.asdIntroFlow{margin-top:13px;gap:6px;font-size:11px}.asdIntroFlow span{height:28px;padding:0 10px;}
+    
+    .asdIntroTitle{font-size:23px;line-height:1.2}
+    .asdIntroDesc{font-size:13px;margin-top:8px}
+    .asdIntroFlow.asdChevronFlow{margin-top:13px;gap:8px}
+    .asdIntroFlow.asdChevronFlow .flowStep{
+      min-height:46px;
+      padding:9px 16px 9px 12px;
+      border-radius:13px;
+    }
+    .asdIntroFlow.asdChevronFlow .flowStep::after{
+      right:-11px;
+      width:22px;
+      height:22px;
+      border-radius:4px;
+    }
+    .asdIntroFlow.asdChevronFlow .flowMain{font-size:13px}
+    .asdIntroFlow.asdChevronFlow .flowSub{font-size:9px}
+
     #asdCard{border-radius:20px!important;}
     #asdHeader{padding:13px 14px 9px!important;}
     #asdHeaderTitle{font-size:17px!important;}
@@ -2907,6 +3103,44 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
 #asdCameraLensIntro{z-index:8!important;}
 #asdCameraGuide{z-index:7!important;}
 </style>
+<style id="asd-only-build-style">
+
+/* =========================================================
+   ASD ONLY BUILD
+   PVP / Blue-light / Prism and unrelated 3D UI are disabled.
+   ASD camera, blink detection and stabilization remain intact.
+   ========================================================= */
+#missionBarWrap,
+#thicknessBar,
+#pvpBig,
+#pvpOverlay,
+#pvpSimOverlay,
+#comfortOverlay,
+#tutorialLayer,
+#blueBackGlow,
+#blueRayLayerBack,
+#blueRayLayer,
+#blueInfo,
+#blueSimOverlay,
+model-viewer,
+#bottomBtns,
+#globalToricDisclaimer{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
+/* ASD page remains the only active screen. */
+#asdOverlay{
+  display:flex !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+}
+body{
+  background:#f5f9ff !important;
+}
+
+</style>
 </head>
 <body>
 <div id="missionBarWrap">
@@ -2978,7 +3212,22 @@ html, body { overflow:auto !important; min-height:100%; background:#eef5ff !impo
   <div class="asdIntroKicker">ASTIGMATISM VISION EXPERIENCE</div>
   <h1 class="asdIntroTitle"><span class="em">렌즈 축회전에</span>&nbsp;&nbsp;따른 시야를 확인하고<br><span class="em2">축 안정 효과</span>를 체험해 보세요</h1>
   <p class="asdIntroDesc">렌즈 축이 회전했을 때의 시야 변화와<br> 눈 깜박임을 통한 ASD™ 축 안정화를 직접 확인할 수 있습니다.</p>
-  <div class="asdIntroFlow"><span>시작(축  회전 발생)</span><i>→</i><span>눈 깜박임</span><i>→</i><span>축 안정</span></div>
+  
+  <div class="asdIntroFlow asdModernStepper" aria-label="축회전 발생, 눈 깜박임, 축 안정 단계">
+    <div class="stepperTrack" aria-hidden="true"></div>
+    <div class="stepperItem step-one">
+      <div class="stepperDot"><span>1</span></div>
+      <div class="stepperLabel">축회전 발생</div>
+    </div>
+    <div class="stepperItem step-two">
+      <div class="stepperDot"><span>2</span></div>
+      <div class="stepperLabel">눈 깜박임</div>
+    </div>
+    <div class="stepperItem step-three">
+      <div class="stepperDot"><span>3</span></div>
+      <div class="stepperLabel">축 안정</div>
+    </div>
+  </div>
 </section>
 <div id="asdCard">
 <div id="asdHeader">
@@ -5043,6 +5292,9 @@ function initASDPatch(){
           asdCameraVideo.classList.add('ready');
           try{ await asdCameraVideo.play(); }catch(e){}
           await applyRealCameraZoom(stream, useRearCamera ? 1 : 1.8);
+          if(useRearCamera){
+            await applyASDRearCameraQuality(stream);
+          }
         };
         asdCameraVideo.onloadedmetadata = markReady;
         asdCameraVideo.onloadeddata = markReady;
@@ -5120,6 +5372,43 @@ function initASDPatch(){
         return true;
       }catch(err){
         console.warn('Real camera zoom unavailable', err);
+        return false;
+      }
+    }
+
+    async function applyASDRearCameraQuality(stream){
+      try{
+        if(!isAndroidDevice() || !stream || !stream.getVideoTracks) return false;
+        const track = stream.getVideoTracks()[0];
+        if(!track || !track.getCapabilities || !track.applyConstraints) return false;
+        const caps = track.getCapabilities() || {};
+        const advanced = [];
+
+        if (Array.isArray(caps.focusMode)){
+          if (caps.focusMode.includes('continuous')) advanced.push({ focusMode:'continuous' });
+          else if (caps.focusMode.includes('single-shot')) advanced.push({ focusMode:'single-shot' });
+        }
+        if (Array.isArray(caps.exposureMode) && caps.exposureMode.includes('continuous')){
+          advanced.push({ exposureMode:'continuous' });
+        }
+        if (Array.isArray(caps.whiteBalanceMode) && caps.whiteBalanceMode.includes('continuous')){
+          advanced.push({ whiteBalanceMode:'continuous' });
+        }
+        if (caps.sharpness && typeof caps.sharpness === 'object'){
+          const maxSharpness = Number.isFinite(caps.sharpness.max) ? caps.sharpness.max : null;
+          const minSharpness = Number.isFinite(caps.sharpness.min) ? caps.sharpness.min : null;
+          if (maxSharpness !== null){
+            advanced.push({ sharpness: maxSharpness });
+          } else if (minSharpness !== null){
+            advanced.push({ sharpness: minSharpness });
+          }
+        }
+
+        if (!advanced.length) return false;
+        await track.applyConstraints({ advanced });
+        return true;
+      }catch(err){
+        console.warn('Android rear camera tuning unavailable', err);
         return false;
       }
     }
@@ -5494,9 +5783,14 @@ function initASDPatch(){
       let sx=0, sy=0, sw=vw, sh=vh;
       if(srcRatio>dstRatio){ sw=vh*dstRatio; sx=(vw-sw)/2; }
       else{ sh=vw/dstRatio; sy=(vh-sh)/2; }
-      const ctx=canvas.getContext('2d',{alpha:false});
-      ctx.fillStyle='#dfe6ef'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      const ctx=canvas.getContext('2d',{alpha:false, desynchronized:true});
+      ctx.imageSmoothingEnabled = true;
+      try{ ctx.imageSmoothingQuality = 'high'; }catch(e){}
+      ctx.filter = isAndroidDevice() ? 'contrast(1.03) saturate(1.02)' : 'none';
+      ctx.fillStyle='#dfe6ef';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
       ctx.drawImage(video,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
+      ctx.filter = 'none';
     }
 
 
@@ -5513,33 +5807,58 @@ function initASDPatch(){
 
       setASDCaptureHoldMessage(true);
 
-      /* 카메라 전환 직후 손떨림·자동초점이 가라앉을 시간을 확보한다. */
-      await new Promise(resolve => setTimeout(resolve, 850));
+      const android = isAndroidDevice();
+
+      /* 갤럭시는 초점이 늦게 안정되는 경우가 있어 조금 더 기다린다. */
+      await new Promise(resolve => setTimeout(resolve, android ? 1200 : 850));
 
       const scene = document.getElementById('asdScene');
       const rect = scene ? scene.getBoundingClientRect() : { width: asdCameraVideo.videoWidth, height: asdCameraVideo.videoHeight };
       const outW = Math.max(2, Math.round(rect.width || asdCameraVideo.videoWidth));
       const outH = Math.max(2, Math.round(rect.height || asdCameraVideo.videoHeight));
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      const videoW = Math.max(2, asdCameraVideo.videoWidth || outW);
+      const videoH = Math.max(2, asdCameraVideo.videoHeight || outH);
+      const baseDpr = window.devicePixelRatio || 1;
+      const targetScale = android ? Math.min(baseDpr, 3) : Math.min(baseDpr, 2);
+
+      let targetW = Math.round(outW * targetScale);
+      let targetH = Math.round(outH * targetScale);
+
+      if(android){
+        targetW = Math.max(targetW, Math.min(videoW, Math.round(outW * 2.6)));
+        targetH = Math.max(targetH, Math.min(videoH, Math.round(outH * 2.6)));
+      }
+
+      const maxSide = android ? 1600 : 1280;
+      if (targetW > maxSide || targetH > maxSide){
+        const ratio = Math.min(maxSide / targetW, maxSide / targetH);
+        targetW = Math.max(2, Math.round(targetW * ratio));
+        targetH = Math.max(2, Math.round(targetH * ratio));
+      }
+
+      const sampleCount = android ? 12 : 8;
+      const sampleDelay = android ? 110 : 90;
 
       let bestCanvas=null, bestScore=-1;
       /* 연속 프레임 중 가장 선명한 프레임을 선택해 흔들림 캡처를 줄인다. */
-      for(let i=0;i<8;i++){
+      for(let i=0;i<sampleCount;i++){
         const c=document.createElement('canvas');
-        c.width=Math.round(outW*dpr); c.height=Math.round(outH*dpr);
+        c.width=targetW;
+        c.height=targetH;
         drawASDVideoCover(asdCameraVideo,c);
         const score=getASDFrameSharpness(c);
         if(score>bestScore){ bestScore=score; bestCanvas=c; }
         await new Promise(resolve => {
           if(typeof asdCameraVideo.requestVideoFrameCallback==='function') asdCameraVideo.requestVideoFrameCallback(()=>resolve());
-          else setTimeout(resolve,90);
+          else setTimeout(resolve, sampleDelay);
         });
       }
       if(!bestCanvas){ setASDCaptureHoldMessage(false); return false; }
 
-      const dataUrl=bestCanvas.toDataURL('image/jpeg',0.97);
+      const dataUrl = android ? bestCanvas.toDataURL('image/png') : bestCanvas.toDataURL('image/jpeg', 0.98);
       const loaded=await new Promise(resolve=>{
-        const timer=setTimeout(()=>resolve(false),2200);
+        const timer=setTimeout(()=>resolve(false),2400);
         asdCaptureImage.onload=()=>{clearTimeout(timer);resolve(true);};
         asdCaptureImage.onerror=()=>{clearTimeout(timer);resolve(false);};
         asdCaptureImage.src=dataUrl;
@@ -6317,6 +6636,59 @@ function goHomeMain(event){
   setTimeout(requestCameraFirst,500);
 
   window.addEventListener('beforeunload',()=>{running=false;});
+})();
+</script>
+
+
+<script id="asd-only-disable-unused-features">
+(function(){
+  const unusedIds = [
+    'missionBarWrap','thicknessBar','pvpBig','pvpOverlay','pvpSimOverlay',
+    'comfortOverlay','tutorialLayer','blueBackGlow','blueRayLayerBack',
+    'blueRayLayer','blueInfo','blueSimOverlay','mv','bottomBtns',
+    'globalToricDisclaimer'
+  ];
+
+  function stopUnusedVideo(id){
+    const video = document.getElementById(id);
+    if(!video) return;
+    try{
+      const stream = video.srcObject;
+      if(stream && stream.getTracks){
+        stream.getTracks().forEach(function(track){ track.stop(); });
+      }
+      video.pause();
+      video.srcObject = null;
+    }catch(e){}
+  }
+
+  function disableUnusedFeatures(){
+    unusedIds.forEach(function(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.setAttribute('aria-hidden','true');
+      try{ el.inert = true; }catch(e){}
+    });
+
+    [
+      'comfortCameraBase','comfortCameraTop','comfortCameraBottom',
+      'blueCameraVideo','blueCameraVideoOn'
+    ].forEach(stopUnusedVideo);
+
+    /* ASD must remain active and interactive. */
+    const asd = document.getElementById('asdOverlay');
+    if(asd){
+      asd.classList.add('show');
+      asd.setAttribute('aria-hidden','false');
+      try{ asd.inert = false; }catch(e){}
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', disableUnusedFeatures, {once:true});
+  }else{
+    disableUnusedFeatures();
+  }
 })();
 </script>
 
