@@ -1266,6 +1266,209 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 }
 </style>
 
+
+<style id="asd-final-user-fixes">
+/* 1) Hide unwanted lens graphics behind the live camera area and header */
+#asdCameraLensIntro,
+#asdLensImg{
+  display:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
+/* 2) Move the blink-prep guide slightly to the right */
+#asdBlinkPrepGuide{
+  top:18px !important;
+  left:44px !important;
+  right:164px !important;
+  align-items:center !important;
+  text-align:center !important;
+}
+#asdBlinkPrepGuide .blinkPrepText{
+  text-align:center !important;
+}
+@media(max-width:560px){
+  #asdBlinkPrepGuide{
+    top:18px !important;
+    left:48px !important;
+    right:116px !important;
+  }
+}
+
+/* 3,4) Remove the orange message from the mini camera and shrink the mini camera height */
+#asdMiniFace{
+  width:112px !important;
+  height:40px !important;
+  top:14px !important;
+  right:14px !important;
+  border-radius:14px !important;
+}
+#asdMiniFaceVideo,
+#asdMiniFaceCanvas{
+  object-position:center 26% !important;
+}
+#asdMiniFaceLabel{
+  display:none !important;
+}
+
+
+/* 7) Do not show the iOS/Safari native pause icon before start: use only the canvas visually */
+#asdOverlay.camera-on #asdCameraVideo,
+#asdOverlay.camera-on #asdCameraVideo.ready,
+#asdOverlay.camera-on #asdCameraVideo.canvas-covered,
+#asdOverlay.camera-on.lens-intro-playing #asdCameraVideo{
+  opacity:0 !important;
+  visibility:hidden !important;
+}
+#asdOverlay.camera-on #asdCameraDisplayCanvas,
+#asdOverlay.camera-on #asdCameraDisplayCanvas.camera-frame-ready,
+#asdOverlay.camera-on.lens-intro-playing #asdCameraDisplayCanvas{
+  opacity:1 !important;
+  visibility:visible !important;
+}
+#asdOverlay.camera-on.auto-captured #asdCameraDisplayCanvas,
+#asdOverlay.camera-on.auto-captured.lens-intro-playing #asdCameraDisplayCanvas{
+  opacity:0 !important;
+  visibility:hidden !important;
+}
+#asdCameraVideo::-webkit-media-controls,
+#asdCameraVideo::-webkit-media-controls-panel,
+#asdCameraVideo::-webkit-media-controls-play-button,
+#asdCameraVideo::-webkit-media-controls-start-playback-button,
+#asdCameraVideo::-webkit-media-controls-overlay-play-button,
+#asdCameraVideo::-webkit-media-controls-enclosure,
+#asdCameraVideo::-webkit-media-controls-overlay-enclosure,
+#asdMiniFaceVideo::-webkit-media-controls,
+#asdMiniFaceVideo::-webkit-media-controls-panel,
+#asdMiniFaceVideo::-webkit-media-controls-play-button,
+#asdMiniFaceVideo::-webkit-media-controls-start-playback-button,
+#asdMiniFaceVideo::-webkit-media-controls-overlay-play-button{
+  display:none !important;
+  -webkit-appearance:none !important;
+}
+</style>
+<script id="asd-final-user-fixes-script">
+document.addEventListener('DOMContentLoaded', function(){
+  var mainVideo = document.getElementById('asdCameraVideo');
+  var miniVideo = document.getElementById('asdMiniFaceVideo');
+  [mainVideo, miniVideo].forEach(function(v){
+    if(!v) return;
+    v.removeAttribute('controls');
+    v.controls = false;
+    v.muted = true;
+    v.autoplay = true;
+    v.playsInline = true;
+    v.setAttribute('playsinline','');
+    v.setAttribute('webkit-playsinline','');
+    v.setAttribute('disablepictureinpicture','');
+    v.setAttribute('disableremoteplayback','');
+    v.setAttribute('controlsList','nodownload noplaybackrate noremoteplayback nofullscreen');
+  });
+});
+</script>
+
+
+<style id="asd-full-white-area-fix">
+/* 사용자가 표시한 ASD 카드 전체 범위를 통째로 흰 바탕으로 고정 */
+#asdCard{
+  background:#ffffff !important;
+  border:1.5px solid #dbe5f1 !important;
+  border-radius:22px !important;
+  overflow:hidden !important;
+  box-shadow:0 10px 26px rgba(20,52,90,.08) !important;
+}
+#asdHeader,
+#asdControlBar,
+#asdHint,
+#asdCard > .toric-popup-disclaimer{
+  background:#ffffff !important;
+}
+#asdScene{
+  background:#ffffff !important;
+}
+#asdControlBar{
+  margin:0 auto !important;
+  padding:12px 14px 14px !important;
+}
+#asdHint{
+  margin:0 14px 14px !important;
+  padding:14px 14px 14px !important;
+  border-radius:14px !important;
+  border-top:0 !important;
+}
+#asdCard > .toric-popup-disclaimer{
+  margin:0 14px 14px !important;
+  padding:8px 4px 0 !important;
+  border-top:1px solid #e5edf6 !important;
+}
+@media (max-width:560px){
+  #asdCard{
+    border-radius:20px !important;
+  }
+  #asdHint{
+    margin:0 12px 12px !important;
+    padding:12px 12px 12px !important;
+  }
+  #asdCard > .toric-popup-disclaimer{
+    margin:0 12px 12px !important;
+  }
+}
+</style>
+
+
+<style id="asd-one-group-area-fix">
+/* ASD 전체를 하나의 흰 카드 영역으로 보이게 통일 */
+#asdCard{
+  background:#fff !important;
+  border:1.5px solid #dbe5f1 !important;
+  border-radius:24px !important;
+  overflow:hidden !important;
+  box-shadow:0 10px 26px rgba(20,52,90,.08) !important;
+  padding-bottom:14px !important;
+}
+#asdHeader,
+#asdControlBar,
+#asdHint,
+#asdCard > .toric-popup-disclaimer{
+  background:transparent !important;
+}
+#asdScene{
+  background:transparent !important;
+  margin:0 14px !important;
+}
+#asdControlBar{
+  margin:0 14px !important;
+  padding:12px 0 10px !important;
+}
+/* 하단 안내도 별도 박스처럼 보이지 않게 카드 안에 자연스럽게 연결 */
+#asdHint{
+  margin:0 14px !important;
+  padding:16px 0 0 !important;
+  border-radius:0 !important;
+  border-top:1px solid #e5edf6 !important;
+  box-shadow:none !important;
+}
+#asdInfoBadge{
+  margin-left:0 !important;
+}
+#asdCard > .toric-popup-disclaimer{
+  margin:0 14px !important;
+  padding:10px 0 0 !important;
+  border-top:none !important;
+}
+@media (max-width:560px){
+  #asdCard{
+    border-radius:22px !important;
+    padding-bottom:12px !important;
+  }
+  #asdScene{ margin:0 12px !important; }
+  #asdControlBar{ margin:0 12px !important; padding:10px 0 8px !important; }
+  #asdHint{ margin:0 12px !important; padding:14px 0 0 !important; }
+  #asdCard > .toric-popup-disclaimer{ margin:0 12px !important; padding:8px 0 0 !important; }
+}
+</style>
+
 </head><body><div id="missionASD" aria-hidden="true"></div><div aria-hidden="false" class="show camera-on auto-mode" id="asdOverlay">
 <div id="asdPageTopbar">아큐브<sup class="reg-mark">®</sup>  난시 시야 체험</div>
 <div id="asdPageWrap">
@@ -1334,7 +1537,7 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 <div aria-hidden="true" id="asdMiniFace">
 <video autoplay="" id="asdMiniFaceVideo" muted="" playsinline=""></video>
 <canvas id="asdMiniFaceCanvas"></canvas>
-<div id="asdMiniFaceLabel">눈을 깜박여<br>주세요</br></div>
+
 </div>
 <img alt="Eye background" id="asdEyeMV" onerror="this.onerror=null; this.src='a.gif';" src="a.png"/>
 <div aria-hidden="true" id="asdCameraGuide">
@@ -1581,7 +1784,7 @@ function initASDPatch(){
       if(Math.abs(asdAngleValue) === 0){
         setASDHintSuccess();
       } else if(isAutoPrompt){
-        asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">눈을 깜박여</span> 회전된 렌즈 축을 안정화 시켜보세요.</span><svg class="asdHintDiagram" viewBox="0 0 340 152" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><text class="diagramTop" x="84" y="16" text-anchor="middle">15°</text><text class="diagramTop" x="256" y="16" text-anchor="middle">2° 이하</text><line class="diagramFlow" x1="124" y1="63" x2="214" y2="63"></line><path class="diagramArrow" d="M214 63 L204 57 L204 69 Z"></path><g transform="translate(84 64)"><circle class="diagramCircle" cx="0" cy="0" r="38"></circle><g transform="rotate(15)"><line class="diagramAxis" x1="-30" y1="0" x2="30" y2="0"></line><rect class="diagramPill" x="-25" y="-13" width="12" height="26" rx="6"></rect><rect class="diagramPill" x="13" y="-13" width="12" height="26" rx="6"></rect><circle class="diagramDotBlur" cx="-36" cy="0" r="5"></circle><circle class="diagramDotBlur" cx="36" cy="0" r="5"></circle></g></g><g transform="translate(256 64)"><circle class="diagramCircle stable" cx="0" cy="0" r="38"></circle><g transform="rotate(2)"><line class="diagramAxis" x1="-30" y1="0" x2="30" y2="0"></line><rect class="diagramPill" x="-25" y="-13" width="12" height="26" rx="6"></rect><rect class="diagramPill" x="13" y="-13" width="12" height="26" rx="6"></rect><circle class="diagramDotStable" cx="-36" cy="0" r="5"></circle><circle class="diagramDotStable" cx="36" cy="0" r="5"></circle></g></g><text class="diagramBottom" x="84" y="122" text-anchor="middle"><tspan x="84" dy="0">축 회전 시</tspan><tspan x="84" dy="16">시야 흐림</tspan></text><text class="diagramBottom" x="256" y="122" text-anchor="middle"><tspan x="256" dy="0">축 안정 시</tspan><tspan class="diagramGreen" x="256" dy="16">시야 선명</tspan></text></svg></div>`;
+        asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">눈을 깜박여</span> 회전된 렌즈 축을 안정화 시켜보세요.</span><svg class="asdHintDiagram" viewBox="0 0 340 152" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><text class="diagramTop" x="84" y="16" text-anchor="middle">회전 발생</text><text class="diagramTop" x="256" y="16" text-anchor="middle">회전 없음</text><line class="diagramFlow" x1="124" y1="63" x2="214" y2="63"></line><path class="diagramArrow" d="M214 63 L204 57 L204 69 Z"></path><g transform="translate(84 64)"><circle class="diagramCircle" cx="0" cy="0" r="38"></circle><g transform="rotate(15)"><line class="diagramAxis" x1="-30" y1="0" x2="30" y2="0"></line><rect class="diagramPill" x="-25" y="-13" width="12" height="26" rx="6"></rect><rect class="diagramPill" x="13" y="-13" width="12" height="26" rx="6"></rect><circle class="diagramDotBlur" cx="-36" cy="0" r="5"></circle><circle class="diagramDotBlur" cx="36" cy="0" r="5"></circle></g></g><g transform="translate(256 64)"><circle class="diagramCircle stable" cx="0" cy="0" r="38"></circle><g transform="rotate(0)"><line class="diagramAxis" x1="-30" y1="0" x2="30" y2="0"></line><rect class="diagramPill" x="-25" y="-13" width="12" height="26" rx="6"></rect><rect class="diagramPill" x="13" y="-13" width="12" height="26" rx="6"></rect><circle class="diagramDotStable" cx="-36" cy="0" r="5"></circle><circle class="diagramDotStable" cx="36" cy="0" r="5"></circle></g></g><text class="diagramBottom" x="84" y="122" text-anchor="middle"><tspan x="84" dy="0">축 회전 시</tspan><tspan x="84" dy="16">시야 흐림</tspan></text><text class="diagramBottom" x="256" y="122" text-anchor="middle"><tspan x="256" dy="0">축 안정 시</tspan><tspan class="diagramGreen" x="256" dy="16">시야 선명</tspan></text></svg></div>`;
       } else {
         const guideLabel = getASDGuideLabel();
         asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">${guideLabel}</span>을 눌러 회전된 축을 안정화 시켜 보세요.</span></div>`;
