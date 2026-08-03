@@ -1164,7 +1164,7 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
   top:54% !important;
 }
 #asdMiniFace{
-  width:56px !important;
+  width:108px !important;
   height:39px !important;
   border-radius:14px !important;
 }
@@ -1254,6 +1254,26 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
   #asdHint .miniCapBottom{ font-size:12px; }
 }
 
+
+#asdOverlayInstruction .oiText{ margin-bottom:10px; }
+#asdOverlayInstruction .oiEye{ position:relative; width:150px; height:72px; margin:0 auto; }
+#asdOverlayInstruction .oiEye .arc{ position:absolute; top:0; width:34px; height:54px; border:6px solid #fff; border-top-color:transparent; border-left-color:transparent; border-radius:999px; opacity:.96; }
+#asdOverlayInstruction .oiEye .arc.left{ left:20px; transform:rotate(225deg); }
+#asdOverlayInstruction .oiEye .arc.right{ right:20px; transform:rotate(45deg); }
+#asdOverlayInstruction .oiEye .lid{ position:absolute; left:50%; top:24px; width:64px; height:22px; transform:translateX(-50%); border-bottom:6px solid #fff; border-radius:0 0 40px 40px; }
+#asdOverlayInstruction .oiEye .lash{ position:absolute; top:40px; width:6px; height:18px; background:#fff; border-radius:99px; }
+#asdOverlayInstruction .oiEye .l1{ left:calc(50% - 22px); transform:rotate(-18deg); }
+#asdOverlayInstruction .oiEye .l2{ left:calc(50% - 3px); }
+#asdOverlayInstruction .oiEye .l3{ left:calc(50% + 16px); transform:rotate(18deg); }
+#asdHint .hintGuideWrap{ margin-top:14px; }
+@media (max-width:560px){
+  #asdMiniFace{ width:104px !important; height:38px !important; }
+  #asdOverlayInstruction .oiEye{ width:132px; height:66px; }
+  #asdOverlayInstruction .oiEye .arc{ width:30px; height:48px; border-width:5px; }
+  #asdOverlayInstruction .oiEye .lid{ width:56px; top:22px; border-bottom-width:5px; }
+  #asdOverlayInstruction .oiEye .lash{ height:16px; }
+}
+
 </style></head><body><div id="missionASD" aria-hidden="true"></div><div aria-hidden="false" class="show camera-on auto-mode" id="asdOverlay">
 <div id="asdPageTopbar">아큐브<sup class="reg-mark">®</sup>  난시 시야 체험</div>
 <div id="asdPageWrap">
@@ -1306,7 +1326,7 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 <canvas id="asdMiniFaceCanvas"></canvas>
 
 </div>
-<div id="asdOverlayInstruction">눈을 깜박여<br>렌즈 축을 안정화하세요!</div>
+<div id="asdOverlayInstruction"><div class="oiText">눈을 깜박여<br>렌즈 축을 안정화하세요!</div><div class="oiEye" aria-hidden="true"><span class="arc left"></span><span class="arc right"></span><span class="lid"></span><span class="lash l1"></span><span class="lash l2"></span><span class="lash l3"></span></div></div>
 <img alt="Eye background" id="asdEyeMV" onerror="this.onerror=null; this.src='a.gif';" src="a.png"/>
 <div aria-hidden="true" id="asdCameraGuide">
 <div id="asdGuideLidTop"></div>
