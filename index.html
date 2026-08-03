@@ -1399,8 +1399,14 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
   position: relative !important;
   z-index: 21 !important;
 }
-#asdGuideCircle, #asdLensImg, #asdGuideAxis, #asdGuideDotLeft, #asdGuideDotRight{
+#asdGuideCircle, #asdGuideAxis, #asdGuideDotLeft, #asdGuideDotRight{
   z-index: 8 !important;
+}
+/* 카메라 ON에서는 모형 렌즈 이미지를 표시하지 않음 */
+#asdOverlay.camera-on #asdLensImg{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
 }
 </style>
 
