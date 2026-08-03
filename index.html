@@ -1825,8 +1825,9 @@ function initASDPatch(){
         asdMiniFace.style.width = '';
         asdMiniFace.style.height = '';
       } else if (isAndroidDevice()){
-        asdMiniFace.style.width = '124px';
-        asdMiniFace.style.height = '132px';
+        /* 안드로이드는 아이폰과 비슷한 크기로 축소 */
+        asdMiniFace.style.width = '112px';
+        asdMiniFace.style.height = '78px';
       } else {
         asdMiniFace.style.width = '148px';
         asdMiniFace.style.height = '104px';
