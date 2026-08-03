@@ -1299,6 +1299,43 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 }
 </style>
 
+
+<style id="eye-icon-smaller-only">
+/* 상단 중앙 흰색 눈 깜박임 아이콘만 추가 축소 */
+#asdOverlayInstruction .oiEye{
+  width: 66px !important;
+  height: 30px !important;
+  margin-top: 2px !important;
+}
+#asdOverlayInstruction .oiEye .arc{
+  width: 14px !important;
+  height: 20px !important;
+  border-width: 3px !important;
+}
+#asdOverlayInstruction .oiEye .arc.left{ left: 7px !important; }
+#asdOverlayInstruction .oiEye .arc.right{ right: 7px !important; }
+#asdOverlayInstruction .oiEye .lid{
+  width: 28px !important;
+  top: 10px !important;
+  height: 10px !important;
+  border-bottom-width: 3px !important;
+}
+#asdOverlayInstruction .oiEye .lash{
+  top: 16px !important;
+  width: 3px !important;
+  height: 7px !important;
+}
+#asdOverlayInstruction .oiEye .l1{ left: calc(50% - 10px) !important; }
+#asdOverlayInstruction .oiEye .l2{ left: calc(50% - 1.5px) !important; }
+#asdOverlayInstruction .oiEye .l3{ left: calc(50% + 7px) !important; }
+@media (max-width:560px){
+  #asdOverlayInstruction .oiEye{
+    width: 60px !important;
+    height: 27px !important;
+  }
+}
+</style>
+
 </head><body><div id="missionASD" aria-hidden="true"></div><div aria-hidden="false" class="show camera-on auto-mode" id="asdOverlay">
 <div id="asdPageTopbar">아큐브<sup class="reg-mark">®</sup>  난시 시야 체험</div>
 <div id="asdPageWrap">
