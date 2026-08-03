@@ -1248,7 +1248,58 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
   .asdGuideComparison .guideBottom{ font-size:19px; }
 }
 
-</style></head><body><div id="missionASD" aria-hidden="true"></div><div aria-hidden="false" class="show camera-on auto-mode" id="asdOverlay">
+</style>
+<style id="mini-camera-final-tweak">
+#asdMiniFace{
+  width: 92px !important;
+  height: 52px !important;
+  border-radius: 16px !important;
+}
+#asdMiniFace video,
+#asdMiniFace canvas,
+#asdMiniFace img,
+#asdMiniFaceVideo,
+#asdMiniFaceCanvas{
+  object-fit: cover !important;
+  object-position: center 44% !important;
+}
+#asdOverlayInstruction .oiEye{
+  width: 92px !important;
+  height: 40px !important;
+}
+#asdOverlayInstruction .oiEye .arc{
+  width: 20px !important;
+  height: 28px !important;
+  border-width: 4px !important;
+}
+#asdOverlayInstruction .oiEye .arc.left{ left: 10px !important; }
+#asdOverlayInstruction .oiEye .arc.right{ right: 10px !important; }
+#asdOverlayInstruction .oiEye .lid{
+  width: 38px !important;
+  top: 14px !important;
+  border-bottom-width: 4px !important;
+}
+#asdOverlayInstruction .oiEye .lash{
+  top: 22px !important;
+  width: 4px !important;
+  height: 9px !important;
+}
+#asdOverlayInstruction .oiEye .l1{ left: calc(50% - 14px) !important; }
+#asdOverlayInstruction .oiEye .l2{ left: calc(50% - 2px) !important; }
+#asdOverlayInstruction .oiEye .l3{ left: calc(50% + 10px) !important; }
+@media (max-width:560px){
+  #asdMiniFace{
+    width: 88px !important;
+    height: 50px !important;
+  }
+  #asdOverlayInstruction .oiEye{
+    width: 84px !important;
+    height: 36px !important;
+  }
+}
+</style>
+
+</head><body><div id="missionASD" aria-hidden="true"></div><div aria-hidden="false" class="show camera-on auto-mode" id="asdOverlay">
 <div id="asdPageTopbar">아큐브<sup class="reg-mark">®</sup>  난시 시야 체험</div>
 <div id="asdPageWrap">
 <section id="asdIntroCopy">
