@@ -1385,6 +1385,25 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 }
 </style>
 
+
+<style id="overlay-text-front-fix">
+#asdOverlayInstruction{
+  z-index: 20 !important;
+  position: absolute !important;
+}
+#asdOverlayInstruction .oiText{
+  position: relative !important;
+  z-index: 21 !important;
+}
+#asdOverlayInstruction .oiEye{
+  position: relative !important;
+  z-index: 21 !important;
+}
+#asdGuideCircle, #asdLensImg, #asdGuideAxis, #asdGuideDotLeft, #asdGuideDotRight{
+  z-index: 8 !important;
+}
+</style>
+
 </head><body><div id="missionASD" aria-hidden="true"></div><div aria-hidden="false" class="show camera-on auto-mode" id="asdOverlay">
 <div id="asdPageTopbar">아큐브<sup class="reg-mark">®</sup>  난시 시야 체험</div>
 <div id="asdPageWrap">
