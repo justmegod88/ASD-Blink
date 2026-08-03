@@ -96,7 +96,7 @@ html, body{
       filter: drop-shadow(0 2px 10px rgba(0,0,0,.18));
     }
 #asdLensImg{
-      position:absolute; left:50%; top:52%; width:80%;
+      position:absolute; left:50%; top:50%; width:82%;
       transform: translate(calc(-50% - 4px), calc(-50% + 10px)) rotate(20deg);
       opacity:.70; pointer-events:none; will-change: transform, opacity; mix-blend-mode:normal; filter:saturate(1.08) contrast(1.06);
     }
@@ -224,7 +224,7 @@ html, body{
       transform:scaleY(-1);
     }
 #asdGuideCircle{
-      position:absolute; left:50%; top:52%; height:80%; width:auto; aspect-ratio:1 / 1;
+      position:absolute; left:50%; top:50%; height:82%; width:auto; aspect-ratio:1 / 1;
       transform:translate(-50%,-50%) rotate(0deg);
       border-radius:999px;
       border:3px solid rgba(196,224,255,.92);
@@ -259,7 +259,7 @@ html, body{
 #asdGuideSideLeft{ left:22%; top:52%; transform:translate(-50%,-50%) rotate(0deg); }
 #asdGuideSideRight{ left:78%; top:52%; transform:translate(-50%,-50%) rotate(0deg); }
 #asdGuideAxis{
-      position:absolute; left:10%; right:10%; top:52%;
+      position:absolute; left:9%; right:9%; top:50%;
       border-top:4px dashed rgba(255,255,255,.96);
       transform:rotate(0deg); transform-origin:center;
       transition:transform .18s ease, border-color .18s ease, filter .18s ease, opacity .18s ease;
@@ -386,18 +386,14 @@ html, body{
       background:linear-gradient(180deg,#1266C4,#005EB8); color:#fff; box-shadow:0 8px 16px rgba(0,94,184,.18);
     }
 #asdMiniFace{
-      position:absolute; right:14px; top:14px; z-index:8; width:112px; height:78px; border-radius:20px; overflow:hidden;
+      position:absolute; right:14px; top:14px; z-index:8; width:132px; height:74px; border-radius:18px; overflow:hidden;
       background:#fff; border:2px solid rgba(255,255,255,.92); box-shadow:0 14px 26px rgba(0,0,0,.18); display:none;
     }
 #asdOverlay.camera-on.auto-running #asdMiniFace{ display:block; }
 #asdMiniFaceVideo, #asdMiniFaceCanvas{
-      position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 24%;
+      position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 48%;
     }
-#asdMiniFaceLabel{
-      position:absolute; left:6px; right:6px; top:6px; bottom:auto; background:linear-gradient(180deg,#FFB84A,#FFA61F);
-      color:#173C64; border-radius:12px; padding:6px 8px; text-align:center; font-size:11px; font-weight:900; line-height:1.08;
-      box-shadow:0 10px 16px rgba(255,176,32,.26);
-    }
+#asdMiniFaceLabel{ display:none !important; }
 #asdOverlay.camera-on #asdAngleBadge{
       left:18px; bottom:18px; top:auto; min-height:32px; padding:5px 9px; gap:6px;
       font-size:11px; box-shadow:0 7px 16px rgba(15,23,42,.11);
@@ -516,9 +512,9 @@ body{ margin:0 !important; position:relative !important; }
 #asdCameraLensIntro{
   position:absolute;
   left:50%;
-  top:52%;
-  width:80%;
-  height:80%;
+  top:50%;
+  width:82%;
+  height:82%;
   z-index:8;
   display:none;
   opacity:0;
@@ -1147,149 +1143,110 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
     margin-top:2px !important;
   }
 }
-/* custom tweaks */
-#asdGuideCircle{
-  height:84% !important;
-  top:51% !important;
-}
-#asdGuideAxis{
-  left:10% !important;
-  right:10% !important;
-  top:51% !important;
-}
-#asdGuideDotLeft{ left:10% !important; top:51% !important; }
-#asdGuideDotRight{ left:90% !important; top:51% !important; }
-#asdLensImg{
-  width:84% !important;
-  top:51% !important;
-}
-#asdMiniFace{
-  width:116px !important;
-  height:58px !important;
-  border-radius:16px !important;
-}
-#asdMiniFaceVideo, #asdMiniFaceCanvas{ object-position:center 42% !important; }
-#asdMiniFaceLabel{
-  display:none !important;
-}
 #asdOverlayInstruction{
   position:absolute;
   left:50%;
-  top:20px;
+  top:18px;
   transform:translateX(-50%);
-  z-index:8;
-  width:min(72%, 360px);
+  z-index:7;
+  width:min(68%, 300px);
+  display:none;
+  pointer-events:none;
   text-align:center;
   color:#fff;
-  font-size:17px;
-  line-height:1.25;
+  text-shadow:0 2px 9px rgba(0,0,0,.42);
+}
+#asdOverlay.camera-on.auto-running:not(.asd-stable) #asdOverlayInstruction{ display:block; }
+.asdOverlayInstructionText{
+  font-size:16px;
+  line-height:1.28;
   font-weight:900;
-  letter-spacing:-.03em;
-  text-shadow:0 2px 10px rgba(0,0,0,.32), 0 0 14px rgba(0,0,0,.18);
-  pointer-events:none;
-  display:none;
+  letter-spacing:-.035em;
 }
-#asdOverlay.camera-on.auto-running:not(.asd-stable) #asdOverlayInstruction{
+.asdBlinkGuideIcon{
+  width:112px;
+  height:66px;
   display:block;
+  margin:6px auto 0;
+  overflow:visible;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.24));
 }
-#asdHint .hintGuideWrap{
+.asdBlinkGuideIcon path{
+  fill:none;
+  stroke:#fff;
+  stroke-width:5.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.asdBlinkGuideIcon .blinkArrowHead{ stroke-width:5; }
+.asdBlinkGuideIcon .blinkLid{ stroke-width:5; }
+.asdBlinkGuideIcon .blinkLash{ stroke-width:4; }
+
+
+#asdHint{
+  flex-wrap:wrap;
+}
+#asdHint .hintText{
+  width:calc(100% - 52px);
+}
+.asdGuideComparison{
+  flex:0 0 100%;
   width:100%;
-  display:flex;
-  justify-content:center;
-  margin-top:10px;
-}
-#asdHint .hintGuideGraphic{
-  width:min(92%, 360px);
+  margin:12px auto 0;
+  padding:10px 10px 6px;
   border-radius:18px;
   background:#fff;
-  border:1px solid #dfe8f2;
-  padding:14px 12px 12px;
-  box-shadow:0 8px 20px rgba(15,23,42,.06);
+  border:1px solid rgba(203,213,225,.78);
+  box-shadow:0 8px 22px rgba(15,23,42,.055);
 }
-#asdHint .hintGuideCols{
-  display:grid;
-  grid-template-columns:1fr 34px 1fr;
-  gap:8px;
-  align-items:center;
+.asdGuideComparison svg{
+  width:100%;
+  height:auto;
+  display:block;
+  overflow:visible;
+  font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
-#asdHint .hintGuideCol{ text-align:center; }
-#asdHint .miniLens{
-  position:relative;
-  width:112px;
-  height:112px;
-  margin:0 auto 8px;
-  border-radius:999px;
-  border:3px solid #d8e4f5;
+.asdGuideComparison .guideTop,
+.asdGuideComparison .guideBottom{
+  font-size:21px;
+  font-weight:900;
+  fill:#25364A;
+  letter-spacing:-.04em;
 }
-#asdHint .miniLens.right{ border-color:#b7e3c3; }
-#asdHint .miniAxis{
-  position:absolute;
-  left:14%; right:14%; top:50%;
-  border-top:4px dashed #64748b;
-  transform-origin:center;
+.asdGuideComparison .guideGreen{ fill:#20A451; }
+.asdGuideComparison .guideCircle{
+  fill:none;
+  stroke-width:6;
 }
-#asdHint .miniLens.left .miniAxis{ transform:rotate(15deg); }
-#asdHint .miniLens.right .miniAxis{ transform:rotate(0deg); }
-#asdHint .miniSide{
-  position:absolute; width:16%; height:30%; border-radius:999px; top:50%; transform:translate(-50%,-50%);
-  background:linear-gradient(180deg, rgba(34,211,238,.26), rgba(56,189,248,.14)); box-shadow:inset 0 0 0 1px rgba(56,189,248,.14);
+.asdGuideComparison .guideCircleLeft{ stroke:#D4E1F3; }
+.asdGuideComparison .guideCircleRight{ stroke:#BDE7C8; }
+.asdGuideComparison .guideAxis{
+  stroke:#64748B;
+  stroke-width:8;
+  stroke-linecap:round;
+  stroke-dasharray:18 15;
 }
-#asdHint .miniLeftSide{ left:24%; }
-#asdHint .miniRightSide{ left:76%; }
-#asdHint .miniDot{ position:absolute; width:16px; height:16px; border-radius:999px; top:50%; transform:translate(-50%,-50%); }
-#asdHint .miniLens.left .miniDot{ background:#f59e0b; box-shadow:0 0 0 7px rgba(245,158,11,.10); }
-#asdHint .miniLens.right .miniDot{ background:#22c55e; box-shadow:0 0 0 7px rgba(34,197,94,.12); }
-#asdHint .miniDotL{ left:10%; }
-#asdHint .miniDotR{ left:90%; }
-#asdHint .miniCapTop{ font-size:14px; line-height:1.2; font-weight:900; color:#1e293b; margin-bottom:6px; }
-#asdHint .miniCapBottom{ font-size:13px; line-height:1.35; font-weight:900; color:#334155; }
-#asdHint .miniCapBottom .green{ color:#16a34a !important; }
-#asdHint .hintGuideArrow{ font-size:34px; line-height:1; color:#94a3b8; font-weight:900; text-align:center; }
-@media (max-width:560px){
-  #asdOverlayInstruction{ top:16px; width:72%; font-size:15px; }
-  #asdHint .hintGuideGraphic{ width:100%; padding:12px 10px 10px; }
-  #asdHint .hintGuideCols{ grid-template-columns:1fr 26px 1fr; gap:6px; }
-  #asdHint .miniLens{ width:96px; height:96px; }
-  #asdHint .hintGuideArrow{ font-size:26px; }
-  #asdHint .miniCapTop{ font-size:13px; }
-  #asdHint .miniCapBottom{ font-size:12px; }
+.asdGuideComparison .guideSide{
+  fill:#C6EEF1;
+  stroke:#8DD8DE;
+  stroke-width:2;
+  opacity:.82;
 }
-
-
-#asdOverlayInstruction .oiText{ margin-bottom:8px; }
-#asdOverlayInstruction .oiEye{ position:relative; width:118px; height:54px; margin:0 auto; }
-#asdOverlayInstruction .oiEye .arc{ position:absolute; top:5px; width:28px; height:40px; border:5px solid #fff; border-top-color:transparent; border-left-color:transparent; border-radius:999px; opacity:.96; }
-#asdOverlayInstruction .oiEye .arc.left{ left:12px; transform:rotate(225deg); }
-#asdOverlayInstruction .oiEye .arc.right{ right:12px; transform:rotate(45deg); }
-#asdOverlayInstruction .oiEye .lid{ position:absolute; left:50%; top:20px; width:50px; height:16px; transform:translateX(-50%); border-bottom:5px solid #fff; border-radius:0 0 36px 36px; }
-#asdOverlayInstruction .oiEye .lash{ position:absolute; top:31px; width:5px; height:12px; background:#fff; border-radius:99px; }
-#asdOverlayInstruction .oiEye .l1{ left:calc(50% - 18px); transform:rotate(-18deg); }
-#asdOverlayInstruction .oiEye .l2{ left:calc(50% - 2px); }
-#asdOverlayInstruction .oiEye .l3{ left:calc(50% + 14px); transform:rotate(18deg); }
-#asdHint .hintGuideWrap{ margin-top:14px; }
-@media (max-width:560px){
-  #asdMiniFace{ width:112px !important; height:56px !important; }
-  #asdOverlayInstruction .oiEye{ width:112px; height:50px; }
-  #asdOverlayInstruction .oiEye .arc{ width:26px; height:36px; border-width:4px; }
-  #asdOverlayInstruction .oiEye .lid{ width:46px; top:19px; border-bottom-width:4px; }
-  #asdOverlayInstruction .oiEye .lash{ height:10px; top:29px; }
+.asdGuideComparison .guideDotOrange{ fill:#F5A116; }
+.asdGuideComparison .guideDotGreen{ fill:#20BF63; }
+.asdGuideComparison .guideCenterArrow{
+  stroke:#B8C2D0;
+  stroke-width:6;
+  stroke-linecap:round;
 }
-@media (max-width:560px){
-  #asdMiniFace{ width:112px !important; height:56px !important; }
-  #asdOverlayInstruction .oiEye{ width:132px; height:66px; }
-  #asdOverlayInstruction .oiEye .arc{ width:30px; height:48px; border-width:5px; }
-  #asdOverlayInstruction .oiEye .lid{ width:56px; top:22px; border-bottom-width:5px; }
-  #asdOverlayInstruction .oiEye .lash{ height:16px; }
+@media(max-width:560px){
+  #asdMiniFace{ width:132px; height:74px; }
+  .asdOverlayInstructionText{ font-size:15px; }
+  .asdBlinkGuideIcon{ width:104px; height:60px; margin-top:4px; }
+  .asdGuideComparison{ padding:8px 7px 4px; }
+  .asdGuideComparison .guideTop,
+  .asdGuideComparison .guideBottom{ font-size:19px; }
 }
-
-
-#asdHint .hintGuideGraphic{ width:min(96%, 420px); border-radius:14px; background:#fff; }
-#asdHint .miniLens{ width:124px; height:124px; border-width:4px; }
-#asdHint .miniAxis{ border-top:5px dashed #64748b; }
-#asdHint .miniLens.left .miniAxis{ transform:rotate(14deg); }
-#asdHint .miniDot{ width:18px; height:18px; }
-#asdHint .hintGuideArrow{ color:#94a3b8; font-size:30px; }
-@media (max-width:560px){ #asdHint .miniLens{ width:104px; height:104px; } }
 
 </style></head><body><div id="missionASD" aria-hidden="true"></div><div aria-hidden="false" class="show camera-on auto-mode" id="asdOverlay">
 <div id="asdPageTopbar">아큐브<sup class="reg-mark">®</sup>  난시 시야 체험</div>
@@ -1343,7 +1300,17 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 <canvas id="asdMiniFaceCanvas"></canvas>
 
 </div>
-<div id="asdOverlayInstruction"><div class="oiText">눈을 깜박여<br>렌즈 축을 안정화하세요!</div><div class="oiEye" aria-hidden="true"><span class="arc left"></span><span class="arc right"></span><span class="lid"></span><span class="lash l1"></span><span class="lash l2"></span><span class="lash l3"></span></div></div>
+<div id="asdOverlayInstruction" aria-hidden="true">
+  <div class="asdOverlayInstructionText">눈을 깜박여<br>렌즈 축을 안정화하세요!</div>
+  <svg class="asdBlinkGuideIcon" viewBox="0 0 120 72" aria-hidden="true">
+    <path class="blinkArrow" d="M30 59 C18 45 18 26 31 13"/>
+    <path class="blinkArrowHead" d="M20 18 L31 13 L29 25"/>
+    <path class="blinkArrow" d="M90 13 C103 26 103 45 91 59"/>
+    <path class="blinkArrowHead" d="M91 47 L91 59 L101 53"/>
+    <path class="blinkLid" d="M42 36 Q60 51 78 36"/>
+    <path class="blinkLash" d="M48 42 L45 52 M59 45 L59 56 M70 42 L74 52"/>
+  </svg>
+</div>
 <img alt="Eye background" id="asdEyeMV" onerror="this.onerror=null; this.src='a.gif';" src="a.png"/>
 <div aria-hidden="true" id="asdCameraGuide">
 <div id="asdGuideLidTop"></div>
@@ -1383,7 +1350,41 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 <div id="asdInfoBadge">i</div>
 <div class="hintText">
 <span class="hintTitle">난시 렌즈 축 안정의 중요성</span>
-<span class="hintBody">아큐브<sup class="reg-mark">®</sup> ASD™는 <span class="green"><span style="color:#2563eb;font-weight:600;">자연스러운 눈 깜박임으로 렌즈 움직임을 안정화하여 선명한 시야</span></span>를 제공합니다.</span><div class="hintGuideWrap"><div class="hintGuideGraphic"><div class="hintGuideCols"><div class="hintGuideCol"><div class="miniCapTop">회전 발생</div><div class="miniLens left"><div class="miniAxis"></div><div class="miniSide miniLeftSide"></div><div class="miniSide miniRightSide"></div><div class="miniDot miniDotL"></div><div class="miniDot miniDotR"></div></div><div class="miniCapBottom">축 회전 시<br>시야 흐림</div></div><div class="hintGuideArrow">▶</div><div class="hintGuideCol"><div class="miniCapTop">회전 없음</div><div class="miniLens right"><div class="miniAxis"></div><div class="miniSide miniLeftSide"></div><div class="miniSide miniRightSide"></div><div class="miniDot miniDotL"></div><div class="miniDot miniDotR"></div></div><div class="miniCapBottom">축 안정 시<br><span class="green">시야 선명</span></div></div></div></div></div></div></div>
+<span class="hintBody">아큐브<sup class="reg-mark">®</sup> ASD™는 <span class="green"><span style="color:#2563eb;font-weight:600;">자연스러운 눈 깜박임으로 렌즈 움직임을 안정화하여 선명한 시야</span></span>를 제공합니다.</span>
+</div>
+<div class="asdGuideComparison" aria-label="축 회전과 축 안정 비교 안내">
+<svg viewBox="0 0 520 265" role="img" aria-hidden="true">
+  <defs>
+    <marker id="asdArrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+  <text x="130" y="30" text-anchor="middle" class="guideTop">회전 발생</text>
+  <text x="390" y="30" text-anchor="middle" class="guideTop">회전 없음</text>
+
+  <circle cx="130" cy="120" r="72" class="guideCircle guideCircleLeft"/>
+  <g transform="rotate(14 130 120)">
+    <line x1="58" y1="120" x2="202" y2="120" class="guideAxis"/>
+    <rect x="82" y="98" width="20" height="44" rx="10" class="guideSide"/>
+    <rect x="158" y="98" width="20" height="44" rx="10" class="guideSide"/>
+    <circle cx="58" cy="120" r="13" class="guideDotOrange"/>
+    <circle cx="202" cy="120" r="13" class="guideDotOrange"/>
+  </g>
+
+  <line x1="218" y1="120" x2="294" y2="120" class="guideCenterArrow" marker-end="url(#asdArrowHead)"/>
+
+  <circle cx="390" cy="120" r="72" class="guideCircle guideCircleRight"/>
+  <line x1="318" y1="120" x2="462" y2="120" class="guideAxis"/>
+  <rect x="342" y="98" width="20" height="44" rx="10" class="guideSide"/>
+  <rect x="418" y="98" width="20" height="44" rx="10" class="guideSide"/>
+  <circle cx="318" cy="120" r="13" class="guideDotGreen"/>
+  <circle cx="462" cy="120" r="13" class="guideDotGreen"/>
+
+  <text x="130" y="220" text-anchor="middle" class="guideBottom">축 회전 시</text>
+  <text x="130" y="246" text-anchor="middle" class="guideBottom">시야 흐림</text>
+  <text x="390" y="220" text-anchor="middle" class="guideBottom">축 안정 시</text>
+  <text x="390" y="246" text-anchor="middle" class="guideBottom guideGreen">시야 선명</text>
+</svg>
 </div>
 </div>
 <div class="toric-popup-disclaimer"><span class="disc-note">McIlraith R, Young G, Hunt C.Toric lens orientation and visual acuity in non-standard conditions. Contact Lens &amp; Anterior Eye, 2010
@@ -1392,8 +1393,42 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 </div>
 </div><script>
 window.asdAngle = typeof window.asdAngle === 'number' ? window.asdAngle : 15;
-function getASDHintGuideGraphic(){
-  return `<div class="hintGuideWrap"><div class="hintGuideGraphic"><div class="hintGuideCols"><div class="hintGuideCol"><div class="miniCapTop">회전 발생</div><div class="miniLens left"><div class="miniAxis"></div><div class="miniSide miniLeftSide"></div><div class="miniSide miniRightSide"></div><div class="miniDot miniDotL"></div><div class="miniDot miniDotR"></div></div><div class="miniCapBottom">축 회전 시<br>시야 흐림</div></div><div class="hintGuideArrow">▶</div><div class="hintGuideCol"><div class="miniCapTop">회전 없음</div><div class="miniLens right"><div class="miniAxis"></div><div class="miniSide miniLeftSide"></div><div class="miniSide miniRightSide"></div><div class="miniDot miniDotL"></div><div class="miniDot miniDotR"></div></div><div class="miniCapBottom">축 안정 시<br><span class="green">시야 선명</span></div></div></div></div></div>`;
+
+function getASDGuideComparisonHTML(){
+  return `<div class="asdGuideComparison" aria-label="축 회전과 축 안정 비교 안내">
+<svg viewBox="0 0 520 265" role="img" aria-hidden="true">
+  <defs>
+    <marker id="asdArrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+  <text x="130" y="30" text-anchor="middle" class="guideTop">회전 발생</text>
+  <text x="390" y="30" text-anchor="middle" class="guideTop">회전 없음</text>
+
+  <circle cx="130" cy="120" r="72" class="guideCircle guideCircleLeft"/>
+  <g transform="rotate(14 130 120)">
+    <line x1="58" y1="120" x2="202" y2="120" class="guideAxis"/>
+    <rect x="82" y="98" width="20" height="44" rx="10" class="guideSide"/>
+    <rect x="158" y="98" width="20" height="44" rx="10" class="guideSide"/>
+    <circle cx="58" cy="120" r="13" class="guideDotOrange"/>
+    <circle cx="202" cy="120" r="13" class="guideDotOrange"/>
+  </g>
+
+  <line x1="218" y1="120" x2="294" y2="120" class="guideCenterArrow" marker-end="url(#asdArrowHead)"/>
+
+  <circle cx="390" cy="120" r="72" class="guideCircle guideCircleRight"/>
+  <line x1="318" y1="120" x2="462" y2="120" class="guideAxis"/>
+  <rect x="342" y="98" width="20" height="44" rx="10" class="guideSide"/>
+  <rect x="418" y="98" width="20" height="44" rx="10" class="guideSide"/>
+  <circle cx="318" cy="120" r="13" class="guideDotGreen"/>
+  <circle cx="462" cy="120" r="13" class="guideDotGreen"/>
+
+  <text x="130" y="220" text-anchor="middle" class="guideBottom">축 회전 시</text>
+  <text x="130" y="246" text-anchor="middle" class="guideBottom">시야 흐림</text>
+  <text x="390" y="220" text-anchor="middle" class="guideBottom">축 안정 시</text>
+  <text x="390" y="246" text-anchor="middle" class="guideBottom guideGreen">시야 선명</text>
+</svg>
+</div>`;
 }
 function setASDHintSuccess(){
   const overlay=document.getElementById('asdOverlay');
@@ -1405,7 +1440,7 @@ function setASDHintSuccess(){
     window.setTimeout(function(){overlay.classList.remove('celebrate-stable');},1100);
   }
   if(hint){
-    hint.innerHTML='<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈 축 안정의 중요성</span><span class="hintBody">아큐브 ASD™는 <span class="green"><span style="color:#2563eb;font-weight:600;">자연스러운 눈 깜박임으로 렌즈 움직임을 안정화하여 선명한 시야</span></span>를 제공합니다.</span></div>';
+    hint.innerHTML='<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈 축 안정의 중요성</span><span class="hintBody">아큐브 ASD™는 <span class="green"><span style="color:#2563eb;font-weight:600;">자연스러운 눈 깜박임으로 렌즈 움직임을 안정화하여 선명한 시야</span></span>를 제공합니다.</span></div>'+getASDGuideComparisonHTML();
   }
 }
 
@@ -1592,10 +1627,10 @@ function initASDPatch(){
       if(Math.abs(asdAngleValue) === 0){
         setASDHintSuccess();
       } else if(isAutoPrompt){
-        asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">카메라 위치 확인 후 눈을 깜박여</span> 회전된 축을 안정화 시켜보세요.</span>${getASDHintGuideGraphic()}</div>`;
+        asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">카메라 위치 확인 후 눈을 깜박여</span> 회전된 축을 안정화 시켜보세요.</span></div>` + getASDGuideComparisonHTML();
       } else {
         const guideLabel = getASDGuideLabel();
-        asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">${guideLabel}</span>을 눌러 회전된 축을 안정화 시켜 보세요.</span>${getASDHintGuideGraphic()}</div>`;
+        asdHint.innerHTML = `<div id="asdInfoBadge">i</div><div class="hintText"><span class="hintTitle">난시 렌즈는 축이 회전되면 시야가 흐려집니다.<sup class="reg-mark">1</sup></span><span class="hintBody"><span class="blue">${guideLabel}</span>을 눌러 회전된 축을 안정화 시켜 보세요.</span></div>` + getASDGuideComparisonHTML();
       }
     }
     function updateModeUI(){
@@ -1684,9 +1719,9 @@ function initASDPatch(){
       if (asdGuideCircle) asdGuideCircle.style.transform = `translate(-50%,-50%) rotate(${(asdAngleValue * 0.18).toFixed(2)}deg)`;
 
       const centerX = 50;
-      const centerY = 52;
-      const outerRadius = 40;
-      const cyanRadius = 28;
+      const centerY = 50;
+      const outerRadius = 41;
+      const cyanRadius = 28.7;
       const rad = asdAngleValue * Math.PI / 180;
       const cos = Math.cos(rad);
       const sin = Math.sin(rad);
@@ -1970,16 +2005,12 @@ function initASDPatch(){
 
     function applyASDMiniFaceDeviceSizing(){
       if (!asdMiniFace) return;
-      if (isIPhoneDevice()){
-        asdMiniFace.style.width = '';
-        asdMiniFace.style.height = '';
-      } else if (isAndroidDevice()){
-        /* 안드로이드는 아이폰과 비슷한 크기로 축소 */
-        asdMiniFace.style.width = '116px';
-        asdMiniFace.style.height = '58px';
+      if (isIPhoneDevice() || isAndroidDevice()){
+        asdMiniFace.style.width = '132px';
+        asdMiniFace.style.height = '74px';
       } else {
         asdMiniFace.style.width = '148px';
-        asdMiniFace.style.height = '104px';
+        asdMiniFace.style.height = '92px';
       }
     }
 
@@ -2114,10 +2145,10 @@ function initASDPatch(){
         await asdMiniFaceVideo.play().catch(()=>{});
         await applyRealCameraZoom(stream, isAndroidDevice() ? 1.0 : 1.8);
         asdMiniFaceVideo.style.transform = 'scaleX(-1) scale(1)';
-        asdMiniFaceVideo.style.objectPosition = isAndroidDevice() ? 'center 28%' : 'center 24%';
+        asdMiniFaceVideo.style.objectPosition = isAndroidDevice() ? 'center 50%' : 'center 46%';
         if(asdMiniFaceCanvas){
           asdMiniFaceCanvas.style.transform = 'scaleX(-1) scale(1)';
-          asdMiniFaceCanvas.style.objectPosition = isAndroidDevice() ? 'center 28%' : 'center 24%';
+          asdMiniFaceCanvas.style.objectPosition = isAndroidDevice() ? 'center 50%' : 'center 46%';
         }
       }catch(e){
         console.warn('ASD mini camera unavailable', e);
