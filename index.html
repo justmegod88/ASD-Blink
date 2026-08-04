@@ -1060,7 +1060,7 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 #asdCaptureHoldMessage{display:none!important;visibility:hidden!important;opacity:0!important;}
 #asdRotateBtn{display:none!important;}
 #asdBlinkBtn{flex:1 1 100%!important;}
-#asdCameraDisplayCanvas{display:none!important;opacity:0!important;}
+#asdCameraDisplayCanvas{display:block!important;opacity:0!important;}
 #asdOverlay.camera-on #asdCameraVideo.ready{opacity:1!important;}
 #asdOverlay.camera-on #asdCameraVideo.canvas-covered{opacity:1!important;}
 #asdOverlay.camera-on.lens-intro-playing #asdCameraVideo{display:block!important;opacity:1!important;visibility:visible!important;}
@@ -1421,17 +1421,54 @@ html, body{ overflow:auto !important; min-height:100%; background:#eef5ff !impor
 </style>
 
 
-<style id="hide-center-pause-icon">
-/* Hide center pause/play overlay */
-.pause-overlay, .pauseOverlay, .centerPauseButton, .center-pause-button, .videoPauseBtn, .pause-btn, .center-play-icon,
-#pauseOverlay, #pauseButton, #centerPauseButton, #playPauseOverlay, #videoPauseOverlay, #centerOverlayIcon {
+<style id="asd-ios-native-video-overlay-final-fix">
+/*
+  iOS Safari/Teams may render a native pause glyph directly on a live <video>.
+  Keep the camera stream playing for capture/analysis, but never paint that
+  native video element in the visible scene. The user sees the copied canvas.
+*/
+#asdCameraDisplayCanvas{
+  display:block !important;
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  z-index:3 !important;
+  opacity:0 !important;
+  visibility:visible !important;
+  pointer-events:none !important;
+  border-radius:inherit !important;
+  background:#dfe6ef !important;
+  transition:opacity .08s linear !important;
+}
+#asdOverlay.camera-on:not(.auto-captured) #asdCameraDisplayCanvas.camera-frame-ready{
+  opacity:1 !important;
+}
+#asdOverlay.camera-on #asdCameraVideo{
+  /* Continue decoding, but fully clip the native iOS video surface/UI. */
+  display:block !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  -webkit-clip-path:inset(100%) !important;
+  clip-path:inset(100%) !important;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+}
+#asdOverlay.auto-captured #asdCameraDisplayCanvas,
+#asdOverlay.camera-on.auto-captured #asdCameraDisplayCanvas{
+  opacity:0 !important;
+}
+#asdCameraVideo::-webkit-media-controls,
+#asdCameraVideo::-webkit-media-controls-enclosure,
+#asdCameraVideo::-webkit-media-controls-panel,
+#asdCameraVideo::-webkit-media-controls-play-button,
+#asdCameraVideo::-webkit-media-controls-start-playback-button,
+#asdCameraVideo::-webkit-media-controls-overlay-play-button,
+#asdCameraVideo::-webkit-media-controls-overlay-enclosure{
   display:none !important;
   opacity:0 !important;
   visibility:hidden !important;
-  pointer-events:none !important;
-}
-button[aria-label*="pause" i], button[title*="pause" i], .material-icons.pause, .fa-pause, .icon-pause {
-  display:none !important;
+  -webkit-appearance:none !important;
 }
 </style>
 
@@ -3065,53 +3102,6 @@ function initASDPatch(){
     initASDPatch();
   }
 })();
-</script><script id="asd-live-canvas-fix">
-(function(){
-  const video=document.getElementById('asdCameraVideo');
-  const canvas=document.getElementById('asdCameraDisplayCanvas');
-  const overlay=document.getElementById('asdOverlay');
-  if(!video||!canvas||!overlay) return;
-  const ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});
-  let firstFrame=false;
-  function drawCover(){
-    const cw=Math.max(2,Math.round(canvas.clientWidth*(window.devicePixelRatio||1)));
-    const ch=Math.max(2,Math.round(canvas.clientHeight*(window.devicePixelRatio||1)));
-    if(canvas.width!==cw||canvas.height!==ch){ canvas.width=cw; canvas.height=ch; }
-    const vw=video.videoWidth, vh=video.videoHeight;
-    if(!vw||!vh||video.readyState<2) return false;
-    const sr=vw/vh, dr=cw/ch; let sx=0,sy=0,sw=vw,sh=vh;
-    if(sr>dr){ sw=vh*dr; sx=(vw-sw)/2; } else { sh=vw/dr; sy=(vh-sh)/2; }
-    ctx.save();
-    // Front camera preview follows the same mirroring as the original video.
-    const mirrored=(video.style.transform||'').includes('scaleX(-1)');
-    if(mirrored){ ctx.translate(cw,0); ctx.scale(-1,1); }
-    ctx.drawImage(video,sx,sy,sw,sh,0,0,cw,ch);
-    ctx.restore();
-    return true;
-  }
-  function frame(){
-    const cameraOn=overlay.classList.contains('camera-on') && video.srcObject;
-    if(cameraOn && drawCover()){
-      if(!firstFrame){
-        firstFrame=true;
-        canvas.classList.add('camera-frame-ready');
-        video.classList.add('canvas-covered');
-      }
-    }else{
-      firstFrame=false;
-      canvas.classList.remove('camera-frame-ready');
-      video.classList.remove('canvas-covered');
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-    }
-    requestAnimationFrame(frame);
-  }
-  video.controls=false;
-  video.removeAttribute('controls');
-  video.setAttribute('playsinline','');
-  video.setAttribute('webkit-playsinline','');
-  video.muted=true; video.defaultMuted=true;
-  requestAnimationFrame(frame);
-})();
 </script><script id="asd-212-remove-native-overlay">
 (function(){
   function clean(){
@@ -3126,95 +3116,114 @@ function initASDPatch(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',clean,{once:true}); else clean();
 })();
-</script><script id="asd-final-video-restore">
+</script>
+<script id="asd-ios-native-video-overlay-final-script">
 (function(){
-  function restore(){
-    const v=document.getElementById('asdCameraVideo');
-    const c=document.getElementById('asdCameraDisplayCanvas');
-    if(c){c.style.display='none';c.classList.remove('camera-frame-ready');}
-    if(v){v.classList.remove('canvas-covered');}
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',restore); else restore();
-  setTimeout(restore,300); setTimeout(restore,1000);
-})();
-</script><script id="asd-214-camera-first-canvas-script">
-(function(){
-  const video=document.getElementById('asdCameraVideo');
-  const canvas=document.getElementById('asdCameraDisplayCanvas');
-  const overlay=document.getElementById('asdOverlay');
-  const cameraBtn=document.getElementById('asdCameraBtn');
-  if(!video||!canvas||!overlay) return;
+  const video = document.getElementById('asdCameraVideo');
+  const canvas = document.getElementById('asdCameraDisplayCanvas');
+  const overlay = document.getElementById('asdOverlay');
+  if(!video || !canvas || !overlay) return;
 
-  const ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});
-  let running=true;
-
-  function syncFilter(){
-    const sourceFilter=(video.style && video.style.filter) ? video.style.filter : '';
-    canvas.style.filter=sourceFilter;
-  }
-
-  function draw(){
-    if(!running) return;
-    const active=overlay.classList.contains('camera-on') && !overlay.classList.contains('auto-captured') && video.srcObject;
-    if(active && video.readyState>=2 && video.videoWidth && video.videoHeight){
-      const rect=canvas.getBoundingClientRect();
-      const dpr=Math.min(window.devicePixelRatio||1,2);
-      const cw=Math.max(2,Math.round(rect.width*dpr));
-      const ch=Math.max(2,Math.round(rect.height*dpr));
-      if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch;}
-      const vw=video.videoWidth, vh=video.videoHeight;
-      const sr=vw/vh, dr=cw/ch;
-      let sx=0,sy=0,sw=vw,sh=vh;
-      if(sr>dr){sw=vh*dr;sx=(vw-sw)/2;}else{sh=vw/dr;sy=(vh-sh)/2;}
-      ctx.save();
-      const mirrored=(video.style.transform||'').includes('scaleX(-1)');
-      if(mirrored){ctx.translate(cw,0);ctx.scale(-1,1);}
-      ctx.drawImage(video,sx,sy,sw,sh,0,0,cw,ch);
-      ctx.restore();
-      syncFilter();
-      canvas.classList.add('camera-frame-ready');
-    }else{
-      canvas.classList.remove('camera-frame-ready');
-    }
-    requestAnimationFrame(draw);
-  }
+  const ctx = canvas.getContext('2d', { alpha:false, desynchronized:true });
+  let rafId = 0;
+  let stopped = false;
 
   function hardenVideo(){
-    video.controls=false;
-    video.removeAttribute('controls');
-    video.setAttribute('playsinline','');
-    video.setAttribute('webkit-playsinline','');
-    video.setAttribute('muted','');
-    video.muted=true;
-    video.defaultMuted=true;
-    video.disablePictureInPicture=true;
-    video.setAttribute('disableremoteplayback','');
-    video.style.pointerEvents='none';
+    try{
+      video.controls = false;
+      video.removeAttribute('controls');
+      video.setAttribute('autoplay','');
+      video.setAttribute('muted','');
+      video.setAttribute('playsinline','');
+      video.setAttribute('webkit-playsinline','');
+      video.setAttribute('controlslist','nodownload noplaybackrate nofullscreen noremoteplayback');
+      video.setAttribute('disableremoteplayback','');
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.disablePictureInPicture = true;
+      video.oncontextmenu = function(e){ e.preventDefault(); return false; };
+    }catch(e){}
+  }
+
+  function clearCanvas(){
+    canvas.classList.remove('camera-frame-ready');
+    if(canvas.width && canvas.height) ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+
+  function drawCover(){
+    const vw = video.videoWidth || 0;
+    const vh = video.videoHeight || 0;
+    if(video.readyState < 2 || !vw || !vh) return false;
+
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const cw = Math.max(2, Math.round(rect.width * dpr));
+    const ch = Math.max(2, Math.round(rect.height * dpr));
+    if(canvas.width !== cw || canvas.height !== ch){
+      canvas.width = cw;
+      canvas.height = ch;
+    }
+
+    const srcRatio = vw / vh;
+    const dstRatio = cw / ch;
+    let sx = 0, sy = 0, sw = vw, sh = vh;
+    if(srcRatio > dstRatio){
+      sw = vh * dstRatio;
+      sx = (vw - sw) / 2;
+    }else{
+      sh = vw / dstRatio;
+      sy = (vh - sh) / 2;
+    }
+
+    ctx.save();
+    ctx.fillStyle = '#dfe6ef';
+    ctx.fillRect(0,0,cw,ch);
+    const mirrored = (video.style.transform || '').includes('scaleX(-1)');
+    if(mirrored){
+      ctx.translate(cw,0);
+      ctx.scale(-1,1);
+    }
+    ctx.imageSmoothingEnabled = true;
+    try{ ctx.imageSmoothingQuality = 'high'; }catch(e){}
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+    ctx.restore();
+
+    canvas.style.filter = (video.style && video.style.filter) ? video.style.filter : '';
+    canvas.classList.add('camera-frame-ready');
+    return true;
+  }
+
+  function frame(){
+    if(stopped) return;
+    hardenVideo();
+    const shouldDraw = overlay.classList.contains('camera-on') &&
+      !overlay.classList.contains('auto-captured') &&
+      !!video.srcObject;
+
+    if(shouldDraw){
+      if(!drawCover()) clearCanvas();
+    }else{
+      clearCanvas();
+    }
+    rafId = requestAnimationFrame(frame);
   }
 
   hardenVideo();
-  video.addEventListener('loadedmetadata',hardenVideo);
-  video.addEventListener('play',hardenVideo);
-  new MutationObserver(syncFilter).observe(video,{attributes:true,attributeFilter:['style','class']});
-  requestAnimationFrame(draw);
+  ['loadedmetadata','loadeddata','canplay','play','playing'].forEach(function(name){
+    video.addEventListener(name, hardenVideo, { passive:true });
+  });
+  new MutationObserver(hardenVideo).observe(video, {
+    attributes:true,
+    attributeFilter:['controls','class','style','src','srcObject']
+  });
+  rafId = requestAnimationFrame(frame);
 
-  /* Show the camera-first state immediately. Permission still follows the browser's own prompt. */
-  overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
-  overlay.classList.remove('asd-experience-started','lens-intro-playing','intro-ring-in','auto-captured');
-
-  function requestCameraFirst(){
-    if(!overlay.classList.contains('camera-on') && cameraBtn){
-      try{cameraBtn.click();}catch(e){}
-    }
-  }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(requestCameraFirst,60),{once:true});
-  }else{
-    setTimeout(requestCameraFirst,60);
-  }
-  setTimeout(requestCameraFirst,500);
-
-  window.addEventListener('beforeunload',()=>{running=false;});
+  window.addEventListener('beforeunload', function(){
+    stopped = true;
+    if(rafId) cancelAnimationFrame(rafId);
+  }, { once:true });
 })();
-</script></body></html>
+</script>
+
+</body></html>
